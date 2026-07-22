@@ -1,10 +1,24 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { Download, Send, ExternalLink, UserPlus } from "lucide-react";
 import { membersData } from "@/data";
-import { topicBySlug, categoryBySlug, articlesByCategory } from "@/newsData";
-import { ArticleCard, PortalSidebar } from "@/compenents/news/PortalBlocks";
+import {
+  topicBySlug,
+  categoryBySlug,
+  queryArticles,
+  availableFlags,
+  isArticleSort,
+  isArticleFlag,
+  DEFAULT_SORT,
+} from "@/newsData";
+import {
+  ArticleCard,
+  PortalSidebar,
+  ArticleListControls,
+  ArticlePagination,
+  type ArticleListSearch,
+} from "@/compenents/news/PortalBlocks";
 
 /**
  * Category page. Most categories are a plain article list; a few carry the
@@ -15,6 +29,18 @@ import { ArticleCard, PortalSidebar } from "@/compenents/news/PortalBlocks";
  *  - nối vòng tay lớn: direct partnership-request form
  */
 export const Route = createFileRoute("/news/$topic/$category")({
+  /** List state lives in the URL. Unknown values are dropped (not errors)
+   *  and defaults are normalised to `undefined` so canonical URLs stay
+   *  clean: /news/a/b?sort=moi-nhat collapses to /news/a/b. */
+  validateSearch: (search: Record<string, unknown>): ArticleListSearch => {
+    const out: ArticleListSearch = {};
+    if (isArticleSort(search.sort) && search.sort !== DEFAULT_SORT)
+      out.sort = search.sort;
+    if (isArticleFlag(search.flag)) out.flag = search.flag;
+    const page = Number(search.page);
+    if (Number.isInteger(page) && page > 1) out.page = page;
+    return out;
+  },
   loader: ({ params }) => {
     const topic = topicBySlug(params.topic);
     const category = categoryBySlug(params.topic, params.category);
@@ -182,7 +208,26 @@ function JoinPortalCta() {
 
 function CategoryPage() {
   const { topic, category } = Route.useLoaderData();
-  const articles = articlesByCategory(topic.slug, category.slug);
+  const search = Route.useSearch();
+
+  // Pure filter -> sort -> paginate over the in-memory dataset; memoised so
+  // re-renders (forms, toasts) don't re-sort. With a backend this becomes a
+  // loader/query fetch keyed on the same params.
+  const result = useMemo(
+    () =>
+      queryArticles({
+        topic: topic.slug,
+        category: category.slug,
+        ...search,
+      }),
+    [topic.slug, category.slug, search],
+  );
+  const flags = useMemo(
+    () => availableFlags(topic.slug, category.slug),
+    [topic.slug, category.slug],
+  );
+  // Distinguish "category is empty" from "the active filter matches nothing".
+  const categoryHasArticles = result.total > 0 || search.flag !== undefined;
 
   return (
     <div className="grid lg:grid-cols-12 gap-x-10 gap-y-14">
@@ -214,25 +259,58 @@ function CategoryPage() {
         {category.slug === "noi-vong-tay-lon" && <PartnershipForm />}
         {category.slug === "cong-dong" && <CommunityGrid />}
 
-        {articles.length > 0 ? (
-          <div className="space-y-5">
-            {articles.map((a) => (
-              <div key={a.id} className="relative">
-                <ArticleCard article={a} />
-                {/* Policy library: download directly from the list. */}
-                {a.pdfUrl && (
-                  <a
-                    href={a.pdfUrl}
-                    download
-                    className="absolute bottom-3 right-4 flex items-center gap-1 text-[10px] font-bold uppercase text-accent hover:text-cyan-300 transition-colors"
-                  >
-                    <Download className="w-3 h-3" />
-                    Tải PDF
-                  </a>
-                )}
+        {categoryHasArticles ? (
+          <>
+            <ArticleListControls
+              topic={topic.slug}
+              category={category.slug}
+              search={search}
+              total={result.total}
+              flags={flags}
+            />
+
+            {result.total > 0 ? (
+              <div className="space-y-5">
+                {result.items.map((a) => (
+                  <div key={a.id} className="relative">
+                    <ArticleCard article={a} />
+                    {/* Policy library: download directly from the list. */}
+                    {a.pdfUrl && (
+                      <a
+                        href={a.pdfUrl}
+                        download
+                        className="absolute bottom-3 right-4 flex items-center gap-1 text-[10px] font-bold uppercase text-accent hover:text-cyan-300 transition-colors"
+                      >
+                        <Download className="w-3 h-3" />
+                        Tải PDF
+                      </a>
+                    )}
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
+            ) : (
+              /* Filter matched nothing — offer the way back out. */
+              <div className="rounded-xl border border-dashed border-white/10 p-8 text-center text-xs text-white/45">
+                Không có bài viết nào khớp bộ lọc.{" "}
+                <Link
+                  to="/news/$topic/$category"
+                  params={{ topic: topic.slug, category: category.slug }}
+                  search={{ ...search, flag: undefined, page: undefined }}
+                  className="text-accent hover:text-cyan-300 font-bold transition-colors"
+                >
+                  Bỏ lọc
+                </Link>
+              </div>
+            )}
+
+            <ArticlePagination
+              topic={topic.slug}
+              category={category.slug}
+              search={search}
+              page={result.page}
+              pageCount={result.pageCount}
+            />
+          </>
         ) : (
           <div className="rounded-xl border border-dashed border-white/10 p-8 text-center text-xs text-white/45">
             Chuyên mục đang chờ bài viết đầu tiên từ Ban Biên tập.

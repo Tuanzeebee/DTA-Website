@@ -171,6 +171,120 @@ export const portalArticles: PortalArticle[] = [
       "Tải văn bản đầy đủ ở nút bên dưới.",
     ],
   },
+  /* <!-- mock --> cs-03..cs-10: extra sample rows so the policy library
+     exceeds ARTICLES_PAGE_SIZE and the pagination/filter UI is visible.
+     A few intentionally have no pdfUrl so the "Có văn bản PDF" chip
+     visibly narrows the list. */
+  {
+    id: "cs-03",
+    title: "Thông tư hướng dẫn định danh điện tử cho doanh nghiệp có hiệu lực",
+    summary:
+      "Doanh nghiệp dùng tài khoản định danh mức 2 để thực hiện toàn bộ thủ tục hành chính trực tuyến.",
+    topic: "su-kien",
+    category: "tai-nguyen-chinh-sach",
+    date: "09/07/2026",
+    image: "https://picsum.photos/seed/dta-policy-3/800/450",
+    tags: ["Chính sách", "Định danh điện tử"],
+    views: 720,
+    pdfUrl: "/documents/thong-tu-dinh-danh-dien-tu.pdf",
+    body: ["Toàn văn thông tư tải ở nút bên dưới."],
+  },
+  {
+    id: "cs-04",
+    title: "Quy định mới về bảo vệ dữ liệu cá nhân: lộ trình tuân thủ 12 tháng",
+    summary:
+      "Các doanh nghiệp xử lý dữ liệu khách hàng cần hoàn tất đánh giá tác động trước quý II năm sau.",
+    topic: "su-kien",
+    category: "tai-nguyen-chinh-sach",
+    date: "05/07/2026",
+    image: "https://picsum.photos/seed/dta-policy-4/800/450",
+    tags: ["Dữ liệu cá nhân", "Tuân thủ"],
+    views: 1890,
+    pdfUrl: "/documents/quy-dinh-bao-ve-du-lieu.pdf",
+    body: ["Hiệp hội sẽ tổ chức workshop hướng dẫn tuân thủ cho hội viên."],
+  },
+  {
+    id: "cs-05",
+    title: "Đà Nẵng miễn giảm tiền thuê hạ tầng CNTT cho startup năm đầu",
+    summary:
+      "Chính sách ưu đãi mới áp dụng cho doanh nghiệp công nghệ thành lập dưới 3 năm tại các khu CNTT tập trung.",
+    topic: "su-kien",
+    category: "tai-nguyen-chinh-sach",
+    date: "02/07/2026",
+    image: "https://picsum.photos/seed/dta-policy-5/800/450",
+    tags: ["Ưu đãi", "Startup"],
+    views: 2440,
+    body: ["Chi tiết điều kiện áp dụng liên hệ Văn phòng hiệp hội."],
+  },
+  {
+    id: "cs-06",
+    title: "Khung tiêu chí đánh giá mức độ chuyển đổi số doanh nghiệp 2026",
+    summary:
+      "Bộ tiêu chí gồm 6 trụ cột giúp doanh nghiệp tự chấm điểm mức độ trưởng thành số.",
+    topic: "su-kien",
+    category: "tai-nguyen-chinh-sach",
+    date: "28/06/2026",
+    image: "https://picsum.photos/seed/dta-policy-6/800/450",
+    tags: ["Chuyển đổi số", "Tiêu chí"],
+    views: 1350,
+    pdfUrl: "/documents/khung-tieu-chi-cds-2026.pdf",
+    body: ["Tải bộ tiêu chí đầy đủ ở nút bên dưới."],
+  },
+  {
+    id: "cs-07",
+    title: "Hướng dẫn đăng ký sandbox fintech cho doanh nghiệp công nghệ",
+    summary:
+      "Cơ chế thử nghiệm có kiểm soát mở đăng ký đợt hai với 4 nhóm giải pháp tài chính số.",
+    topic: "su-kien",
+    category: "tai-nguyen-chinh-sach",
+    date: "24/06/2026",
+    image: "https://picsum.photos/seed/dta-policy-7/800/450",
+    tags: ["Fintech", "Sandbox"],
+    views: 560,
+    pdfUrl: "/documents/huong-dan-sandbox-fintech.pdf",
+    body: ["Hồ sơ đăng ký nộp trực tuyến trước ngày 15/8."],
+  },
+  {
+    id: "cs-08",
+    title: "Chính sách thuế mới cho hoạt động xuất khẩu phần mềm từ 2027",
+    summary:
+      "Tổng hợp các thay đổi về ưu đãi thuế thu nhập doanh nghiệp đối với dịch vụ phần mềm xuất khẩu.",
+    topic: "su-kien",
+    category: "tai-nguyen-chinh-sach",
+    date: "20/06/2026",
+    image: "https://picsum.photos/seed/dta-policy-8/800/450",
+    tags: ["Thuế", "Xuất khẩu phần mềm"],
+    views: 3010,
+    body: ["Hiệp hội đang tổng hợp ý kiến hội viên để kiến nghị điều chỉnh."],
+  },
+  {
+    id: "cs-09",
+    title: "Quy chuẩn kỹ thuật quốc gia về an toàn thông tin mạng cập nhật",
+    summary:
+      "Phiên bản mới bổ sung yêu cầu đối với hệ thống dùng AI và dịch vụ điện toán đám mây.",
+    topic: "su-kien",
+    category: "tai-nguyen-chinh-sach",
+    date: "15/06/2026",
+    image: "https://picsum.photos/seed/dta-policy-9/800/450",
+    tags: ["An toàn thông tin", "Quy chuẩn"],
+    views: 830,
+    pdfUrl: "/documents/quy-chuan-attt-2026.pdf",
+    body: ["Toàn văn quy chuẩn tải ở nút bên dưới."],
+  },
+  {
+    id: "cs-10",
+    title: "Đề án phát triển kinh tế số Đà Nẵng: mục tiêu 30% GRDP đến 2030",
+    summary:
+      "Thành phố công bố lộ trình ba giai đoạn với 25 nhiệm vụ trọng tâm về kinh tế số.",
+    topic: "su-kien",
+    category: "tai-nguyen-chinh-sach",
+    date: "10/06/2026",
+    image: "https://picsum.photos/seed/dta-policy-10/800/450",
+    tags: ["Kinh tế số", "Đề án"],
+    views: 1670,
+    pdfUrl: "/documents/de-an-kinh-te-so-danang.pdf",
+    body: ["Tải toàn văn đề án ở nút bên dưới."],
+  },
   {
     id: "nganh-01",
     title:
@@ -264,6 +378,78 @@ export const portalArticles: PortalArticle[] = [
     image: "https://picsum.photos/seed/dta-td-2/800/450",
     tags: ["Tuyển dụng", "Tổng hợp"],
     views: 1870,
+    body: ["Danh sách chi tiết cập nhật hằng tuần từ các hội viên."],
+  },
+  /* <!-- mock --> td-03..td-07: extra recruitment rows — pushes the category
+     past one page AND demonstrates intern pinning (td-05 is an intern post
+     with an old date: it still sits above every non-intern row). */
+  {
+    id: "td-03",
+    title: "Hội viên Enouvo tuyển 12 lập trình viên React Native",
+    summary:
+      "Yêu cầu 2 năm kinh nghiệm, làm việc tại văn phòng Đà Nẵng hoặc hybrid.",
+    topic: "digi-tech",
+    category: "tuyen-dung",
+    date: "14/07/2026",
+    image: "https://picsum.photos/seed/dta-td-3/800/450",
+    tags: ["Tuyển dụng", "Mobile"],
+    views: 940,
+    memberUrl: "https://example-member.vn/tuyen-dung",
+    body: ["Ứng viên nộp hồ sơ theo liên kết của doanh nghiệp."],
+  },
+  {
+    id: "td-04",
+    title: "Tuyển kỹ sư kiểm thử tự động cho dự án tài chính Nhật Bản",
+    summary:
+      "Hội viên BAP cần 8 QA engineer biết tiếng Nhật N3 trở lên, đãi ngộ cạnh tranh.",
+    topic: "digi-tech",
+    category: "tuyen-dung",
+    date: "12/07/2026",
+    image: "https://picsum.photos/seed/dta-td-4/800/450",
+    tags: ["Tuyển dụng", "QA"],
+    views: 720,
+    memberUrl: "https://example-member.vn/tuyen-dung",
+    body: ["Ứng viên nộp hồ sơ theo liên kết của doanh nghiệp."],
+  },
+  {
+    id: "td-05",
+    title: "[Thực tập sinh] Chương trình thực tập thiết kế vi mạch khóa 2",
+    summary:
+      "Hội viên Acronics nhận 15 sinh viên năm cuối ngành điện tử — có phụ cấp và mentor 1:1.",
+    topic: "digi-tech",
+    category: "tuyen-dung",
+    date: "01/07/2026",
+    image: "https://picsum.photos/seed/dta-td-5/800/450",
+    tags: ["Thực tập sinh", "Vi mạch"],
+    views: 1150,
+    isIntern: true,
+    memberUrl: "https://example-member.vn/tuyen-dung",
+    body: ["Tin tuyển dụng do hội viên cung cấp."],
+  },
+  {
+    id: "td-06",
+    title: "Viettel Đà Nẵng tuyển 10 kỹ sư vận hành Data Center",
+    summary:
+      "Ưu tiên ứng viên có chứng chỉ CCNA/CCNP, làm việc theo ca tại trạm Hòa Cầm.",
+    topic: "digi-tech",
+    category: "tuyen-dung",
+    date: "28/06/2026",
+    image: "https://picsum.photos/seed/dta-td-6/800/450",
+    tags: ["Tuyển dụng", "Hạ tầng"],
+    views: 530,
+    body: ["Danh sách vị trí chi tiết cập nhật tại Văn phòng số."],
+  },
+  {
+    id: "td-07",
+    title: "Tổng hợp vị trí kỹ sư cầu nối (BrSE) tháng 6 từ các hội viên",
+    summary:
+      "18 vị trí BrSE tiếng Nhật với mức lương công bố từ 1.500 đến 3.500 USD.",
+    topic: "digi-tech",
+    category: "tuyen-dung",
+    date: "20/06/2026",
+    image: "https://picsum.photos/seed/dta-td-7/800/450",
+    tags: ["Tuyển dụng", "BrSE"],
+    views: 2280,
     body: ["Danh sách chi tiết cập nhật hằng tuần từ các hội viên."],
   },
   {
@@ -425,29 +611,146 @@ export function articlesByTopic(topicSlug: string) {
   return portalArticles.filter((a) => a.topic === topicSlug);
 }
 
-export function articlesByCategory(topicSlug: string, categorySlug: string) {
-  const list = portalArticles.filter(
-    (a) => a.topic === topicSlug && a.category === categorySlug,
-  );
-  // Recruitment: intern posts first, per the brief.
-  return categorySlug === "tuyen-dung"
-    ? [...list].sort(
-        (a, b) => Number(b.isIntern ?? false) - Number(a.isIntern ?? false),
-      )
-    : list;
-}
+/* ------------------------------------------------------------------ *
+ * List engine: filter -> sort -> paginate.
+ *
+ * All list state lives in the URL (?sort=&flag=&page=) so pages are
+ * shareable and the back button works; these helpers are pure functions
+ * over that state. When a real backend arrives, the same query object
+ * maps 1:1 onto API params and only queryArticles() changes.
+ * ------------------------------------------------------------------ */
+
+export const articleSorts = ["moi-nhat", "cu-nhat", "doc-nhieu"] as const;
+export type ArticleSort = (typeof articleSorts)[number];
+export const articleSortLabels: Record<ArticleSort, string> = {
+  "moi-nhat": "Mới nhất",
+  "cu-nhat": "Cũ nhất",
+  "doc-nhieu": "Đọc nhiều",
+};
+export const DEFAULT_SORT: ArticleSort = "moi-nhat";
+
+/** Facet filters derived from article capabilities, not editor tags. */
+export const articleFlags = ["pdf", "thuc-tap", "lien-ket"] as const;
+export type ArticleFlag = (typeof articleFlags)[number];
+export const articleFlagLabels: Record<ArticleFlag, string> = {
+  pdf: "Có văn bản PDF",
+  "thuc-tap": "Thực tập sinh",
+  "lien-ket": "Link hội viên",
+};
+
+const flagTest: Record<ArticleFlag, (a: PortalArticle) => boolean> = {
+  pdf: (a) => Boolean(a.pdfUrl),
+  "thuc-tap": (a) => Boolean(a.isIntern),
+  "lien-ket": (a) => Boolean(a.memberUrl),
+};
+
+export const isArticleSort = (v: unknown): v is ArticleSort =>
+  articleSorts.includes(v as ArticleSort);
+export const isArticleFlag = (v: unknown): v is ArticleFlag =>
+  articleFlags.includes(v as ArticleFlag);
 
 const parseDate = (d: string) => {
   const [dd, mm, yyyy] = d.split("/").map(Number);
   return new Date(yyyy, mm - 1, dd).getTime();
 };
 
+/** dd/mm/yyyy -> ms, cached per article so sort comparators don't re-parse
+ *  the string on every comparison (O(n log n) comparisons per sort). */
+const dateMsCache = new WeakMap<PortalArticle, number>();
+const dateMs = (a: PortalArticle) => {
+  let ms = dateMsCache.get(a);
+  if (ms === undefined) {
+    ms = parseDate(a.date);
+    dateMsCache.set(a, ms);
+  }
+  return ms;
+};
+
+const comparators: Record<
+  ArticleSort,
+  (a: PortalArticle, b: PortalArticle) => number
+> = {
+  "moi-nhat": (a, b) => dateMs(b) - dateMs(a),
+  "cu-nhat": (a, b) => dateMs(a) - dateMs(b),
+  "doc-nhieu": (a, b) => b.views - a.views,
+};
+
+/** Filtered + sorted (not yet paginated) list for one category. */
+function filterSort(
+  topicSlug: string,
+  categorySlug: string,
+  sort: ArticleSort = DEFAULT_SORT,
+  flag?: ArticleFlag,
+) {
+  let list = portalArticles.filter(
+    (a) => a.topic === topicSlug && a.category === categorySlug,
+  );
+  if (flag) list = list.filter(flagTest[flag]);
+
+  const cmp = comparators[sort];
+  // Recruitment: intern posts stay pinned above the rest in EVERY sort
+  // order, per the brief — sort applies within each group.
+  const pinned =
+    categorySlug === "tuyen-dung"
+      ? (a: PortalArticle, b: PortalArticle) =>
+          Number(b.isIntern ?? false) - Number(a.isIntern ?? false) || cmp(a, b)
+      : cmp;
+  return list.sort(pinned); // list is already a fresh array from filter()
+}
+
+/** Category list with the default policy (newest first, interns pinned) —
+ *  used by pages that show a fixed teaser slice. */
+export function articlesByCategory(topicSlug: string, categorySlug: string) {
+  return filterSort(topicSlug, categorySlug);
+}
+
+export const ARTICLES_PAGE_SIZE = 6;
+
+export interface ArticleQuery {
+  topic: string;
+  category: string;
+  sort?: ArticleSort;
+  flag?: ArticleFlag;
+  page?: number;
+  pageSize?: number;
+}
+
+export interface ArticlePageResult {
+  items: PortalArticle[];
+  /** Matches after filtering, before pagination. */
+  total: number;
+  /** Clamped to [1, pageCount] — a stale ?page=9 URL degrades gracefully. */
+  page: number;
+  pageCount: number;
+}
+
+export function queryArticles(q: ArticleQuery): ArticlePageResult {
+  const sorted = filterSort(q.topic, q.category, q.sort, q.flag);
+  const pageSize = q.pageSize ?? ARTICLES_PAGE_SIZE;
+  const total = sorted.length;
+  const pageCount = Math.max(1, Math.ceil(total / pageSize));
+  const page = Math.min(Math.max(1, q.page ?? 1), pageCount);
+  return {
+    items: sorted.slice((page - 1) * pageSize, page * pageSize),
+    total,
+    page,
+    pageCount,
+  };
+}
+
+/** Flags that match at least one article in the category — lets the UI hide
+ *  filter chips that could only ever produce an empty list. */
+export function availableFlags(topicSlug: string, categorySlug: string) {
+  const pool = portalArticles.filter(
+    (a) => a.topic === topicSlug && a.category === categorySlug,
+  );
+  return articleFlags.filter((f) => pool.some(flagTest[f]));
+}
+
 export function latestArticles(n = 5) {
-  return [...portalArticles]
-    .sort((a, b) => parseDate(b.date) - parseDate(a.date))
-    .slice(0, n);
+  return [...portalArticles].sort(comparators["moi-nhat"]).slice(0, n);
 }
 
 export function mostReadArticles(n = 5) {
-  return [...portalArticles].sort((a, b) => b.views - a.views).slice(0, n);
+  return [...portalArticles].sort(comparators["doc-nhieu"]).slice(0, n);
 }

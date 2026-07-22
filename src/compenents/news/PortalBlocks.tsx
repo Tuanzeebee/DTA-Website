@@ -1,13 +1,36 @@
 import { useMemo, useState, useEffect } from "react";
 import { Link } from "@tanstack/react-router";
-import { Clock, Flame, Download, ExternalLink, BadgeCheck } from "lucide-react";
+import {
+  Clock,
+  Flame,
+  Download,
+  ExternalLink,
+  BadgeCheck,
+  ChevronLeft,
+  ChevronRight,
+  X,
+} from "lucide-react";
 import { membersData } from "@/data";
 import {
   latestArticles,
   mostReadArticles,
   boardMembers,
+  articleSorts,
+  articleSortLabels,
+  articleFlagLabels,
+  DEFAULT_SORT,
   type PortalArticle,
+  type ArticleSort,
+  type ArticleFlag,
 } from "@/newsData";
+
+/** URL-borne list state for a category page (?sort=&flag=&page=).
+ *  Defaults are OMITTED from the URL, so plain links stay clean. */
+export interface ArticleListSearch {
+  sort?: ArticleSort;
+  flag?: ArticleFlag;
+  page?: number;
+}
 
 /** Shared building blocks for every portal page. */
 
@@ -75,6 +98,187 @@ export function ArticleCard({
         </div>
       </article>
     </Link>
+  );
+}
+
+/**
+ * Sort + facet-filter toolbar for a category list. All state is URL search
+ * params on /news/$topic/$category, so every control is a real <Link>:
+ * shareable, back-button friendly, crawlable. Changing sort or filter drops
+ * `page` (a new ordering invalidates the old page number).
+ */
+export function ArticleListControls({
+  topic,
+  category,
+  search,
+  total,
+  flags,
+}: {
+  topic: string;
+  category: string;
+  search: ArticleListSearch;
+  total: number;
+  /** Flags with >=1 match in this category — zero-result chips are hidden. */
+  flags: ArticleFlag[];
+}) {
+  const sort = search.sort ?? DEFAULT_SORT;
+
+  return (
+    <div className="flex flex-wrap items-center gap-x-4 gap-y-3 mb-6">
+      {/* Segmented sort control */}
+      <div
+        role="group"
+        aria-label="Sắp xếp bài viết"
+        className="flex rounded-full border border-white/10 bg-white/[0.03] p-0.5"
+      >
+        {articleSorts.map((s) => (
+          <Link
+            key={s}
+            to="/news/$topic/$category"
+            params={{ topic, category }}
+            search={{
+              ...search,
+              sort: s === DEFAULT_SORT ? undefined : s,
+              page: undefined,
+            }}
+            aria-current={sort === s ? "true" : undefined}
+            className={`px-3.5 py-1.5 rounded-full text-[11px] font-bold transition-colors ${
+              sort === s
+                ? "bg-accent/15 text-accent"
+                : "text-white/55 hover:text-white"
+            }`}
+          >
+            {articleSortLabels[s]}
+          </Link>
+        ))}
+      </div>
+
+      {/* Facet chips — toggle on/off */}
+      {flags.length > 0 && (
+        <div className="flex flex-wrap items-center gap-2">
+          {flags.map((f) => {
+            const active = search.flag === f;
+            return (
+              <Link
+                key={f}
+                to="/news/$topic/$category"
+                params={{ topic, category }}
+                search={{
+                  ...search,
+                  flag: active ? undefined : f,
+                  page: undefined,
+                }}
+                aria-pressed={active}
+                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider border transition-colors ${
+                  active
+                    ? "border-accent/50 bg-accent/15 text-accent"
+                    : "border-white/10 bg-white/[0.03] text-white/55 hover:text-white hover:border-white/25"
+                }`}
+              >
+                {articleFlagLabels[f]}
+                {active && <X className="w-3 h-3" />}
+              </Link>
+            );
+          })}
+        </div>
+      )}
+
+      <span className="ml-auto text-[11px] text-white/45 font-mono">
+        {total} bài viết
+      </span>
+    </div>
+  );
+}
+
+/** 1 … 4 [5] 6 … 12 — first, last and the current neighbourhood, with
+ *  ellipsis for the gaps. */
+function pageItems(page: number, count: number): (number | "gap")[] {
+  if (count <= 7) return Array.from({ length: count }, (_, i) => i + 1);
+  const keep = new Set([1, count, page - 1, page, page + 1]);
+  const out: (number | "gap")[] = [];
+  for (let p = 1; p <= count; p++) {
+    if (keep.has(p)) out.push(p);
+    else if (out[out.length - 1] !== "gap") out.push("gap");
+  }
+  return out;
+}
+
+export function ArticlePagination({
+  topic,
+  category,
+  search,
+  page,
+  pageCount,
+}: {
+  topic: string;
+  category: string;
+  search: ArticleListSearch;
+  page: number;
+  pageCount: number;
+}) {
+  if (pageCount <= 1) return null;
+
+  const pageLink = (p: number) => ({
+    to: "/news/$topic/$category" as const,
+    params: { topic, category },
+    // page 1 is the default — keep it out of the URL.
+    search: { ...search, page: p === 1 ? undefined : p },
+  });
+  const jumpTop = () => window.scrollTo({ top: 0 });
+
+  return (
+    <nav
+      aria-label="Phân trang"
+      className="mt-10 flex items-center justify-center gap-1.5"
+    >
+      {page > 1 && (
+        <Link
+          {...pageLink(page - 1)}
+          onClick={jumpTop}
+          aria-label="Trang trước"
+          className="w-9 h-9 rounded-xl border border-white/10 bg-white/[0.03] flex items-center justify-center text-white/60 hover:text-white hover:border-white/25 transition-colors"
+        >
+          <ChevronLeft className="w-4 h-4" />
+        </Link>
+      )}
+
+      {pageItems(page, pageCount).map((p, i) =>
+        p === "gap" ? (
+          <span
+            key={`gap-${i}`}
+            aria-hidden
+            className="w-6 text-center text-white/35 text-xs select-none"
+          >
+            …
+          </span>
+        ) : (
+          <Link
+            key={p}
+            {...pageLink(p)}
+            onClick={jumpTop}
+            aria-current={p === page ? "page" : undefined}
+            className={`min-w-9 h-9 px-2 rounded-xl border text-xs font-bold flex items-center justify-center transition-colors ${
+              p === page
+                ? "border-accent/50 bg-accent/15 text-accent"
+                : "border-white/10 bg-white/[0.03] text-white/60 hover:text-white hover:border-white/25"
+            }`}
+          >
+            {p}
+          </Link>
+        ),
+      )}
+
+      {page < pageCount && (
+        <Link
+          {...pageLink(page + 1)}
+          onClick={jumpTop}
+          aria-label="Trang sau"
+          className="w-9 h-9 rounded-xl border border-white/10 bg-white/[0.03] flex items-center justify-center text-white/60 hover:text-white hover:border-white/25 transition-colors"
+        >
+          <ChevronRight className="w-4 h-4" />
+        </Link>
+      )}
+    </nav>
   );
 }
 
