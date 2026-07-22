@@ -1,0 +1,480 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * Design system definition.
+ *
+ * The @theme inline block maps CSS custom properties to Tailwind utility
+ * classes (e.g. --color-primary -> bg-primary, text-primary).
+ *
+ * The :root and .dark blocks define the actual color values using oklch.
+ * All colors MUST use oklch format.
+ *
+ * To add a new semantic color:
+ * 1. Add the variable to :root (light value) and .dark (dark value)
+ * 2. Register it in @theme inline as --color-<name>: var(--<name>)
+ */
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-ring-offset-background: var(--background);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+:root {
+  --radius: 0.625rem;
+  /* Dark space-blue theme with electric cyan + gold accents */
+  --background: oklch(0.14 0.08 265);
+  --foreground: oklch(0.98 0.01 250);
+  --card: oklch(0.19 0.09 265 / 0.6);
+  --card-foreground: oklch(0.98 0.01 250);
+  --popover: oklch(0.19 0.09 265);
+  --popover-foreground: oklch(0.98 0.01 250);
+  --primary: oklch(0.75 0.19 235);
+  --primary-foreground: oklch(0.12 0.08 265);
+  --secondary: oklch(0.22 0.09 265);
+  --secondary-foreground: oklch(0.98 0.01 250);
+  --muted: oklch(0.22 0.06 265);
+  --muted-foreground: oklch(0.85 0.02 245);
+  --accent: oklch(0.85 0.16 90);
+  --accent-foreground: oklch(0.14 0.08 265);
+  --destructive: oklch(0.6 0.24 27);
+  --destructive-foreground: oklch(0.98 0.01 250);
+  --border: oklch(0.98 0.01 250 / 0.12);
+  --input: oklch(0.98 0.01 250 / 0.15);
+  --ring: oklch(0.75 0.19 235);
+
+  --gold: oklch(0.85 0.16 90);
+  --cyan: oklch(0.82 0.17 220);
+  --deep: oklch(0.12 0.09 268);
+
+  --gradient-hero:
+    radial-gradient(
+      ellipse at 70% 40%,
+      oklch(0.35 0.18 240 / 0.6),
+      transparent 60%
+    ),
+    linear-gradient(180deg, oklch(0.12 0.09 268), oklch(0.16 0.1 262));
+  --gradient-primary: linear-gradient(
+    135deg,
+    oklch(0.82 0.17 220),
+    oklch(0.75 0.19 250)
+  );
+  --gradient-gold: linear-gradient(
+    135deg,
+    oklch(0.88 0.17 95),
+    oklch(0.72 0.18 60)
+  );
+  --shadow-glow: 0 0 60px oklch(0.75 0.2 235 / 0.35);
+  --shadow-gold: 0 0 40px oklch(0.85 0.18 85 / 0.4);
+  --chart-1: oklch(0.646 0.222 41.116);
+  --chart-2: oklch(0.6 0.118 184.704);
+  --chart-3: oklch(0.398 0.07 227.392);
+  --chart-4: oklch(0.828 0.189 84.429);
+  --chart-5: oklch(0.769 0.188 70.08);
+  --sidebar: oklch(0.19 0.09 265);
+  --sidebar-foreground: oklch(0.98 0.01 250);
+  --sidebar-primary: oklch(0.208 0.042 265.755);
+  --sidebar-primary-foreground: oklch(0.984 0.003 247.858);
+  --sidebar-accent: oklch(0.968 0.007 247.896);
+  --sidebar-accent-foreground: oklch(0.208 0.042 265.755);
+  --sidebar-border: oklch(0.929 0.013 255.508);
+  --sidebar-ring: oklch(0.704 0.04 256.788);
+}
+
+.dark {
+  --background: oklch(0.129 0.042 264.695);
+  --foreground: oklch(0.984 0.003 247.858);
+  --card: oklch(0.208 0.042 265.755);
+  --card-foreground: oklch(0.984 0.003 247.858);
+  --popover: oklch(0.208 0.042 265.755);
+  --popover-foreground: oklch(0.984 0.003 247.858);
+  --primary: oklch(0.929 0.013 255.508);
+  --primary-foreground: oklch(0.208 0.042 265.755);
+  --secondary: oklch(0.279 0.041 260.031);
+  --secondary-foreground: oklch(0.984 0.003 247.858);
+  --muted: oklch(0.279 0.041 260.031);
+  --muted-foreground: oklch(0.85 0.02 245);
+  --accent: oklch(0.279 0.041 260.031);
+  --accent-foreground: oklch(0.984 0.003 247.858);
+  --destructive: oklch(0.704 0.191 22.216);
+  --destructive-foreground: oklch(0.984 0.003 247.858);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.551 0.027 264.364);
+  --chart-1: oklch(0.488 0.243 264.376);
+  --chart-2: oklch(0.696 0.17 162.48);
+  --chart-3: oklch(0.769 0.188 70.08);
+  --chart-4: oklch(0.627 0.265 303.9);
+  --chart-5: oklch(0.645 0.246 16.439);
+  --sidebar: oklch(0.208 0.042 265.755);
+  --sidebar-foreground: oklch(0.984 0.003 247.858);
+  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary-foreground: oklch(0.984 0.003 247.858);
+  --sidebar-accent: oklch(0.279 0.041 260.031);
+  --sidebar-accent-foreground: oklch(0.984 0.003 247.858);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.551 0.027 264.364);
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  body {
+    background: var(--gradient-hero);
+    background-attachment: fixed;
+    color: var(--color-foreground);
+    font-family: "Be Vietnam Pro", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  h1,
+  h2,
+  h3,
+  .display {
+    font-family: "Be Vietnam Pro", "Space Grotesk", sans-serif;
+    letter-spacing: -0.01em;
+  }
+
+  .label {
+    font-family: "Be Vietnam Pro", "Space Grotesk", sans-serif;
+  }
+}
+
+@utility text-gradient-cyan {
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+@utility text-gradient-gold {
+  background: var(--gradient-gold);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+@utility glass {
+  background: oklch(0.19 0.09 265 / 0.55);
+  backdrop-filter: blur(14px);
+  border: 1px solid oklch(0.98 0.01 250 / 0.1);
+}
+@utility glow {
+  box-shadow: var(--shadow-glow);
+}
+
+/* ---------------------------------------------------------------
+ * PREMIUM SURFACE SYSTEM
+ * Card surfaces, nested bezels, and section background layers.
+ * All tints stay inside the cyan / indigo / gold palette defined above.
+ * --------------------------------------------------------------- */
+
+/* The shared card fill. Same 141.06deg geometry the cards already used,
+ * retuned from the off-palette rose tint to the theme's cyan/indigo. */
+.card-surface {
+  position: relative;
+  background-image: linear-gradient(
+    141.06deg,
+    oklch(0.82 0.17 220 / 0.1) 4.14%,
+    oklch(0.75 0.19 250 / 0.055) 50.74%,
+    oklch(0.19 0.09 265 / 0.32) 100%
+  );
+  background-color: oklch(0.16 0.07 265 / 0.45);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid oklch(0.82 0.17 220 / 0.14);
+  box-shadow:
+    inset 0 1px 0 oklch(0.98 0.02 220 / 0.09),
+    0 1px 2px oklch(0.08 0.06 265 / 0.5),
+    0 12px 32px -12px oklch(0.08 0.06 265 / 0.7);
+  transition:
+    border-color 600ms cubic-bezier(0.32, 0.72, 0, 1),
+    box-shadow 600ms cubic-bezier(0.32, 0.72, 0, 1),
+    transform 600ms cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+/* Top-edge specular highlight — the "machined glass" edge. */
+.card-surface::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    oklch(0.98 0.02 220 / 0.06) 0%,
+    transparent 22%
+  );
+}
+
+.card-surface:hover {
+  border-color: oklch(0.82 0.17 220 / 0.38);
+  box-shadow:
+    inset 0 1px 0 oklch(0.98 0.02 220 / 0.14),
+    0 1px 2px oklch(0.08 0.06 265 / 0.5),
+    0 24px 56px -16px oklch(0.75 0.19 235 / 0.28);
+  transform: translateY(-4px);
+}
+
+/* Gold variant for the featured / accent card. */
+.card-surface-gold {
+  background-image: linear-gradient(
+    141.06deg,
+    oklch(0.85 0.16 90 / 0.12) 4.14%,
+    oklch(0.72 0.18 60 / 0.06) 50.74%,
+    oklch(0.19 0.09 265 / 0.32) 100%
+  );
+  border-color: oklch(0.85 0.16 90 / 0.24);
+  box-shadow:
+    inset 0 1px 0 oklch(0.95 0.1 90 / 0.14),
+    0 12px 40px -12px oklch(0.85 0.18 85 / 0.28);
+}
+
+.card-surface-gold:hover {
+  border-color: oklch(0.85 0.16 90 / 0.5);
+  box-shadow:
+    inset 0 1px 0 oklch(0.95 0.1 90 / 0.2),
+    0 24px 60px -16px oklch(0.85 0.18 85 / 0.4);
+}
+
+/* Double-bezel: outer tray that a card sits inside, like a machined part.
+ * Inner radius is computed from outer radius minus padding for concentricity. */
+.bezel {
+  padding: 6px;
+  border-radius: 2rem;
+  background: oklch(0.98 0.02 220 / 0.03);
+  border: 1px solid oklch(0.98 0.02 220 / 0.06);
+}
+
+.bezel > * {
+  border-radius: calc(2rem - 6px);
+}
+
+/* ---------------------------------------------------------------
+ * SECTION BACKGROUND LAYERS
+ * All are absolutely positioned, pointer-events-none, and sit at z-0.
+ * --------------------------------------------------------------- */
+
+/* Blueprint grid, faded out radially so it never reaches the section edge. */
+.bg-grid {
+  background-image:
+    linear-gradient(oklch(0.82 0.17 220 / 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, oklch(0.82 0.17 220 / 0.06) 1px, transparent 1px);
+  background-size: 72px 72px;
+  -webkit-mask-image: radial-gradient(
+    ellipse 90% 65% at 50% 40%,
+    #000 0%,
+    transparent 78%
+  );
+  mask-image: radial-gradient(
+    ellipse 90% 65% at 50% 40%,
+    #000 0%,
+    transparent 78%
+  );
+}
+
+/* Fine dot matrix — quieter than the grid, for dense sections. */
+.bg-dots {
+  background-image: radial-gradient(
+    oklch(0.82 0.17 220 / 0.12) 1px,
+    transparent 1px
+  );
+  background-size: 26px 26px;
+  -webkit-mask-image: radial-gradient(
+    ellipse 80% 60% at 50% 50%,
+    #000 0%,
+    transparent 75%
+  );
+  mask-image: radial-gradient(
+    ellipse 80% 60% at 50% 50%,
+    #000 0%,
+    transparent 75%
+  );
+}
+
+/* Aurora mesh: three offset colour fields in cyan / indigo / gold. */
+.bg-aurora {
+  background-image:
+    radial-gradient(
+      ellipse 60% 50% at 15% 0%,
+      oklch(0.75 0.19 235 / 0.18),
+      transparent 60%
+    ),
+    radial-gradient(
+      ellipse 50% 45% at 85% 25%,
+      oklch(0.62 0.2 285 / 0.15),
+      transparent 62%
+    ),
+    radial-gradient(
+      ellipse 55% 40% at 50% 100%,
+      oklch(0.85 0.16 90 / 0.08),
+      transparent 65%
+    );
+}
+
+/* A single wide spotlight from the top edge — for headline sections. */
+.bg-spotlight {
+  background-image: radial-gradient(
+    ellipse 70% 50% at 50% -10%,
+    oklch(0.75 0.19 235 / 0.22),
+    transparent 70%
+  );
+}
+
+/* Horizon: a lit floor line at the bottom of the section. */
+.bg-horizon {
+  background-image:
+    radial-gradient(
+      ellipse 80% 60% at 50% 108%,
+      oklch(0.75 0.19 235 / 0.22),
+      transparent 62%
+    ),
+    linear-gradient(
+      180deg,
+      transparent 55%,
+      oklch(0.85 0.16 90 / 0.05) 100%
+    );
+}
+
+/* Hairline rule that fades at both ends — replaces hard border-t. */
+.rule-fade {
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    oklch(0.82 0.17 220 / 0.28) 20%,
+    oklch(0.82 0.17 220 / 0.28) 80%,
+    transparent
+  );
+}
+
+/* Film grain. Fixed and pointer-events-none so it never repaints on scroll. */
+.grain-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  pointer-events: none;
+  opacity: 0.035;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Mobile: the page carries ~30 card-surface elements, and a backdrop-filter on
+ * each forces the GPU to re-sample the backdrop for every one on every scroll
+ * frame. Below the tablet breakpoint we drop the blur and pay for the frosted
+ * look with a slightly more opaque fill instead — visually near-identical,
+ * dramatically cheaper. Fixed/overlay blurs (nav sheet, modal) are untouched. */
+@media (max-width: 767px) {
+  .card-surface {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background-color: oklch(0.17 0.075 265 / 0.82);
+  }
+
+  /* Coarser grid and dots so the pattern doesn't turn into moiré at 2-3x DPR. */
+  .bg-grid {
+    background-size: 48px 48px;
+  }
+
+  .bg-dots {
+    background-size: 20px 20px;
+  }
+}
+
+/* Touch devices have no hover; the lift on tap-and-hold reads as a glitch. */
+@media (hover: none) {
+  .card-surface:hover {
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .card-surface,
+  .glass {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background-color: oklch(0.18 0.08 265 / 0.96);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card-surface:hover {
+    transform: none;
+  }
+  .animate-marquee,
+  .animate-marquee-reverse {
+    animation: none;
+  }
+}
+
+@keyframes marquee {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  display: flex;
+  width: max-content;
+  animation: marquee 40s linear infinite;
+}
+
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
+
+.animate-marquee-reverse {
+  display: flex;
+  width: max-content;
+  animation: marquee 40s linear infinite reverse;
+}
+
+.animate-marquee-reverse:hover {
+  animation-play-state: paused;
+}

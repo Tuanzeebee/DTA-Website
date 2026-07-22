@@ -1,0 +1,6 @@
+{
+  "name": "Hiệp hội Công nghệ số Đà Nẵng (DTA)",
+  "description": "Website chính thức của Hiệp hội Công nghệ số thành phố Đà Nẵng (Danang Digital Technology Association - DTA). Cầu nối liên kết, diễn đàn phản biện và nền tảng hỗ trợ đắc lực cho các hội viên công nghệ số.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
