@@ -130,13 +130,6 @@ export function PortalSidebar() {
       <div className="rounded-2xl border border-dashed border-white/15 bg-white/[0.03] h-40 flex items-center justify-center text-white/40 text-[10px] uppercase tracking-[0.2em]">
         Quảng cáo
       </div>
-
-      <section className="card-surface rounded-2xl p-4">
-        <h4 className="text-xs font-black uppercase tracking-wider text-accent mb-3">
-          Hội viên DTA
-        </h4>
-        <MemberLogoGrid compact />
-      </section>
     </aside>
   );
 }

@@ -64,7 +64,23 @@ export function GrainOverlay() {
   return <div aria-hidden className="grain-overlay" />;
 }
 
-/** Hairline section divider that fades out at both ends. */
+/**
+ * Seam light — the section connector.
+ *
+ * Formerly a 1px hairline, which read as a fence between sections no matter
+ * how faint. Replaced with a soft bloom of the page's shared cyan breathing
+ * down from the boundary: light carries across a seam, a line blocks it. The
+ * same device already joins the hero to the About section.
+ *
+ * Works over any background because every section edge resolves to the same
+ * page base colour (edge bands / image edge blends) before this glow is laid
+ * on top. Callers keep the same usage: `absolute inset-x-0 top-0`.
+ */
 export function RuleFade({ className = "" }: { className?: string }) {
-  return <div aria-hidden className={`rule-fade ${className}`} />;
+  return (
+    <div
+      aria-hidden
+      className={`pointer-events-none h-24 bg-[radial-gradient(ellipse_65%_130%_at_50%_0%,oklch(0.75_0.19_235_/_0.09),transparent_70%)] ${className}`}
+    />
+  );
 }

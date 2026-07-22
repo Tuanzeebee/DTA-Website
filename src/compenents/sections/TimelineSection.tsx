@@ -9,6 +9,8 @@ import {
 import { SectionHeader } from "@/compenents/SectionHeader";
 import { dtaNews, dtaEvents } from "@/data";
 import type { Lang } from "@/types";
+import tinTucCutout from "@/assets/image 1566.png";
+import leftGradientBg from "@/assets/left-gradient-start-background.webp";
 
 export function TimelineSection({ lang }: { lang: Lang }) {
   return (
@@ -17,7 +19,62 @@ export function TimelineSection({ lang }: { lang: Lang }) {
       className="py-20 md:py-28 px-5 md:px-6 relative overflow-hidden"
     >
       <RuleFade className="absolute inset-x-0 top-0" />
-      <SectionBackground variant={["grid", "vignette"]} />
+      <SectionBackground variant="grid" />
+
+      {/* Diagonal image panel, right side, lg+ only (stacked mobile columns
+          would just be visually noisy over it).
+
+          Technique: the outer wrapper is skewed -8deg and clips; the image
+          inside is counter-skewed +8deg (and over-scaled) so the artwork
+          itself is not distorted — only its left edge is cut on the diagonal.
+          Because the seam accents live INSIDE the skewed wrapper, they are
+          parallel to the cut by construction, no angle math. */}
+      <div
+        aria-hidden
+        className="absolute inset-y-0 right-0 w-[58%] hidden lg:block pointer-events-none"
+      >
+        {/* Skewed backdrop: the gradient artwork fills the diagonal panel.
+            The subject is a separate background-removed cutout layered on
+            top, so overlays here stay LIGHT — the old 45% black stack would
+            just sink this corner into darkness. */}
+        <div className="absolute -inset-y-10 left-20 -right-32 -skew-x-[8deg] overflow-hidden">
+          <img
+            src={leftGradientBg}
+            alt=""
+            loading="lazy"
+            decoding="async"
+            className="absolute inset-0 w-full h-full object-cover skew-x-[8deg] scale-[1.18]"
+          />
+          {/* Left-weighted fade only, for the text column's contrast — no
+              full dark overlay. */}
+          <div className="absolute inset-0 bg-gradient-to-r from-[oklch(0.10_0.06_265_/_0.92)] via-[oklch(0.10_0.06_265_/_0.3)] to-transparent" />
+          <div className="noise-layer" />
+
+          {/* Seam accents: two gradient beams stitched along the diagonal
+              cut — cyan hairline plus a gold thread, the page's two accent
+              hues. Skewed with the wrapper, so always parallel to the edge. */}
+          <div className="absolute inset-y-0 left-0 w-px bg-gradient-to-b from-transparent via-cyan-400/60 to-transparent" />
+          <div className="absolute inset-y-0 left-2.5 w-[2px] bg-gradient-to-b from-transparent via-[oklch(0.85_0.16_90_/_0.35)] to-transparent" />
+          {/* Soft bloom along the seam so the cut reads as lit, not sliced. */}
+          <div className="absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-cyan-400/10 to-transparent" />
+        </div>
+
+        {/* The cutout subject: NOT skewed and object-contain, so the whole
+            artwork is visible at a modest size instead of being cropped by
+            the panel. Anchored to the right, vertically centred. */}
+        <img
+          src={tinTucCutout}
+          alt=""
+          loading="lazy"
+          decoding="async"
+          className="absolute -right-[13%] top-[29%] -translate-y-1/2 h-[62%] max-w-[92%] w-auto object-contain drop-shadow-[0_24px_48px_rgba(0,0,0,0.45)]"
+        />
+
+        {/* Fade the panel's top and bottom into the page base so the diagonal
+            never collides with the neighbouring sections' seams. */}
+        <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-[oklch(0.10_0.06_265_/_0.9)] to-transparent" />
+        <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-[oklch(0.10_0.06_265_/_0.9)] to-transparent" />
+      </div>
 
       <div className="max-w-6xl mx-auto relative z-10">
         <SectionHeader
@@ -61,7 +118,7 @@ export function TimelineSection({ lang }: { lang: Lang }) {
             <StaggerContainer className="space-y-4">
               {dtaNews.slice(0, 3).map((news) => (
                 <StaggerItem key={news.title.vn}>
-                  <div className="card-surface rounded-3xl flex overflow-hidden group">
+                  <div className="card-surface card-solid rounded-3xl flex overflow-hidden group">
                     {/* News Image Metadata */}
                     <div className="w-28 h-auto shrink-0 relative overflow-hidden hidden sm:block">
                       <img
@@ -138,7 +195,7 @@ export function TimelineSection({ lang }: { lang: Lang }) {
             <StaggerContainer className="space-y-6">
               {dtaEvents.map((event, idx) => (
                 <StaggerItem key={event.title.vn}>
-                  <div className="card-surface rounded-3xl relative overflow-hidden flex flex-col md:flex-row group">
+                  <div className="card-surface card-solid rounded-3xl relative overflow-hidden flex flex-col md:flex-row group">
                     {/* Event Image */}
                     <div className="w-full md:w-44 h-36 md:h-auto shrink-0 relative overflow-hidden">
                       <img

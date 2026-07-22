@@ -2,12 +2,8 @@ import { createFileRoute, Outlet } from "@tanstack/react-router";
 import { useLang, useSession } from "@/hooks/useLang";
 import { PageShell } from "@/compenents/layout/PageShell";
 import { Nav } from "@/compenents/layout/Nav";
-import {
-  PortalMenuBar,
-  PortalBanner,
-  PortalFooter,
-} from "@/compenents/news/PortalChrome";
-import { BoardSection, MemberLogoGrid } from "@/compenents/news/PortalBlocks";
+import { PortalMenuBar, PortalBanner } from "@/compenents/news/PortalChrome";
+import { Footer } from "@/compenents/layout/Footer";
 
 /**
  * Layout for the news portal (/news/*), a "Trang thông tin điện tử tổng hợp"
@@ -15,8 +11,10 @@ import { BoardSection, MemberLogoGrid } from "@/compenents/news/PortalBlocks";
  *
  * The portal shares the site-wide header (Nav) with the landing page; its own
  * topic menu docks directly under that header as a sticky bar. Below:
- * banner zone -> content -> member logo strip (shuffled, all linked) ->
- * BCH/Ban Kiểm tra -> portal footer (licence, editorial board, repeated menu).
+ * banner zone -> content -> portal footer (licence, editorial board, repeated
+ * menu). The bottom member-logo strip and the BCH/Ban Kiểm tra block were
+ * removed on request; member logos still appear in the sidebar (column 3),
+ * and BoardSection remains available in PortalBlocks if it is wanted back.
  */
 export const Route = createFileRoute("/news")({
   component: NewsPortalLayout,
@@ -40,17 +38,21 @@ function NewsPortalLayout() {
           <Outlet />
         </main>
 
-        {/* Bottom member logo strip: random order each load so every member
-            gets equal exposure; every logo links to the member's site. */}
-        <section className="max-w-7xl mx-auto px-4 md:px-6 mt-20">
-          <h3 className="text-sm font-black uppercase tracking-wider text-white mb-6">
-            Hội viên DTA
-          </h3>
-          <MemberLogoGrid />
-        </section>
+        <Footer lang={lang} />
 
-        <BoardSection />
-        <PortalFooter />
+        {/* Licence strip: the shared landing Footer replaces the portal
+            footer, but a news site operating under giấy phép 447/GP-STTTT is
+            required to display its licence — kept as one compact line at the
+            very bottom, under the shared footer. */}
+        <div className="border-t border-white/10 bg-black/50">
+          <p className="max-w-7xl mx-auto px-4 md:px-6 py-3 text-[10px] font-light leading-relaxed text-white/45 text-center">
+            DTA News — Trang thông tin điện tử tổng hợp của Hiệp hội Công nghệ
+            số Đà Nẵng. Giấy phép số{" "}
+            <span className="font-normal text-white/70">447/GP-STTTT</span> do
+            Sở Thông tin và Truyền thông TP. Đà Nẵng cấp. Chịu trách nhiệm nội
+            dung: Ban Biên tập DTA.
+          </p>
+        </div>
       </div>
     </PageShell>
   );

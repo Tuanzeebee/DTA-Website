@@ -29,6 +29,12 @@ function useClock() {
 export function PortalMenuBar() {
   const clock = useClock();
 
+  /* State-driven dropdown instead of pure CSS hover/focus-within: navigation
+     here is client-side (no page reload), so a clicked link KEEPS focus and a
+     :focus-within dropdown would stay open until the user clicked elsewhere.
+     With state, any click closes it immediately. */
+  const [openTopic, setOpenTopic] = useState<string | null>(null);
+
   return (
     /* top-16 = height of the fixed shared header, so the bar docks right
        under it while scrolling. */
@@ -48,35 +54,65 @@ export function PortalMenuBar() {
             other axis to auto too, so the absolute dropdown was creating an
             inner vertical scrollbar on hover — the "scroll down" glitch. */}
         <div className="flex items-stretch gap-1 overflow-x-auto md:overflow-visible">
-          {mainTopics.map((t) => (
-            <div key={t.slug} className="relative group shrink-0">
-              <Link
-                to="/news/$topic"
-                params={{ topic: t.slug }}
-                className="flex items-center gap-1 px-3 md:px-4 h-11 text-[12px] md:text-[13px] font-bold uppercase tracking-wide text-white hover:text-cyan-300 transition-colors whitespace-nowrap"
+          {mainTopics.map((t) => {
+            const isOpen = openTopic === t.slug;
+            return (
+              <div
+                key={t.slug}
+                className="relative shrink-0"
+                onMouseEnter={() => setOpenTopic(t.slug)}
+                onMouseLeave={() => setOpenTopic(null)}
+                /* Keyboard: opens when any link inside receives focus, closes
+                   when focus moves outside this topic's subtree. */
+                onFocusCapture={() => setOpenTopic(t.slug)}
+                onBlurCapture={(e) => {
+                  if (!e.currentTarget.contains(e.relatedTarget as Node)) {
+                    setOpenTopic(null);
+                  }
+                }}
               >
-                <span>{t.short}</span>
-                <ChevronDown className="w-3 h-3 opacity-60 group-hover:rotate-180 transition-transform duration-300" />
-              </Link>
-              {/* Opens on hover AND on keyboard focus (focus-within). Uses
-                  visibility+opacity (not display) so it can ease in instead of
-                  popping. */}
-              <div className="absolute left-0 top-full invisible opacity-0 translate-y-1 group-hover:visible group-hover:opacity-100 group-hover:translate-y-0 group-focus-within:visible group-focus-within:opacity-100 group-focus-within:translate-y-0 transition-all duration-200 ease-out min-w-[260px] z-50">
-                <div className="glass rounded-b-xl border border-white/10 py-2 shadow-2xl">
-                  {t.categories.map((c) => (
-                    <Link
-                      key={c.slug}
-                      to="/news/$topic/$category"
-                      params={{ topic: t.slug, category: c.slug }}
-                      className="block px-4 py-2 text-[12px] text-white/85 hover:text-cyan-300 hover:bg-white/5 transition-colors"
-                    >
-                      {c.name}
-                    </Link>
-                  ))}
+                <Link
+                  to="/news/$topic"
+                  params={{ topic: t.slug }}
+                  onClick={() => setOpenTopic(null)}
+                  className="flex items-center gap-1 px-3 md:px-4 h-11 text-[12px] md:text-[13px] font-bold uppercase tracking-wide text-white hover:text-cyan-300 transition-colors whitespace-nowrap"
+                >
+                  <span>{t.short}</span>
+                  <ChevronDown
+                    className={`w-3 h-3 opacity-60 transition-transform duration-300 ${
+                      isOpen ? "rotate-180" : ""
+                    }`}
+                  />
+                </Link>
+                {/* visibility+opacity (not display) so it eases in instead of
+                    popping. */}
+                <div
+                  className={`absolute left-0 top-full transition-all duration-200 ease-out min-w-[260px] z-50 ${
+                    isOpen
+                      ? "visible opacity-100 translate-y-0"
+                      : "invisible opacity-0 translate-y-1 pointer-events-none"
+                  }`}
+                >
+                  <div className="glass rounded-b-xl border border-white/10 py-2 shadow-2xl">
+                    {t.categories.map((c) => (
+                      <Link
+                        key={c.slug}
+                        to="/news/$topic/$category"
+                        params={{ topic: t.slug, category: c.slug }}
+                        onClick={(e) => {
+                          setOpenTopic(null);
+                          e.currentTarget.blur();
+                        }}
+                        className="block px-4 py-2 text-[12px] text-white/85 hover:text-cyan-300 hover:bg-white/5 transition-colors"
+                      >
+                        {c.name}
+                      </Link>
+                    ))}
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         {/* Live date-time ("góc thời gian" in the brief). */}

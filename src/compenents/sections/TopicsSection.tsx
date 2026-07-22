@@ -1,5 +1,5 @@
 import { ChevronRight } from "lucide-react";
-import { SectionBackground, RuleFade } from "@/compenents/SectionBackground";
+import { RuleFade } from "@/compenents/SectionBackground";
 import {
   ScrollReveal,
   StaggerContainer,
@@ -8,6 +8,7 @@ import {
 import { TechAreaIcon } from "@/compenents/icons/SectionIcons";
 import { coreTechAreas } from "@/data";
 import type { Lang } from "@/types";
+import linhVucBg from "@/assets/LinhVuc.png";
 
 export function TopicsSection({ lang }: { lang: Lang }) {
   return (
@@ -16,7 +17,31 @@ export function TopicsSection({ lang }: { lang: Lang }) {
       className="py-20 md:py-28 px-5 md:px-6 relative overflow-hidden"
     >
       <RuleFade className="absolute inset-x-0 top-0" />
-      <SectionBackground variant={["dots", "vignette"]} />
+
+      {/* Background contrast stack, bottom to top:
+          image -> dark overlay -> black-to-transparent gradient
+          -> faint noise -> (content). Keeps the mesh/network artwork visible
+          while guaranteeing the display type stays high-contrast. */}
+      <div aria-hidden className="absolute inset-0 z-0 pointer-events-none">
+        <img
+          src={linhVucBg}
+          alt=""
+          loading="lazy"
+          decoding="async"
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+        {/* 2. Dark overlay (45%, middle of the requested 35-60% band). */}
+        <div className="absolute inset-0 bg-black/45" />
+        {/* 3. Black -> transparent gradient: deepest behind the display type
+            at the top, clearing over the cards. */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/55 via-black/15 to-transparent" />
+        {/* Edge blend into the page base so the image never ends on a hard
+            line against the neighbouring sections. */}
+        <div className="absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-[oklch(0.10_0.06_265_/_0.9)] to-transparent" />
+        <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-[oklch(0.10_0.06_265_/_0.9)] to-transparent" />
+        {/* 4. Very light noise. */}
+        <div className="noise-layer" />
+      </div>
 
       <div className="max-w-7xl mx-auto relative z-10">
         <ScrollReveal className="flex flex-wrap items-center justify-between gap-x-8 gap-y-6 mb-14">

@@ -7,10 +7,11 @@ import {
   ShieldCheck,
   User,
 } from "lucide-react";
-import { SectionBackground, RuleFade } from "@/compenents/SectionBackground";
+import { RuleFade } from "@/compenents/SectionBackground";
 import { SectionHeader } from "@/compenents/SectionHeader";
 import { membersData } from "@/data";
 import type { Lang } from "@/types";
+import doiTacBg from "@/assets/DoiTac.png";
 
 export function MembersDirectorySection({ lang }: { lang: Lang }) {
   const sliderOrganizations = membersData.map((m) => {
@@ -91,7 +92,28 @@ export function MembersDirectorySection({ lang }: { lang: Lang }) {
   return (
     <section id="members" className="py-20 md:py-28 relative overflow-hidden">
       <RuleFade className="absolute inset-x-0 top-0" />
-      <SectionBackground variant="spotlight" edge="bottom" />
+
+      {/* Background contrast stack (same recipe as TopicsSection):
+          image -> dark overlay -> black-to-transparent gradient
+          -> faint noise -> content. */}
+      <div aria-hidden className="absolute inset-0 z-0 pointer-events-none">
+        {/* scale-[1.04] hides the transparent fringe a CSS blur creates at
+            the element edges. */}
+        <img
+          src={doiTacBg}
+          alt=""
+          loading="lazy"
+          decoding="async"
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-black/45" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/55 via-black/15 to-transparent" />
+        {/* Edge blend into the page base so the image never ends on a hard
+            line against the neighbouring sections. */}
+        <div className="absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-[oklch(0.10_0.06_265_/_0.9)] to-transparent" />
+        <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-[oklch(0.10_0.06_265_/_0.9)] to-transparent" />
+        <div className="noise-layer" />
+      </div>
 
       <div className="max-w-7xl mx-auto px-6 relative z-10">
         <SectionHeader
