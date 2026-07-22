@@ -132,6 +132,8 @@ export interface DtaMember {
   domain: { vn: string; en: string };
   logoInitials: string;
   logoUrl?: string;
+  /** Member site URL — logos on the news portal must link out (per brief). */
+  website?: string;
 }
 
 export const membersData: DtaMember[] = [

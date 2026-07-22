@@ -167,6 +167,34 @@ export function MapAddressSection({ lang }: { lang: Lang }) {
                 className="w-full h-full min-h-[350px] lg:min-h-[450px] select-none"
                 title="DTA Danang Office Location Map"
               />
+
+              {/* "HERE" ping. The embed URL centres the venue in the frame, so
+                  an overlay at the exact centre sits on the venue without any
+                  Maps API. pointer-events-none keeps the map fully
+                  interactive; if the user pans away, the ping simply floats
+                  until the map springs back. Hidden until the map loads. */}
+              {mapLoaded && (
+                <div
+                  aria-hidden
+                  className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none z-10 flex flex-col items-center"
+                >
+                  {/* Label pill */}
+                  <div className="mb-2 px-3 py-1.5 rounded-full glass border border-accent/30 shadow-[0_0_20px_oklch(0.85_0.16_90_/_0.25)] whitespace-nowrap">
+                    <span className="text-[10px] font-black uppercase tracking-wider text-accent">
+                      {lang === "vn" ? "Trụ sở DTA tại đây" : "DTA HQ is here"}
+                    </span>
+                  </div>
+                  {/* Radar rings + core dot */}
+                  <div className="relative w-10 h-10 flex items-center justify-center">
+                    <span className="absolute inline-flex w-full h-full rounded-full bg-cyan-400/40 animate-ping motion-reduce:animate-none" />
+                    <span
+                      className="absolute inline-flex w-2/3 h-2/3 rounded-full bg-cyan-400/30 animate-ping motion-reduce:animate-none"
+                      style={{ animationDelay: "0.5s" }}
+                    />
+                    <span className="relative w-3.5 h-3.5 rounded-full bg-cyan-300 border-2 border-white shadow-[0_0_12px_rgba(34,211,238,0.9)]" />
+                  </div>
+                </div>
+              )}
             </div>
           </ScrollReveal>
         </div>
