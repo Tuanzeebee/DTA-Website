@@ -40,7 +40,7 @@ export function TopicsSection({ lang }: { lang: Lang }) {
         <StaggerContainer className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
           {coreTechAreas.map((t, idx) => (
             <StaggerItem key={t.title.vn}>
-              <div className="group card-surface rounded-3xl p-6 flex flex-col justify-between h-full">
+              <div className="group card-prism rounded-3xl p-6 flex flex-col justify-between h-full">
                 <div>
                   <TechAreaIcon id={idx} />
                   <div className="font-bold text-base text-white mb-2 leading-tight">

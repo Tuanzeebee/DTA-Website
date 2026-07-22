@@ -47,7 +47,7 @@ export function ServicesSection({ lang }: { lang: Lang }) {
         <StaggerContainer className="grid md:grid-cols-4 gap-4 mb-16">
           {programsAndServices.map((c, idx) => (
             <StaggerItem key={c.tag}>
-              <div className="card-surface rounded-3xl p-6 h-full flex flex-col justify-between">
+              <div className="card-flow rounded-3xl p-6 h-full flex flex-col justify-between">
                 <div>
                   <PillarIcon idx={idx} />
                   <div className="text-[10px] tracking-[0.25em] font-black text-accent mb-2 uppercase">

@@ -1,10 +1,7 @@
 import { Building, ShieldCheck, Layers, FileText } from "lucide-react";
-import {
-  TrongDongWatermark,
-  TraditionalClouds,
-  AssociationSeal,
-} from "@/compenents/Aesthetic";
-import { SectionBackground, RuleFade } from "@/compenents/SectionBackground";
+import { TraditionalClouds, AssociationSeal } from "@/compenents/Aesthetic";
+import { TrongDongDisc } from "@/compenents/TrongDongDisc";
+import { SectionBackground } from "@/compenents/SectionBackground";
 import { ScrollReveal } from "@/compenents/ScrollReveal";
 import { membersData, translationStrings } from "@/data";
 import type { Lang } from "@/types";
@@ -53,22 +50,27 @@ export function AboutSection({
   return (
     <section
       id="about"
-      className="py-20 md:py-28 px-5 md:px-6 relative overflow-hidden"
+      /* min-height is sized to the drum disc (750px at md, 850px at lg, plus
+         breathing room) so the full artifact is visible instead of being
+         clipped by the section's natural content height. The section becomes
+         a flex container so the content grid stays vertically centred over
+         the disc. */
+      className="py-20 md:py-28 px-5 md:px-6 relative overflow-hidden md:flex md:items-center md:min-h-[53rem] lg:min-h-[60rem]"
     >
-      <RuleFade className="absolute inset-x-0 top-0" />
+      {/* No top rule: the hero dissolves straight into this section with no
+          seam. edge="bottom" keeps the top open (no dark top fade) so the
+          hero's aurora carries through continuously. */}
       <SectionBackground variant={["spotlight", "grid"]} edge="bottom" />
 
-      {/* Background SVG Aesthetics */}
+      {/* Rotating Đông Sơn bronze drum, centred behind the content. Kept at a
+          low opacity so the credential panel and copy stay legible over it. */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0 overflow-hidden">
-        <TrongDongWatermark
-          className="w-[550px] h-[550px] md:w-[750px] md:h-[750px] lg:w-[850px] lg:h-[850px] opacity-35"
-          glowColor="rgba(0, 251, 252, 0.2)"
-        />
+        <TrongDongDisc className="w-[550px] h-[550px] md:w-[750px] md:h-[750px] lg:w-[850px] lg:h-[850px] opacity-40" />
       </div>
       <TraditionalClouds className="absolute left-0 top-6 w-64 md:w-96 opacity-30 z-0 pointer-events-none" />
       <TraditionalClouds className="absolute right-12 bottom-6 w-56 md:w-80 opacity-20 z-0 pointer-events-none rotate-180" />
 
-      <div className="max-w-6xl mx-auto grid lg:grid-cols-5 gap-8 md:gap-14 items-center relative z-10">
+      <div className="w-full max-w-6xl mx-auto grid lg:grid-cols-5 gap-8 md:gap-14 items-center relative z-10">
         <ScrollReveal
           direction="right"
           /* aspect-square + overflow-hidden would clip the credential rows once
