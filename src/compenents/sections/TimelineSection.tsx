@@ -1,6 +1,6 @@
 import { toast } from "sonner";
 import { FileText, Calendar, Download } from "lucide-react";
-import { SectionBackground, RuleFade } from "@/compenents/SectionBackground";
+import { SectionBackground, seamTint } from "@/compenents/SectionBackground";
 import {
   ScrollReveal,
   StaggerContainer,
@@ -18,8 +18,11 @@ export function TimelineSection({ lang }: { lang: Lang }) {
       id="news"
       className="py-20 md:py-28 px-5 md:px-6 relative overflow-hidden"
     >
-      <RuleFade className="absolute inset-x-0 top-0" />
-      <SectionBackground variant="grid" />
+      <SectionBackground
+        variant="grid"
+        tintTop={seamTint.cyan}
+        tintBottom={seamTint.indigo}
+      />
 
       {/* Diagonal image panel, right side, lg+ only (stacked mobile columns
           would just be visually noisy over it).
@@ -31,7 +34,7 @@ export function TimelineSection({ lang }: { lang: Lang }) {
           parallel to the cut by construction, no angle math. */}
       <div
         aria-hidden
-        className="absolute inset-y-0 right-0 w-[58%] hidden lg:block pointer-events-none"
+        className="absolute inset-y-0 right-0 w-[58%] hidden lg:block pointer-events-none [mask-image:linear-gradient(to_bottom,transparent,black_10%,black_90%,transparent)]"
       >
         {/* Skewed backdrop: the gradient artwork fills the diagonal panel.
             The subject is a separate background-removed cutout layered on
@@ -69,20 +72,10 @@ export function TimelineSection({ lang }: { lang: Lang }) {
           decoding="async"
           className="absolute -right-[13%] top-[29%] -translate-y-1/2 h-[62%] max-w-[92%] w-auto object-contain drop-shadow-[0_24px_48px_rgba(0,0,0,0.45)]"
         />
-
-        {/* Fade the panel's top and bottom into the page base so the diagonal
-            never collides with the neighbouring sections' seams. */}
-        <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-[oklch(0.10_0.06_265_/_0.9)] to-transparent" />
-        <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-[oklch(0.10_0.06_265_/_0.9)] to-transparent" />
       </div>
 
       <div className="max-w-6xl mx-auto relative z-10">
         <SectionHeader
-          eyebrow={
-            lang === "vn"
-              ? "ẤN PHẨM & LỊCH TRÌNH HOẠT ĐỘNG"
-              : "PUBLICATIONS & SCHEDULES"
-          }
           title={
             <>
               {lang === "vn"

@@ -1,7 +1,7 @@
 import { Building, ShieldCheck, Layers, FileText } from "lucide-react";
 import { TraditionalClouds, AssociationSeal } from "@/compenents/Aesthetic";
 import { TrongDongDisc } from "@/compenents/TrongDongDisc";
-import { SectionBackground } from "@/compenents/SectionBackground";
+import { SectionBackground, seamTint } from "@/compenents/SectionBackground";
 import { ScrollReveal } from "@/compenents/ScrollReveal";
 import { membersData, translationStrings } from "@/data";
 import type { Lang } from "@/types";
@@ -57,10 +57,13 @@ export function AboutSection({
          the disc. */
       className="py-20 md:py-28 px-5 md:px-6 relative overflow-hidden md:flex md:items-center md:min-h-[53rem] lg:min-h-[60rem]"
     >
-      {/* No top rule: the hero dissolves straight into this section with no
-          seam. edge="bottom" keeps the top open (no dark top fade) so the
-          hero's aurora carries through continuously. */}
-      <SectionBackground variant={["spotlight", "grid"]} edge="bottom" />
+      {/* tintTop receives the cyan the hero hands down; tintBottom passes
+          cyan on to Topics — the same handoff chain as the rest of the page. */}
+      <SectionBackground
+        variant={["spotlight", "grid"]}
+        tintTop={seamTint.cyan}
+        tintBottom={seamTint.cyan}
+      />
 
       {/* Rotating Đông Sơn bronze drum, centred behind the content. Kept at a
           low opacity so the credential panel and copy stay legible over it. */}
@@ -102,10 +105,10 @@ export function AboutSection({
                 >
                   <c.icon className="w-3.5 h-3.5 text-accent shrink-0 mt-0.5" />
                   <div className="min-w-0">
-                    <div className="text-[9px] font-bold uppercase tracking-[0.14em] text-muted-foreground/70 leading-none">
+                    <div className="text-[10px] font-bold uppercase tracking-[0.14em] text-muted-foreground/70 leading-none">
                       {c.label}
                     </div>
-                    <div className="text-[11px] font-semibold text-white leading-snug mt-1">
+                    <div className="text-[12px] font-semibold text-white leading-snug mt-1">
                       {c.value}
                     </div>
                   </div>
@@ -116,7 +119,7 @@ export function AboutSection({
         </ScrollReveal>
 
         <ScrollReveal direction="left" delay={0.15} className="lg:col-span-3">
-          <div className="text-xs tracking-[0.25em] font-bold text-accent mb-4 uppercase">
+          <div className="text-sm md:text-base tracking-[0.25em] font-bold text-accent mb-4 uppercase">
             {lang === "vn" ? "TÔN CHỈ & SỨ MỆNH" : "MISSION & CHARTER"}
           </div>
           <h2 className="display text-3xl md:text-5xl font-black leading-tight text-white uppercase">
@@ -128,7 +131,7 @@ export function AboutSection({
               {lang === "vn" ? "đà nẵng vươn tầm" : "of danang globally"}
             </span>
           </h2>
-          <div className="mt-6 space-y-4 text-muted-foreground leading-relaxed text-sm md:text-base">
+          <div className="mt-6 space-y-4 text-muted-foreground leading-relaxed text-base md:text-lg">
             <p>{translationStrings.charterDesc1[lang]}</p>
             <p>{translationStrings.charterDesc2[lang]}</p>
           </div>

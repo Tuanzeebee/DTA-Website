@@ -7,7 +7,7 @@ import {
   ShieldCheck,
   User,
 } from "lucide-react";
-import { RuleFade } from "@/compenents/SectionBackground";
+import { SectionBackground, seamTint } from "@/compenents/SectionBackground";
 import { SectionHeader } from "@/compenents/SectionHeader";
 import { membersData } from "@/data";
 import type { Lang } from "@/types";
@@ -91,12 +91,19 @@ export function MembersDirectorySection({ lang }: { lang: Lang }) {
 
   return (
     <section id="members" className="py-20 md:py-28 relative overflow-hidden">
-      <RuleFade className="absolute inset-x-0 top-0" />
+      <SectionBackground
+        variant="none"
+        tintTop={seamTint.indigo}
+        tintBottom={seamTint.cyan}
+      />
 
       {/* Background contrast stack (same recipe as TopicsSection):
           image -> dark overlay -> black-to-transparent gradient
           -> faint noise -> content. */}
-      <div aria-hidden className="absolute inset-0 z-0 pointer-events-none">
+      <div
+        aria-hidden
+        className="absolute inset-0 z-0 pointer-events-none [mask-image:linear-gradient(to_bottom,transparent,black_10%,black_90%,transparent)]"
+      >
         {/* scale-[1.04] hides the transparent fringe a CSS blur creates at
             the element edges. */}
         <img
@@ -106,22 +113,13 @@ export function MembersDirectorySection({ lang }: { lang: Lang }) {
           decoding="async"
           className="absolute inset-0 w-full h-full object-cover"
         />
-        <div className="absolute inset-0 bg-black/45" />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/55 via-black/15 to-transparent" />
-        {/* Edge blend into the page base so the image never ends on a hard
-            line against the neighbouring sections. */}
-        <div className="absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-[oklch(0.10_0.06_265_/_0.9)] to-transparent" />
-        <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-[oklch(0.10_0.06_265_/_0.9)] to-transparent" />
+        <div className="absolute inset-0 bg-black/30" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/10 to-transparent" />
         <div className="noise-layer" />
       </div>
 
       <div className="max-w-7xl mx-auto px-6 relative z-10">
         <SectionHeader
-          eyebrow={
-            lang === "vn"
-              ? "HỆ SINH THÁI ĐỐI TÁC VÀ THÀNH VIÊN DTA"
-              : "MEMBER ECOSYSTEM DIRECTORY"
-          }
           title={
             <>
               {lang === "vn"
@@ -144,7 +142,7 @@ export function MembersDirectorySection({ lang }: { lang: Lang }) {
       </div>
 
       {/* Infinite Logo Slider Section */}
-      <div className="relative z-10 my-12 overflow-hidden py-4 select-none w-full">
+      <div className="relative z-10 my-12 overflow-hidden py-4 select-none w-full [mask-image:linear-gradient(90deg,transparent,black_6%,black_94%,transparent)]">
         {/* Row 1: Left sliding */}
         <div className="flex gap-5 animate-marquee mb-5 py-2">
           {track1.map((org, idx) => {
@@ -152,7 +150,7 @@ export function MembersDirectorySection({ lang }: { lang: Lang }) {
             return (
               <div
                 key={`${org.id}-t1-${idx}`}
-                className="card-surface rounded-3xl p-4 w-[330px] shrink-0 flex items-center gap-4 relative"
+                className="card-surface card-solid rounded-3xl p-4 w-[330px] shrink-0 flex items-center gap-4 relative"
                 style={{
                   borderColor: org.borderColor,
                 }}
@@ -206,7 +204,7 @@ export function MembersDirectorySection({ lang }: { lang: Lang }) {
             return (
               <div
                 key={`${org.id}-t2-${idx}`}
-                className="card-surface rounded-3xl p-4 w-[330px] shrink-0 flex items-center gap-4 relative"
+                className="card-surface card-solid rounded-3xl p-4 w-[330px] shrink-0 flex items-center gap-4 relative"
                 style={{
                   borderColor: org.borderColor,
                 }}

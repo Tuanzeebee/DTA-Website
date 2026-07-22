@@ -8,19 +8,36 @@
  */
 
 type Variant =
-  "aurora" | "grid" | "dots" | "spotlight" | "horizon" | "vignette";
+  "aurora" | "grid" | "dots" | "spotlight" | "horizon" | "vignette" | "none";
+
+/**
+ * Seam handoff palette. Each section boundary is crossed by ONE of these
+ * tints: the upper section paints it as its bottom band, the lower section
+ * paints the SAME tint as its top band — so the colour of one section
+ * visibly continues into the start of the next, all the way down the page.
+ */
+export const seamTint = {
+  cyan: "oklch(0.45 0.14 235 / 0.25)",
+  /** Stronger grade for seams between heavy image/colour backgrounds. */
+  cyanStrong: "oklch(0.52 0.16 235 / 0.45)",
+  indigo: "oklch(0.45 0.13 275 / 0.25)",
+  gold: "oklch(0.62 0.12 90 / 0.18)",
+};
 
 interface SectionBackgroundProps {
   /** Layers to stack, painted in array order (first = furthest back). */
   variant?: Variant | Variant[];
-  /** Fade the section into its neighbours at the top and/or bottom edge. */
-  edge?: "none" | "top" | "bottom" | "both";
+  /** Handoff tint at the top edge — pass the PREVIOUS section's tintBottom. */
+  tintTop?: string;
+  /** Handoff tint at the bottom edge — the colour this section passes on. */
+  tintBottom?: string;
   className?: string;
 }
 
 export function SectionBackground({
   variant = "aurora",
-  edge = "both",
+  tintTop,
+  tintBottom,
   className = "",
 }: SectionBackgroundProps) {
   const layers = Array.isArray(variant) ? variant : [variant];
@@ -34,13 +51,23 @@ export function SectionBackground({
         <div key={v} className={`absolute inset-0 ${layerClass[v]}`} />
       ))}
 
-      {/* Edge bands at 0.55 (not 0.85): enough to smooth section seams
-          without sinking every boundary into a dark valley. */}
-      {(edge === "top" || edge === "both") && (
-        <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-[oklch(0.10_0.06_265_/_0.55)] to-transparent" />
+      {/* Colour handoff bands: additive tints (never dark), one shared hue
+          per boundary — see seamTint. */}
+      {tintTop && (
+        <div
+          className="absolute inset-x-0 top-0 h-40"
+          style={{
+            background: `linear-gradient(to bottom, ${tintTop}, transparent)`,
+          }}
+        />
       )}
-      {(edge === "bottom" || edge === "both") && (
-        <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[oklch(0.10_0.06_265_/_0.55)] to-transparent" />
+      {tintBottom && (
+        <div
+          className="absolute inset-x-0 bottom-0 h-40"
+          style={{
+            background: `linear-gradient(to top, ${tintBottom}, transparent)`,
+          }}
+        />
       )}
     </div>
   );
@@ -48,6 +75,7 @@ export function SectionBackground({
 
 const layerClass: Record<Variant, string> = {
   aurora: "bg-aurora",
+  none: "",
   grid: "bg-grid",
   dots: "bg-dots",
   spotlight: "bg-spotlight",
@@ -80,7 +108,7 @@ export function RuleFade({ className = "" }: { className?: string }) {
   return (
     <div
       aria-hidden
-      className={`pointer-events-none h-24 bg-[radial-gradient(ellipse_65%_130%_at_50%_0%,oklch(0.75_0.19_235_/_0.09),transparent_70%)] ${className}`}
+      className={`pointer-events-none h-32 bg-[radial-gradient(ellipse_90%_140%_at_50%_0%,oklch(0.75_0.19_235_/_0.1),transparent_70%)] ${className}`}
     />
   );
 }

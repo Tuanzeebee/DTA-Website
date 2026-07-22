@@ -3,7 +3,7 @@ import type { Lang } from "@/types";
 
 export function Footer({ lang }: { lang: Lang }) {
   return (
-    <footer className="border-t border-white/10 mt-20 py-16 px-6 bg-black/40">
+    <footer className="border-t border-white/10 py-16 px-6 bg-black/40">
       <div className="max-w-6xl mx-auto grid md:grid-cols-4 gap-10 text-xs text-muted-foreground">
         <div className="md:col-span-2">
           <div className="flex items-center gap-2.5 font-black tracking-widest mb-4 text-white">

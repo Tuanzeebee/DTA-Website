@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Building, Phone, Mail, MapPin } from "lucide-react";
-import { SectionBackground, RuleFade } from "@/compenents/SectionBackground";
+import { SectionBackground, seamTint } from "@/compenents/SectionBackground";
 import { ScrollReveal } from "@/compenents/ScrollReveal";
 import { SectionHeader } from "@/compenents/SectionHeader";
 import type { Lang } from "@/types";
@@ -13,14 +13,18 @@ export function MapAddressSection({ lang }: { lang: Lang }) {
       id="location"
       className="py-20 md:py-28 px-5 md:px-6 relative overflow-hidden"
     >
-      <RuleFade className="absolute inset-x-0 top-0" />
-      <SectionBackground variant={["dots", "horizon"]} />
+      {/* No "horizon" layer here: its cyan glow anchors at this section's
+          bottom edge — exactly where the gold handoff band lives — and the
+          two hues muddied each other. With dots only, the bottom is clean
+          and the gold wave crosses into FAQ unpolluted. */}
+      <SectionBackground
+        variant="dots"
+        tintTop={seamTint.cyan}
+        tintBottom={seamTint.gold}
+      />
 
       <div className="max-w-7xl mx-auto relative z-10">
         <SectionHeader
-          eyebrow={
-            lang === "vn" ? "BẢN ĐỒ & TRỤ SỞ CHÍNH" : "HQ LOCATION & MAP"
-          }
           title={
             <>
               {lang === "vn" ? "Trụ sở & Văn phòng" : "Headquarters & Office"}

@@ -1,4 +1,4 @@
-import { SectionBackground, RuleFade } from "@/compenents/SectionBackground";
+import { SectionBackground, seamTint } from "@/compenents/SectionBackground";
 import {
   ScrollReveal,
   StaggerContainer,
@@ -15,8 +15,11 @@ export function ServicesSection({ lang }: { lang: Lang }) {
       id="services"
       className="relative py-20 md:py-28 px-5 md:px-6 overflow-hidden"
     >
-      <RuleFade className="absolute inset-x-0 top-0" />
-      <SectionBackground variant="horizon" edge="top" />
+      <SectionBackground
+        variant="horizon"
+        tintTop={seamTint.indigo}
+        tintBottom={seamTint.cyan}
+      />
 
       <div className="max-w-7xl mx-auto relative z-10">
         <SectionHeader

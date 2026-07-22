@@ -1,13 +1,16 @@
 import React from "react";
 import { GrainOverlay } from "@/compenents/SectionBackground";
+import gradientMid from "@/assets/GradientMid.webp";
 
 /**
- * Shared page chrome: base colour, the fixed aurora field, and the grain.
+ * Shared page chrome: base colour, the fixed colour field, and the grain.
  *
- * Both the home route and the portal previously inlined the same root <div>
- * with a remote Unsplash photo at `background-attachment: fixed` — a network
- * image the compositor re-samples on every scroll frame. One CSS gradient
- * layer replaces it in both places.
+ * The colour field is two FIXED layers — the CSS aurora plus the GradientMid
+ * artwork on `mix-blend-screen`. Screen blending can only ADD light, never
+ * darken, so it lifts the whole page; and because both layers are fixed
+ * (they do not scroll), every section drifts over the same continuous colour
+ * field — which is what makes the sections read as joined rather than
+ * stacked.
  *
  * Content is wrapped in a `relative z-10` layer so sections never need to
  * think about stacking against the background.
@@ -26,6 +29,12 @@ export function PageShell({
       <div
         aria-hidden
         className="fixed inset-0 z-0 pointer-events-none bg-aurora"
+      />
+      <img
+        aria-hidden
+        src={gradientMid}
+        alt=""
+        className="fixed inset-0 z-0 w-full h-full object-cover pointer-events-none mix-blend-screen opacity-40"
       />
       <GrainOverlay />
       <div className="relative z-10">{children}</div>

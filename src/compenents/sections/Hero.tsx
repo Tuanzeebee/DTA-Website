@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { MapPin, Plus, Search } from "lucide-react";
 import heroImage from "@/assets/HerosectionBackGroundV3.jpg";
 import { ScrollReveal } from "@/compenents/ScrollReveal";
+import { SectionBackground, seamTint } from "@/compenents/SectionBackground";
 import { translationStrings } from "@/data";
 import type { Lang } from "@/types";
 
@@ -37,20 +38,25 @@ export function Hero({ lang }: { lang: Lang }) {
           WebkitMaskImage: "linear-gradient(#000 88%, transparent 100%)",
         }}
       />
-      {/* Seam connector, two layers.
-          1. The image's centre (its brightest region) resolves fully to the
-             page base colour — the corners already matched, this makes the
-             middle match too.
-          2. A cyan bloom rises from the bottom edge, mirroring the spotlight
-             About opens with at its top edge (same hue, ellipse anchored on
-             the shared boundary from the other side). The light is therefore
-             continuous across the two sections and the seam disappears. */}
-      <div className="absolute inset-x-0 bottom-0 h-64 md:h-96 bg-gradient-to-t from-[oklch(0.10_0.06_265)] via-[oklch(0.10_0.06_265_/_0.5)] to-transparent" />
+      {/* Seam handoff, same system as every other boundary on the page: the
+          hero's bottom band paints seamTint.cyan and About's top band paints
+          the SAME tint, so the colour crosses the boundary as one wave. The
+          image itself dissolves to transparent via its own mask, revealing
+          the shared fixed colour field underneath. */}
+      <SectionBackground variant="none" tintBottom={seamTint.cyan} />
+
+      {/* Centre bloom, mirroring the spotlight About opens with at its
+          top-centre (same hue, same intensity, ellipse anchored on the shared
+          boundary from THIS side). The corners of the seam already match
+          because both sides are plain base + uniform band there; this makes
+          the centre symmetric too, so the middle melts exactly like the
+          corners do. */}
       <div
-        className="absolute inset-x-0 bottom-0 h-48 md:h-72"
+        aria-hidden
+        className="absolute inset-x-0 bottom-0 h-56 md:h-72 pointer-events-none"
         style={{
           background:
-            "radial-gradient(ellipse 70% 100% at 50% 100%, oklch(0.75 0.19 235 / 0.18), transparent 70%)",
+            "radial-gradient(ellipse 70% 100% at 50% 100%, oklch(0.75 0.19 235 / 0.22), transparent 70%)",
         }}
       />
 

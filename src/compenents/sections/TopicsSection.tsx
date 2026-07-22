@@ -1,5 +1,5 @@
 import { ChevronRight } from "lucide-react";
-import { RuleFade } from "@/compenents/SectionBackground";
+import { SectionBackground, seamTint } from "@/compenents/SectionBackground";
 import {
   ScrollReveal,
   StaggerContainer,
@@ -16,13 +16,20 @@ export function TopicsSection({ lang }: { lang: Lang }) {
       id="topics"
       className="py-20 md:py-28 px-5 md:px-6 relative overflow-hidden"
     >
-      <RuleFade className="absolute inset-x-0 top-0" />
+      <SectionBackground
+        variant="none"
+        tintTop={seamTint.cyan}
+        tintBottom={seamTint.indigo}
+      />
 
       {/* Background contrast stack, bottom to top:
           image -> dark overlay -> black-to-transparent gradient
           -> faint noise -> (content). Keeps the mesh/network artwork visible
           while guaranteeing the display type stays high-contrast. */}
-      <div aria-hidden className="absolute inset-0 z-0 pointer-events-none">
+      <div
+        aria-hidden
+        className="absolute inset-0 z-0 pointer-events-none [mask-image:linear-gradient(to_bottom,transparent,black_10%,black_90%,transparent)]"
+      >
         <img
           src={linhVucBg}
           alt=""
@@ -31,14 +38,10 @@ export function TopicsSection({ lang }: { lang: Lang }) {
           className="absolute inset-0 w-full h-full object-cover"
         />
         {/* 2. Dark overlay (45%, middle of the requested 35-60% band). */}
-        <div className="absolute inset-0 bg-black/45" />
+        <div className="absolute inset-0 bg-black/30" />
         {/* 3. Black -> transparent gradient: deepest behind the display type
             at the top, clearing over the cards. */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/55 via-black/15 to-transparent" />
-        {/* Edge blend into the page base so the image never ends on a hard
-            line against the neighbouring sections. */}
-        <div className="absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-[oklch(0.10_0.06_265_/_0.9)] to-transparent" />
-        <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-[oklch(0.10_0.06_265_/_0.9)] to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/10 to-transparent" />
         {/* 4. Very light noise. */}
         <div className="noise-layer" />
       </div>

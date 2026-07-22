@@ -1,4 +1,4 @@
-import { SectionBackground, RuleFade } from "@/compenents/SectionBackground";
+import { SectionBackground, seamTint } from "@/compenents/SectionBackground";
 import { StaggerContainer, StaggerItem } from "@/compenents/ScrollReveal";
 import { SectionHeader } from "@/compenents/SectionHeader";
 import { faqs } from "@/data";
@@ -10,8 +10,7 @@ export function FAQSection({ lang }: { lang: Lang }) {
       id="faq"
       className="py-20 md:py-28 px-5 md:px-6 relative overflow-hidden"
     >
-      <RuleFade className="absolute inset-x-0 top-0" />
-      <SectionBackground variant="vignette" edge="top" />
+      <SectionBackground variant="vignette" tintTop={seamTint.gold} />
 
       <div className="max-w-4xl mx-auto relative z-10">
         <SectionHeader

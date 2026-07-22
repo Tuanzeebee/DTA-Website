@@ -564,8 +564,8 @@ export const translationStrings = {
     en: "A vital bridge, policy forum, and digital platform supporting tech enterprises, academic institutes, and smart city builders in Central Vietnam.",
   },
   heroBtn1: {
-    vn: "Đăng ký Hội viên",
-    en: "Apply Now",
+    vn: "Gia nhập DTA",
+    en: "Join DTA",
   },
   heroBtn2: {
     vn: "Xem danh bạ Hội viên",

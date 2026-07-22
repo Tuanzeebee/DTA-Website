@@ -34,7 +34,7 @@ function NewsPortalLayout() {
         <PortalMenuBar />
         <PortalBanner />
 
-        <main className="max-w-7xl mx-auto px-4 md:px-6 mt-10 min-h-[50vh]">
+        <main className="max-w-7xl mx-auto px-4 md:px-6 mt-10 pb-20 min-h-[50vh]">
           <Outlet />
         </main>
 
