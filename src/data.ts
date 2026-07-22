@@ -153,6 +153,7 @@ export const membersData: DtaMember[] = [
       en: "Software R&D, IT Outsourcing & Semiconductor Training",
     },
     logoInitials: "FPT",
+    website: "https://fpt.com",
   },
   {
     id: "m2",
@@ -170,6 +171,7 @@ export const membersData: DtaMember[] = [
       en: "Nurturing High-quality IT, Telecommunication & Embedded Engineers",
     },
     logoInitials: "DUT",
+    website: "https://dut.udn.vn",
   },
   {
     id: "m3",
@@ -187,6 +189,7 @@ export const membersData: DtaMember[] = [
       en: "Integrated Circuit (IC) Design, Semiconductor Testing & Smart IoT",
     },
     logoInitials: "ACR",
+    website: "https://acronics.com.vn",
   },
   {
     id: "m4",
@@ -201,6 +204,7 @@ export const membersData: DtaMember[] = [
       en: "Web & Mobile Development, Digital Workspaces & Tech Branding",
     },
     logoInitials: "ENV",
+    website: "https://enouvo.com",
   },
   {
     id: "m5",
@@ -260,6 +264,7 @@ export const membersData: DtaMember[] = [
       en: "AI Integration, Blockchain, Web3, Salesforce & Enterprise ERP",
     },
     logoInitials: "BAP",
+    website: "https://bap-software.net",
   },
   {
     id: "m9",
@@ -293,6 +298,7 @@ export const membersData: DtaMember[] = [
     logoInitials: "DTU",
     logoUrl:
       "https://dsa.org.vn/wp-content/uploads/2017/11/duy-tan-480x300.png",
+    website: "https://duytan.edu.vn",
   },
   {
     id: "m11",
@@ -310,6 +316,7 @@ export const membersData: DtaMember[] = [
       en: "Data Center Infrastructure, Cloud Computing & Smart City Solutions",
     },
     logoInitials: "VTL",
+    website: "https://solutions.viettel.vn",
   },
   {
     id: "m12",
@@ -329,6 +336,7 @@ export const membersData: DtaMember[] = [
     logoInitials: "DTU",
     logoUrl:
       "https://dsa.org.vn/wp-content/uploads/2017/11/duy-tan-480x300.png",
+    website: "https://duytan.edu.vn",
   },
 ];
 

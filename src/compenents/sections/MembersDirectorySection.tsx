@@ -6,12 +6,104 @@ import {
   Briefcase,
   ShieldCheck,
   User,
+  ArrowUpRight,
 } from "lucide-react";
 import { SectionBackground, seamTint } from "@/compenents/SectionBackground";
 import { SectionHeader } from "@/compenents/SectionHeader";
 import { membersData } from "@/data";
 import type { Lang } from "@/types";
+import type { LucideIcon } from "lucide-react";
 import doiTacBg from "@/assets/DoiTac.png";
+
+interface SliderOrg {
+  id: string;
+  name: { vn: string; en: string };
+  domain: { vn: string; en: string };
+  type: "organization" | "individual" | "advisory";
+  logoInitials: string;
+  logoUrl?: string;
+  website?: string;
+  icon: LucideIcon;
+  gradient: string;
+  borderColor: string;
+  textColor: string;
+}
+
+/** One marquee card. Members with a website become external links (open in a
+ *  new tab — the marquee pauses on hover, so the card is clickable at rest);
+ *  members without one (individuals, advisors) stay plain divs. */
+function MemberCard({ org, lang }: { org: SliderOrg; lang: Lang }) {
+  const IconComp = org.icon;
+  const typeLabel =
+    org.type === "organization"
+      ? lang === "vn"
+        ? "Tổ chức"
+        : "Corp"
+      : org.type === "individual"
+        ? lang === "vn"
+          ? "Cá nhân"
+          : "Indiv"
+        : lang === "vn"
+          ? "Cố vấn"
+          : "Advisor";
+
+  const body = (
+    <>
+      {/* Brand Logo graphic */}
+      <div
+        className={`w-[75px] h-[75px] rounded-2xl flex items-center justify-center text-sm font-black shrink-0 bg-gradient-to-br ${org.gradient} border border-white/10 shadow-md overflow-hidden`}
+      >
+        {org.logoUrl ? (
+          <img
+            src={org.logoUrl}
+            alt={org.name[lang]}
+            referrerPolicy="no-referrer"
+            className="w-full h-full object-contain p-0.5 bg-white rounded-2xl"
+          />
+        ) : (
+          <IconComp className={`w-9 h-9 ${org.textColor}`} />
+        )}
+      </div>
+      <div className="min-w-0 flex-1">
+        <h4 className="font-bold text-sm text-white tracking-wide truncate">
+          {org.name[lang]}
+        </h4>
+        <p className="text-[10px] text-muted-foreground mt-0.5 uppercase leading-none font-semibold font-mono tracking-wider">
+          {org.logoInitials} · {typeLabel}
+        </p>
+        <p className="text-[11px] text-accent/80 truncate mt-1.5 leading-none">
+          {org.domain[lang]}
+        </p>
+      </div>
+    </>
+  );
+
+  const cardClass =
+    "card-surface card-solid rounded-3xl p-4 w-[330px] shrink-0 flex items-center gap-4 relative";
+
+  if (!org.website) {
+    return (
+      <div className={cardClass} style={{ borderColor: org.borderColor }}>
+        {body}
+      </div>
+    );
+  }
+
+  return (
+    <a
+      href={org.website}
+      target="_blank"
+      rel="noreferrer noopener"
+      aria-label={`${org.name[lang]} — website`}
+      className={`${cardClass} group cursor-pointer transition-all duration-300 hover:border-accent/50 hover:shadow-[0_0_24px_oklch(0.75_0.19_235_/_0.15)] hover:-translate-y-0.5`}
+      style={{ borderColor: org.borderColor }}
+    >
+      {body}
+      {/* Link affordance: quiet corner arrow, brightens on hover */}
+      <ArrowUpRight className="absolute top-3 right-3 w-3.5 h-3.5 text-white/25 group-hover:text-accent transition-colors duration-300" />
+    </a>
+  );
+}
 
 export function MembersDirectorySection({ lang }: { lang: Lang }) {
   const sliderOrganizations = membersData.map((m) => {
@@ -145,110 +237,16 @@ export function MembersDirectorySection({ lang }: { lang: Lang }) {
       <div className="relative z-10 my-12 overflow-hidden py-4 select-none w-full [mask-image:linear-gradient(90deg,transparent,black_6%,black_94%,transparent)]">
         {/* Row 1: Left sliding */}
         <div className="flex gap-5 animate-marquee mb-5 py-2">
-          {track1.map((org, idx) => {
-            const IconComp = org.icon;
-            return (
-              <div
-                key={`${org.id}-t1-${idx}`}
-                className="card-surface card-solid rounded-3xl p-4 w-[330px] shrink-0 flex items-center gap-4 relative"
-                style={{
-                  borderColor: org.borderColor,
-                }}
-              >
-                {/* Brand Logo graphic */}
-                <div
-                  className={`w-[75px] h-[75px] rounded-2xl flex items-center justify-center text-sm font-black shrink-0 bg-gradient-to-br ${org.gradient} border border-white/10 shadow-md overflow-hidden`}
-                >
-                  {org.logoUrl ? (
-                    <img
-                      src={org.logoUrl}
-                      alt={org.name[lang]}
-                      referrerPolicy="no-referrer"
-                      className="w-full h-full object-contain p-0.5 bg-white rounded-2xl"
-                    />
-                  ) : (
-                    <IconComp className={`w-9 h-9 ${org.textColor}`} />
-                  )}
-                </div>
-                <div className="min-w-0 flex-1">
-                  <h4 className="font-bold text-sm text-white tracking-wide truncate">
-                    {org.name[lang]}
-                  </h4>
-                  <p className="text-[10px] text-muted-foreground mt-0.5 uppercase leading-none font-semibold font-mono tracking-wider">
-                    {org.logoInitials} ·{" "}
-                    {org.type === "organization"
-                      ? lang === "vn"
-                        ? "Tổ chức"
-                        : "Corp"
-                      : org.type === "individual"
-                        ? lang === "vn"
-                          ? "Cá nhân"
-                          : "Indiv"
-                        : lang === "vn"
-                          ? "Cố vấn"
-                          : "Advisor"}
-                  </p>
-                  <p className="text-[11px] text-accent/80 truncate mt-1.5 leading-none">
-                    {org.domain[lang]}
-                  </p>
-                </div>
-              </div>
-            );
-          })}
+          {track1.map((org, idx) => (
+            <MemberCard key={`${org.id}-t1-${idx}`} org={org} lang={lang} />
+          ))}
         </div>
 
         {/* Row 2: Right sliding */}
         <div className="flex gap-5 animate-marquee-reverse py-2">
-          {track2.map((org, idx) => {
-            const IconComp = org.icon;
-            return (
-              <div
-                key={`${org.id}-t2-${idx}`}
-                className="card-surface card-solid rounded-3xl p-4 w-[330px] shrink-0 flex items-center gap-4 relative"
-                style={{
-                  borderColor: org.borderColor,
-                }}
-              >
-                {/* Brand Logo graphic */}
-                <div
-                  className={`w-[75px] h-[75px] rounded-2xl flex items-center justify-center text-sm font-black shrink-0 bg-gradient-to-br ${org.gradient} border border-white/10 shadow-md overflow-hidden`}
-                >
-                  {org.logoUrl ? (
-                    <img
-                      src={org.logoUrl}
-                      alt={org.name[lang]}
-                      referrerPolicy="no-referrer"
-                      className="w-full h-full object-contain p-0.5 bg-white rounded-2xl"
-                    />
-                  ) : (
-                    <IconComp className={`w-9 h-9 ${org.textColor}`} />
-                  )}
-                </div>
-                <div className="min-w-0 flex-1">
-                  <h4 className="font-bold text-sm text-white tracking-wide truncate">
-                    {org.name[lang]}
-                  </h4>
-                  <p className="text-[10px] text-muted-foreground mt-0.5 uppercase leading-none font-semibold font-mono tracking-wider">
-                    {org.logoInitials} ·{" "}
-                    {org.type === "organization"
-                      ? lang === "vn"
-                        ? "Tổ chức"
-                        : "Corp"
-                      : org.type === "individual"
-                        ? lang === "vn"
-                          ? "Cá nhân"
-                          : "Indiv"
-                        : lang === "vn"
-                          ? "Cố vấn"
-                          : "Advisor"}
-                  </p>
-                  <p className="text-[11px] text-accent/80 truncate mt-1.5 leading-none">
-                    {org.domain[lang]}
-                  </p>
-                </div>
-              </div>
-            );
-          })}
+          {track2.map((org, idx) => (
+            <MemberCard key={`${org.id}-t2-${idx}`} org={org} lang={lang} />
+          ))}
         </div>
       </div>
     </section>

@@ -1,5 +1,6 @@
 import { toast } from "sonner";
-import { FileText, Calendar, Download } from "lucide-react";
+import { Link } from "@tanstack/react-router";
+import { FileText, Calendar, Download, ArrowUpRight } from "lucide-react";
 import { SectionBackground, seamTint } from "@/compenents/SectionBackground";
 import {
   ScrollReveal,
@@ -11,6 +12,16 @@ import { dtaNews, dtaEvents } from "@/data";
 import type { Lang } from "@/types";
 import tinTucCutout from "@/assets/image 1566.png";
 import leftGradientBg from "@/assets/left-gradient-start-background.webp";
+
+/** Landing-page teaser -> portal article mapping, by card position. The
+ *  landing teasers (dtaNews) and the portal articles (newsData.ts) are
+ *  separate mock datasets, so until they share a real backend each teaser
+ *  simply deep-links to a representative published article. */
+const teaserArticleIds = ["cs-01", "nganh-01", "dn-02"];
+
+/** Same idea for the events column: each upcoming-event card deep-links to a
+ *  representative portal article until events get real detail pages. */
+const eventArticleIds = ["td-01", "td-02", "dn-03"];
 
 export function TimelineSection({ lang }: { lang: Lang }) {
   return (
@@ -109,9 +120,19 @@ export function TimelineSection({ lang }: { lang: Lang }) {
             </ScrollReveal>
 
             <StaggerContainer className="space-y-4">
-              {dtaNews.slice(0, 3).map((news) => (
+              {dtaNews.slice(0, 3).map((news, idx) => (
                 <StaggerItem key={news.title.vn}>
-                  <div className="card-surface card-solid rounded-3xl flex overflow-hidden group">
+                  <div className="card-surface card-solid rounded-3xl flex overflow-hidden group relative transition-all duration-300 hover:border-accent/40 hover:-translate-y-0.5">
+                    {/* Card-wide click target -> the portal article page.
+                        An overlay Link (not a wrapping <a>) because the card
+                        also contains the PDF button — nesting interactive
+                        elements is invalid; the button sits above on z-[2]. */}
+                    <Link
+                      to="/news/article/$id"
+                      params={{ id: teaserArticleIds[idx] }}
+                      aria-label={news.title[lang]}
+                      className="absolute inset-0 z-[1] rounded-3xl"
+                    />
                     {/* News Image Metadata */}
                     <div className="w-28 h-auto shrink-0 relative overflow-hidden hidden sm:block">
                       <img
@@ -139,7 +160,15 @@ export function TimelineSection({ lang }: { lang: Lang }) {
                           {news.summary[lang]}
                         </p>
                       </div>
-                      <div className="mt-4 pt-3 border-t border-white/5 flex justify-end">
+                      <div className="mt-4 pt-3 border-t border-white/5 flex items-center justify-between gap-3">
+                        {/* Visual affordance only — the overlay Link handles
+                            the actual click, so this stays non-interactive. */}
+                        <span className="text-[10px] uppercase font-bold text-white/40 group-hover:text-accent transition-colors duration-300 flex items-center gap-1 pointer-events-none">
+                          <span>
+                            {lang === "vn" ? "Đọc bài viết" : "Read article"}
+                          </span>
+                          <ArrowUpRight className="w-3 h-3" />
+                        </span>
                         <button
                           onClick={() => {
                             toast.info(
@@ -155,7 +184,7 @@ export function TimelineSection({ lang }: { lang: Lang }) {
                               );
                             }, 1500);
                           }}
-                          className="text-[10px] uppercase font-bold text-cyan-400 flex items-center gap-1 cursor-pointer hover:underline"
+                          className="relative z-[2] text-[10px] uppercase font-bold text-cyan-400 flex items-center gap-1 cursor-pointer hover:underline"
                         >
                           <Download className="w-3 h-3" />
                           <span>
@@ -188,7 +217,16 @@ export function TimelineSection({ lang }: { lang: Lang }) {
             <StaggerContainer className="space-y-6">
               {dtaEvents.map((event, idx) => (
                 <StaggerItem key={event.title.vn}>
-                  <div className="card-surface card-solid rounded-3xl relative overflow-hidden flex flex-col md:flex-row group">
+                  <div className="card-surface card-solid rounded-3xl relative overflow-hidden flex flex-col md:flex-row group transition-all duration-300 hover:border-accent/40 hover:-translate-y-0.5">
+                    {/* Card-wide click target -> the portal article page,
+                        same overlay-Link pattern as the news column: the
+                        register button keeps its own click on z-[2]. */}
+                    <Link
+                      to="/news/article/$id"
+                      params={{ id: eventArticleIds[idx] }}
+                      aria-label={event.title[lang]}
+                      className="absolute inset-0 z-[1] rounded-3xl"
+                    />
                     {/* Event Image */}
                     <div className="w-full md:w-44 h-36 md:h-auto shrink-0 relative overflow-hidden">
                       <img
@@ -245,7 +283,7 @@ export function TimelineSection({ lang }: { lang: Lang }) {
                               {event.location[lang]}
                             </p>
                           </div>
-                          <div className="mt-4">
+                          <div className="mt-4 flex items-center gap-4">
                             <button
                               onClick={() => {
                                 toast.success(
@@ -254,12 +292,20 @@ export function TimelineSection({ lang }: { lang: Lang }) {
                                     : "Registered successfully! Ticket sent to email.",
                                 );
                               }}
-                              className="px-4 py-1.5 rounded-full text-[10px] font-bold border border-white/10 hover:bg-white/10 active:scale-95 transition-all duration-200 text-white cursor-pointer"
+                              className="relative z-[2] px-4 py-1.5 rounded-full text-[10px] font-bold border border-white/10 hover:bg-white/10 active:scale-95 transition-all duration-200 text-white cursor-pointer"
                             >
                               {lang === "vn"
                                 ? "Đăng ký Tham gia"
                                 : "Register Now"}
                             </button>
+                            {/* Visual affordance only — the overlay Link
+                                handles the actual click. */}
+                            <span className="text-[10px] uppercase font-bold text-white/40 group-hover:text-accent transition-colors duration-300 flex items-center gap-1 pointer-events-none">
+                              <span>
+                                {lang === "vn" ? "Xem chi tiết" : "Details"}
+                              </span>
+                              <ArrowUpRight className="w-3 h-3" />
+                            </span>
                           </div>
                         </div>
                       </div>
