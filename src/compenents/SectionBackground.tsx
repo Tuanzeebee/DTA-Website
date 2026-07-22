@@ -34,11 +34,13 @@ export function SectionBackground({
         <div key={v} className={`absolute inset-0 ${layerClass[v]}`} />
       ))}
 
+      {/* Edge bands at 0.55 (not 0.85): enough to smooth section seams
+          without sinking every boundary into a dark valley. */}
       {(edge === "top" || edge === "both") && (
-        <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-[oklch(0.10_0.06_265_/_0.85)] to-transparent" />
+        <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-[oklch(0.10_0.06_265_/_0.55)] to-transparent" />
       )}
       {(edge === "bottom" || edge === "both") && (
-        <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[oklch(0.10_0.06_265_/_0.85)] to-transparent" />
+        <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[oklch(0.10_0.06_265_/_0.55)] to-transparent" />
       )}
     </div>
   );
@@ -51,7 +53,7 @@ const layerClass: Record<Variant, string> = {
   spotlight: "bg-spotlight",
   horizon: "bg-horizon",
   vignette:
-    "bg-[radial-gradient(ellipse_75%_60%_at_50%_50%,transparent_35%,oklch(0.08_0.05_265_/_0.55)_100%)]",
+    "bg-[radial-gradient(ellipse_75%_60%_at_50%_50%,transparent_35%,oklch(0.10_0.05_265_/_0.35)_100%)]",
 };
 
 /**

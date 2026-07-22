@@ -29,13 +29,25 @@ function Index() {
       <Nav lang={lang} toggleLang={toggleLang} isLoggedIn={isLoggedIn} />
       <Hero lang={lang} />
       <AboutSection lang={lang} setShowCharter={setShowCharter} />
-      <TopicsSection lang={lang} />
-      <ServicesSection lang={lang} />
-      <TimelineSection lang={lang} />
-      <MembersDirectorySection lang={lang} />
-      <MapAddressSection lang={lang} />
-      <FAQSection lang={lang} />
-      <Footer lang={lang} />
+
+      {/* From the tech pillars to the footer the page sits one step brighter:
+          a translucent blue lift over the dark base (0.10 -> ~0.14 perceived),
+          fading in over the first 12rem so there is no line where it starts.
+          Same hue family, so the theme lock holds — this is a lighting change,
+          not a palette change. */}
+      <div className="relative">
+        <div
+          aria-hidden
+          className="absolute inset-0 pointer-events-none bg-[oklch(0.28_0.05_262_/_0.4)] [mask-image:linear-gradient(to_bottom,transparent,black_12rem)]"
+        />
+        <TopicsSection lang={lang} />
+        <ServicesSection lang={lang} />
+        <TimelineSection lang={lang} />
+        <MembersDirectorySection lang={lang} />
+        <MapAddressSection lang={lang} />
+        <FAQSection lang={lang} />
+        <Footer lang={lang} />
+      </div>
 
       <AnimatePresence>
         {showCharter && (

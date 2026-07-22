@@ -19,12 +19,17 @@ export function TopicsSection({ lang }: { lang: Lang }) {
       <SectionBackground variant={["dots", "vignette"]} />
 
       <div className="max-w-7xl mx-auto relative z-10">
-        <ScrollReveal className="flex flex-wrap items-end justify-between gap-6 mb-14">
-          <div>
-            <div className="display text-6xl md:text-7xl font-black text-gradient-cyan">
+        <ScrollReveal className="flex flex-wrap items-center justify-between gap-x-8 gap-y-6 mb-14">
+          {/* Count + title on one row. items-center (not baseline): the title
+              wraps to two lines, and baseline alignment hangs a wrapped line
+              below the number — centring the title block against the digits
+              is the alignment that actually reads as "beside the 05".
+              flex-nowrap: the title must never drop under the number. */}
+          <div className="flex flex-nowrap items-center gap-x-4 md:gap-x-6 min-w-0">
+            <div className="display text-[4.5rem] md:text-[7.5rem] lg:text-[200px] leading-[0.8] font-black text-gradient-cyan shrink-0">
               05
             </div>
-            <div className="text-base md:text-lg font-bold tracking-wider uppercase mt-2 text-white">
+            <div className="display text-[1.35rem] md:text-[2rem] lg:text-[40px] leading-[1.05] font-black uppercase tracking-tight text-white max-w-[16ch]">
               {lang === "vn"
                 ? "Lĩnh vực công nghệ trọng tâm"
                 : "Strategic Tech Focus Areas"}
