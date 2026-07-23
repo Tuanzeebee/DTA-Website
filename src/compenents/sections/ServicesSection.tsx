@@ -1,4 +1,5 @@
-import { SectionBackground, seamTint } from "@/compenents/SectionBackground";
+import { SectionBackground } from "@/compenents/SectionBackground";
+import { seamTint } from "@/compenents/seamTint";
 import {
   ScrollReveal,
   StaggerContainer,

@@ -1,7 +1,8 @@
 import { toast } from "sonner";
 import { Link } from "@tanstack/react-router";
 import { FileText, Calendar, Download, ArrowUpRight } from "lucide-react";
-import { SectionBackground, seamTint } from "@/compenents/SectionBackground";
+import { SectionBackground } from "@/compenents/SectionBackground";
+import { seamTint } from "@/compenents/seamTint";
 import {
   ScrollReveal,
   StaggerContainer,

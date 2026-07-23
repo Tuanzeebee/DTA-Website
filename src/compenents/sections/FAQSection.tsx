@@ -1,4 +1,5 @@
-import { SectionBackground, seamTint } from "@/compenents/SectionBackground";
+import { SectionBackground } from "@/compenents/SectionBackground";
+import { seamTint } from "@/compenents/seamTint";
 import { StaggerContainer, StaggerItem } from "@/compenents/ScrollReveal";
 import { SectionHeader } from "@/compenents/SectionHeader";
 import { faqs } from "@/data";

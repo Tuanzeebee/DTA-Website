@@ -39,5 +39,13 @@ export default tseslint.config(
       "@typescript-eslint/no-unused-vars": "off",
     },
   },
+  {
+    /* shadcn-generated primitives ship variant constants next to their
+       components by design; the fast-refresh warning is noise there. */
+    files: ["src/compenents/ui/**/*.{ts,tsx}"],
+    rules: {
+      "react-refresh/only-export-components": "off",
+    },
+  },
   eslintPluginPrettier,
 );

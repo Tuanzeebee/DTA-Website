@@ -9,7 +9,8 @@ import {
   User,
   ArrowUpRight,
 } from "lucide-react";
-import { SectionBackground, seamTint } from "@/compenents/SectionBackground";
+import { SectionBackground } from "@/compenents/SectionBackground";
+import { seamTint } from "@/compenents/seamTint";
 import { SectionHeader } from "@/compenents/SectionHeader";
 import { allMembers } from "@/data";
 import type { Lang } from "@/types";

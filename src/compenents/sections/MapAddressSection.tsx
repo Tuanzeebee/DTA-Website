@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Building, Phone, Mail, MapPin } from "lucide-react";
-import { SectionBackground, seamTint } from "@/compenents/SectionBackground";
+import { SectionBackground } from "@/compenents/SectionBackground";
+import { seamTint } from "@/compenents/seamTint";
 import { ScrollReveal } from "@/compenents/ScrollReveal";
 import { SectionHeader } from "@/compenents/SectionHeader";
 import type { Lang } from "@/types";

@@ -1,7 +1,8 @@
 import { Building, ShieldCheck, Layers, FileText } from "lucide-react";
 import { TraditionalClouds, AssociationSeal } from "@/compenents/Aesthetic";
 import { TrongDongDisc } from "@/compenents/TrongDongDisc";
-import { SectionBackground, seamTint } from "@/compenents/SectionBackground";
+import { SectionBackground } from "@/compenents/SectionBackground";
+import { seamTint } from "@/compenents/seamTint";
 import { ScrollReveal } from "@/compenents/ScrollReveal";
 import { allMembers, translationStrings } from "@/data";
 import type { Lang } from "@/types";
