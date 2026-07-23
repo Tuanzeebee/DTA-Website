@@ -1,5 +1,5 @@
 import { useMemo, useState, useEffect } from "react";
-import { Link } from "@tanstack/react-router";
+import { Link, useRouter } from "@tanstack/react-router";
 import { toast } from "sonner";
 import {
   Clock,
@@ -14,7 +14,11 @@ import {
   Share2,
   Link as LinkIcon,
   Printer,
+  ArrowLeft,
+  Bookmark,
+  BookmarkCheck,
 } from "lucide-react";
+import { useSavedArticles } from "@/hooks/useSavedArticles";
 import { membersData } from "@/data";
 import {
   latestArticles,
@@ -211,6 +215,15 @@ function pageItems(page: number, count: number): (number | "gap")[] {
   return out;
 }
 
+const PAGE_ARROW =
+  "w-9 h-9 rounded-xl border border-white/10 bg-white/[0.03] flex items-center justify-center text-white/60 hover:text-white hover:border-white/25 transition-colors";
+const PAGE_NUM =
+  "min-w-9 h-9 px-2 rounded-xl border text-xs font-bold flex items-center justify-center transition-colors";
+const PAGE_NUM_ACTIVE = "border-accent/50 bg-accent/15 text-accent";
+const PAGE_NUM_IDLE =
+  "border-white/10 bg-white/[0.03] text-white/60 hover:text-white hover:border-white/25";
+
+/** Category-page pagination (?sort/&flag preserved across pages). */
 export function ArticlePagination({
   topic,
   category,
@@ -244,7 +257,7 @@ export function ArticlePagination({
           {...pageLink(page - 1)}
           onClick={jumpTop}
           aria-label="Trang trước"
-          className="w-9 h-9 rounded-xl border border-white/10 bg-white/[0.03] flex items-center justify-center text-white/60 hover:text-white hover:border-white/25 transition-colors"
+          className={PAGE_ARROW}
         >
           <ChevronLeft className="w-4 h-4" />
         </Link>
@@ -265,11 +278,7 @@ export function ArticlePagination({
             {...pageLink(p)}
             onClick={jumpTop}
             aria-current={p === page ? "page" : undefined}
-            className={`min-w-9 h-9 px-2 rounded-xl border text-xs font-bold flex items-center justify-center transition-colors ${
-              p === page
-                ? "border-accent/50 bg-accent/15 text-accent"
-                : "border-white/10 bg-white/[0.03] text-white/60 hover:text-white hover:border-white/25"
-            }`}
+            className={`${PAGE_NUM} ${p === page ? PAGE_NUM_ACTIVE : PAGE_NUM_IDLE}`}
           >
             {p}
           </Link>
@@ -281,7 +290,79 @@ export function ArticlePagination({
           {...pageLink(page + 1)}
           onClick={jumpTop}
           aria-label="Trang sau"
-          className="w-9 h-9 rounded-xl border border-white/10 bg-white/[0.03] flex items-center justify-center text-white/60 hover:text-white hover:border-white/25 transition-colors"
+          className={PAGE_ARROW}
+        >
+          <ChevronRight className="w-4 h-4" />
+        </Link>
+      )}
+    </nav>
+  );
+}
+
+/** Topic-page pagination — same look, links stay on /news/$topic with a
+ *  bare ?page= param. */
+export function TopicPagination({
+  topic,
+  page,
+  pageCount,
+}: {
+  topic: string;
+  page: number;
+  pageCount: number;
+}) {
+  if (pageCount <= 1) return null;
+
+  const pageLink = (p: number) => ({
+    to: "/news/$topic" as const,
+    params: { topic },
+    search: p === 1 ? {} : { page: p },
+  });
+  const jumpTop = () => window.scrollTo({ top: 0 });
+
+  return (
+    <nav
+      aria-label="Phân trang"
+      className="mt-10 flex items-center justify-center gap-1.5"
+    >
+      {page > 1 && (
+        <Link
+          {...pageLink(page - 1)}
+          onClick={jumpTop}
+          aria-label="Trang trước"
+          className={PAGE_ARROW}
+        >
+          <ChevronLeft className="w-4 h-4" />
+        </Link>
+      )}
+
+      {pageItems(page, pageCount).map((p, i) =>
+        p === "gap" ? (
+          <span
+            key={`gap-${i}`}
+            aria-hidden
+            className="w-6 text-center text-white/35 text-xs select-none"
+          >
+            …
+          </span>
+        ) : (
+          <Link
+            key={p}
+            {...pageLink(p)}
+            onClick={jumpTop}
+            aria-current={p === page ? "page" : undefined}
+            className={`${PAGE_NUM} ${p === page ? PAGE_NUM_ACTIVE : PAGE_NUM_IDLE}`}
+          >
+            {p}
+          </Link>
+        ),
+      )}
+
+      {page < pageCount && (
+        <Link
+          {...pageLink(page + 1)}
+          onClick={jumpTop}
+          aria-label="Trang sau"
+          className={PAGE_ARROW}
         >
           <ChevronRight className="w-4 h-4" />
         </Link>
@@ -297,7 +378,8 @@ export function ArticlePagination({
  * exported separately and pages compose them in the mandated order.
  * ------------------------------------------------------------------ */
 
-/** 5 latest — "tin-bài mới đăng, số lượng 5" per the brief. */
+/** 5 latest — "tin-bài mới đăng, số lượng 5" per the brief. Thumbnail-first
+ *  rows so the rail scans visually, not just by title. */
 export function SidebarLatest() {
   return (
     <section className="card-surface rounded-2xl p-4">
@@ -310,9 +392,25 @@ export function SidebarLatest() {
             <Link
               to="/news/article/$id"
               params={{ id: a.id }}
-              className="block py-2.5 text-[12.5px] text-white/85 hover:text-cyan-300 leading-snug transition-colors line-clamp-2"
+              className="group flex gap-3 py-2.5"
             >
-              {a.title}
+              <div className="w-24 h-16 shrink-0 rounded-lg overflow-hidden border border-white/10">
+                <img
+                  src={a.image}
+                  alt=""
+                  loading="lazy"
+                  referrerPolicy="no-referrer"
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+              </div>
+              <div className="min-w-0">
+                <span className="block text-[12.5px] text-white/85 group-hover:text-cyan-300 leading-snug transition-colors line-clamp-3">
+                  {a.title}
+                </span>
+                <span className="block mt-1 text-[10px] text-white/40 font-mono">
+                  {a.date}
+                </span>
+              </div>
             </Link>
           </li>
         ))}
@@ -327,18 +425,35 @@ export function SidebarMostRead() {
       <h4 className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-accent mb-3">
         <Flame className="w-3.5 h-3.5" /> Đọc nhiều
       </h4>
-      <ol className="space-y-3">
+      <ol className="divide-y divide-white/5">
         {mostReadArticles(5).map((a, i) => (
-          <li key={a.id} className="flex gap-2.5 items-start">
-            <span className="display text-lg font-black text-gradient-cyan leading-none w-5 shrink-0">
-              {i + 1}
-            </span>
+          <li key={a.id}>
             <Link
               to="/news/article/$id"
               params={{ id: a.id }}
-              className="text-[12.5px] text-white/85 hover:text-cyan-300 leading-snug transition-colors line-clamp-2"
+              className="group flex gap-3 py-2.5"
             >
-              {a.title}
+              {/* Rank badge rides the thumbnail's corner to keep row width. */}
+              <div className="relative w-24 h-16 shrink-0 rounded-lg overflow-hidden border border-white/10">
+                <img
+                  src={a.image}
+                  alt=""
+                  loading="lazy"
+                  referrerPolicy="no-referrer"
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+                <span className="absolute top-0 left-0 px-1.5 py-0.5 rounded-br-lg bg-black/70 display text-sm font-black text-gradient-cyan leading-none">
+                  {i + 1}
+                </span>
+              </div>
+              <div className="min-w-0">
+                <span className="block text-[12.5px] text-white/85 group-hover:text-cyan-300 leading-snug transition-colors line-clamp-3">
+                  {a.title}
+                </span>
+                <span className="block mt-1 text-[10px] text-white/40 font-mono">
+                  {a.views.toLocaleString("vi-VN")} lượt đọc
+                </span>
+              </div>
             </Link>
           </li>
         ))}
@@ -399,7 +514,8 @@ export function SidebarAssociation() {
   );
 }
 
-/** 5 articles from the same category — article-page rail. */
+/** 5 articles from the same category — article-page rail, with a thumbnail
+ *  per row so the list scans faster than titles alone. */
 export function SidebarSameCategory({ article }: { article: PortalArticle }) {
   const related = relatedArticles(article, 5);
   if (related.length === 0) return null;
@@ -414,9 +530,25 @@ export function SidebarSameCategory({ article }: { article: PortalArticle }) {
             <Link
               to="/news/article/$id"
               params={{ id: a.id }}
-              className="block py-2.5 text-[12.5px] text-white/85 hover:text-cyan-300 leading-snug transition-colors line-clamp-2"
+              className="group flex gap-2.5 py-2.5"
             >
-              {a.title}
+              <div className="w-16 h-11 shrink-0 rounded-lg overflow-hidden border border-white/10">
+                <img
+                  src={a.image}
+                  alt=""
+                  loading="lazy"
+                  referrerPolicy="no-referrer"
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+              </div>
+              <div className="min-w-0">
+                <span className="block text-[12.5px] text-white/85 group-hover:text-cyan-300 leading-snug transition-colors line-clamp-2">
+                  {a.title}
+                </span>
+                <span className="block mt-0.5 text-[10px] text-white/40 font-mono">
+                  {a.date}
+                </span>
+              </div>
             </Link>
           </li>
         ))}
@@ -482,9 +614,27 @@ export function HomeDigest() {
 /**
  * Reader utility menu — mandated both directly under the article header
  * AND repeated at the end of the body, so readers never scroll back up
- * to act on the article.
+ * to act on the article. Full utility set per the brief: back, share,
+ * copy link, save ("lưu"), print.
  */
-export function ReaderUtilityBar({ title }: { title: string }) {
+export function ReaderUtilityBar({
+  title,
+  articleId,
+}: {
+  title: string;
+  articleId: string;
+}) {
+  const router = useRouter();
+  const { isSaved, toggle } = useSavedArticles();
+  const saved = isSaved(articleId);
+
+  const save = () => {
+    toggle(articleId);
+    toast.success(
+      saved ? "Đã bỏ lưu bài viết." : "Đã lưu bài viết — xem lại ở mục Đã lưu.",
+    );
+  };
+
   const share = () => {
     const url = window.location.href;
     if (navigator.share) {
@@ -512,11 +662,33 @@ export function ReaderUtilityBar({ title }: { title: string }) {
       <span className="text-[10px] uppercase tracking-wider text-white/40 font-bold mr-1">
         Tiện ích
       </span>
+      <button onClick={() => router.history.back()} className={btn}>
+        <ArrowLeft className="w-3 h-3" /> Quay lại
+      </button>
       <button onClick={share} className={btn}>
         <Share2 className="w-3 h-3" /> Chia sẻ
       </button>
       <button onClick={copy} className={btn}>
         <LinkIcon className="w-3 h-3" /> Sao chép link
+      </button>
+      <button
+        onClick={save}
+        aria-pressed={saved}
+        className={
+          saved
+            ? "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider border border-accent/50 bg-accent/15 text-accent transition-colors cursor-pointer"
+            : btn
+        }
+      >
+        {saved ? (
+          <>
+            <BookmarkCheck className="w-3 h-3" /> Đã lưu
+          </>
+        ) : (
+          <>
+            <Bookmark className="w-3 h-3" /> Lưu bài
+          </>
+        )}
       </button>
       <button onClick={() => window.print()} className={btn}>
         <Printer className="w-3 h-3" /> In bài

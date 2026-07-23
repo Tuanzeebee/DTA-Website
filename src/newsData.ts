@@ -113,6 +113,35 @@ export const mainTopics: MainTopic[] = [
   },
 ];
 
+/**
+ * Inline image block inside an article body — modelled on Word's Layout
+ * Options, per the plan's editor spec ("cho phép đặt ảnh trái, phải, hoặc
+ * ngay giữa bài; có tham số tùy chọn"):
+ *  - align: horizontal anchor (trái / phải / giữa)
+ *  - wrap:  "square" = text wraps around the image (Word: Square);
+ *           "none"   = image sits on its own line (Word: Top and Bottom).
+ *           Defaults: square for left/right, none for center.
+ *  - width: editor-chosen size as % of the column (default 46 when text
+ *           wraps, 100 for own-line images).
+ */
+export interface ArticleImage {
+  src: string;
+  caption?: string;
+  align: "left" | "right" | "center";
+  wrap?: "square" | "none";
+  width?: number;
+}
+
+/** Highlight box between paragraphs ("điểm nhấn giữa bài (BOX)" in the
+ *  plan) — pull quotes, key numbers, editorial notes. */
+export interface ArticleBox {
+  box: string;
+}
+
+/** A body entry: plain string = paragraph; image and box blocks interleave
+ *  in any order the editor wants. */
+export type ArticleBlock = string | ArticleImage | ArticleBox;
+
 export interface PortalArticle {
   id: string;
   title: string;
@@ -133,7 +162,7 @@ export interface PortalArticle {
   /** Shown right-aligned at the end of the article; defaults to the
    *  editorial board when absent. */
   author?: string;
-  body: string[];
+  body: ArticleBlock[];
 }
 
 /* <!-- mock --> All articles are sample data awaiting real editorial content. */
@@ -153,8 +182,25 @@ export const portalArticles: PortalArticle[] = [
     pdfUrl: "/documents/nghi-dinh-giao-dich-dien-tu.pdf",
     author: "Minh Châu",
     body: [
-      "Văn bản quy định chi tiết về giá trị pháp lý của chữ ký điện tử chuyên dùng và điều kiện bảo đảm an toàn.",
-      "Hội viên có thể tải toàn văn văn bản (PDF) ở nút bên dưới để lưu trữ và phổ biến nội bộ.",
+      "Văn bản quy định chi tiết về giá trị pháp lý của chữ ký điện tử chuyên dùng và điều kiện bảo đảm an toàn. Đây là khung pháp lý được cộng đồng doanh nghiệp chờ đợi từ lâu, bởi phần lớn giao dịch B2B trong ngành công nghệ số hiện đã được thực hiện hoàn toàn trên môi trường điện tử.",
+      {
+        src: "https://picsum.photos/seed/dta-policy-1b/700/420",
+        caption: "Lễ công bố nghị định tại Hà Nội. Ảnh: minh họa",
+        align: "right",
+        width: 40,
+      },
+      "Điểm thay đổi lớn nhất nằm ở nhóm quy định về định danh điện tử: doanh nghiệp được phép sử dụng tài khoản định danh mức 2 thay cho bản sao công chứng trong hầu hết thủ tục hành chính. Thời gian xử lý hồ sơ, theo tính toán của Sở, có thể giảm tới 60%.",
+      {
+        box: "Con số đáng chú ý: 60% thời gian xử lý hồ sơ được cắt giảm khi doanh nghiệp dùng định danh điện tử mức 2 thay cho bản sao công chứng.",
+      },
+      "Với nhóm quy định về lưu trữ chứng từ, văn bản lần đầu công nhận giá trị chứng cứ của thông điệp dữ liệu được lưu trên hạ tầng đám mây đặt tại Việt Nam, kèm điều kiện về sao lưu và toàn vẹn dữ liệu.",
+      {
+        src: "https://picsum.photos/seed/dta-policy-1c/900/500",
+        caption:
+          "Doanh nghiệp hội viên trải nghiệm quy trình ký số mới tại Văn phòng số DTA.",
+        align: "center",
+      },
+      "Ban Chính sách của Hiệp hội sẽ tổ chức buổi phổ biến trực tuyến trong tháng tới; hội viên đăng ký qua Văn phòng số. Hội viên có thể tải toàn văn văn bản (PDF) ở nút bên dưới để lưu trữ và phổ biến nội bộ.",
     ],
   },
   {
@@ -304,8 +350,31 @@ export const portalArticles: PortalArticle[] = [
     memberUrl: "https://example-member.vn",
     author: "Hội viên DTA Logistics",
     body: [
-      "Chuyên mục diễn đàn của hội viên: mỗi bài viết là một giải pháp, một bài học thực tế từ chính doanh nghiệp trong hiệp hội.",
-      "Xem chi tiết giải pháp tại website của hội viên theo liên kết bên dưới.",
+      "Chuyên mục diễn đàn của hội viên: mỗi bài viết là một giải pháp, một bài học thực tế từ chính doanh nghiệp trong hiệp hội. Câu chuyện kỳ này đến từ một hội viên ngành logistics với 18 tháng số hóa toàn bộ quy trình kho vận.",
+      {
+        src: "https://picsum.photos/seed/dta-nganh-1b/700/420",
+        caption: "Kho hàng trước khi số hóa: giấy tờ ở mọi công đoạn.",
+        align: "left",
+      },
+      "Xuất phát điểm không hề thuận lợi: 100% lệnh xuất nhập kho viết tay, đối soát cuối ngày mất trung bình 3 giờ, sai lệch tồn kho có tháng lên tới 4%. Đội dự án bắt đầu bằng việc nhỏ nhất — chuẩn hóa mã hàng — trước khi nghĩ đến bất kỳ phần mềm nào.",
+      "Sáu tháng đầu tiên dành trọn cho dữ liệu nền, trước khi bất kỳ dòng code nào được viết.",
+      {
+        box: "“Chuyển đổi số thất bại không phải vì công nghệ, mà vì dữ liệu đầu vào không sạch.” — đại diện doanh nghiệp chia sẻ tại diễn đàn.",
+      },
+      {
+        src: "https://picsum.photos/seed/dta-nganh-1c/900/500",
+        caption:
+          "Trung tâm điều hành kho vận sau 18 tháng: mọi chỉ số hiển thị thời gian thực.",
+        align: "center",
+      },
+      "Giai đoạn hai triển khai hệ thống quản lý kho (WMS) do một hội viên khác trong Hiệp hội phát triển — một ví dụ điển hình của mô hình 'hội viên dùng giải pháp hội viên' mà chuyên mục Nối vòng tay lớn thúc đẩy.",
+      {
+        src: "https://picsum.photos/seed/dta-nganh-1d/700/420",
+        caption: "Nhân viên vận hành chỉ cần một máy quét và một màn hình.",
+        align: "right",
+        width: 38,
+      },
+      "Kết quả sau 18 tháng: thời gian đối soát còn 15 phút, sai lệch tồn kho dưới 0,3%, và quan trọng nhất — đội ngũ 40 nhân sự kho không ai phải nghỉ việc, tất cả được đào tạo lại cho vai trò mới. Xem chi tiết giải pháp tại website của hội viên theo liên kết bên dưới.",
     ],
   },
   {
@@ -499,7 +568,35 @@ export const portalArticles: PortalArticle[] = [
     image: "https://picsum.photos/seed/dta-mnc-3/800/450",
     tags: ["Thiện nguyện"],
     views: 980,
-    body: ["Tin hoạt động xã hội của hội viên và hiệp hội."],
+    body: [
+      "Phóng sự ảnh: hành trình hai ngày của đoàn công tác xã hội DTA tại huyện Nam Trà My — nơi 60 bộ máy tính được tân trang từ chương trình 'Máy tính cũ – Tri thức mới' tìm được mái trường mới.",
+      {
+        src: "https://picsum.photos/seed/dta-mnc-3b/900/500",
+        caption:
+          "Đoàn xe xuất phát từ Công viên Phần mềm Đà Nẵng lúc 5 giờ sáng.",
+        align: "center",
+      },
+      "Trước chuyến đi một tháng, đội kỹ thuật của các doanh nghiệp hội viên đã thay ổ cứng SSD, vệ sinh và cài đặt phần mềm học tập cho toàn bộ 60 máy — tổng cộng hơn 200 giờ công tình nguyện.",
+      {
+        src: "https://picsum.photos/seed/dta-mnc-3c/700/420",
+        caption: "Kỹ sư hội viên lắp đặt phòng máy tại điểm trường Tắk Pổ.",
+        align: "left",
+      },
+      "Tại điểm trường, các kỹ sư trẻ vừa lắp đặt vừa hướng dẫn thầy cô cách bảo trì cơ bản. Một phòng máy 20 chỗ hoàn thành chỉ trong buổi sáng.",
+      {
+        src: "https://picsum.photos/seed/dta-mnc-3d/700/420",
+        caption: "Giờ tin học đầu tiên của các em học sinh lớp 4.",
+        align: "right",
+      },
+      "Khoảnh khắc đáng nhớ nhất thuộc về giờ tin học đầu tiên: nhiều em lần đầu chạm vào chuột máy tính, và chỉ sau 20 phút đã tự mở được phần mềm tập vẽ.",
+      {
+        src: "https://picsum.photos/seed/dta-mnc-3e/900/500",
+        caption:
+          "Đoàn công tác chụp ảnh lưu niệm cùng thầy trò điểm trường trước khi rời Nam Trà My.",
+        align: "center",
+      },
+      "Chương trình sẽ tiếp tục đợt hai vào cuối năm với mục tiêu 100 máy. Hội viên muốn đóng góp thiết bị hoặc nhân lực kỹ thuật liên hệ Văn phòng Hiệp hội.",
+    ],
   },
   {
     id: "dn-01",
@@ -528,7 +625,25 @@ export const portalArticles: PortalArticle[] = [
     image: "https://picsum.photos/seed/dta-dn-2/800/450",
     tags: ["DevDay", "Sự kiện"],
     views: 1980,
-    body: ["Lịch sự kiện công nghệ số tại Đà Nẵng do hiệp hội tổng hợp."],
+    body: [
+      "Ban tổ chức DevDay Đà Nẵng vừa công bố chủ đề năm nay: 'AI cho miền Trung số' — tập trung vào ứng dụng trí tuệ nhân tạo trong doanh nghiệp vừa và nhỏ, chính quyền số và đào tạo nhân lực.",
+      {
+        src: "https://picsum.photos/seed/dta-dn-2b/700/420",
+        caption: "Không khí DevDay năm trước với hơn 4.000 lượt tham dự.",
+        align: "left",
+      },
+      "Sự kiện dự kiến đón hơn 5.000 lượt tham dự với 3 sân khấu song song: AI Engineering, Sản phẩm số và Nghề nghiệp công nghệ. Nhiều hội viên DTA đã đăng ký gian hàng tuyển dụng và trình diễn giải pháp.",
+      "Hiệp hội là đơn vị đồng hành truyền thông của sự kiện; hội viên đăng ký gian hàng qua Văn phòng số sẽ được ưu tiên vị trí khu trung tâm.",
+      {
+        src: "https://picsum.photos/seed/dta-dn-2c/900/500",
+        caption:
+          "Phối cảnh khu triển lãm DevDay 2026 tại Cung Thể thao Tiên Sơn.",
+        align: "right",
+        wrap: "none",
+        width: 75,
+      },
+      "Lịch chi tiết các phiên và diễn giả sẽ được cập nhật tại chuyên mục Sự kiện sắp đến ngay khi ban tổ chức công bố.",
+    ],
   },
   {
     id: "dn-03",
@@ -681,15 +796,18 @@ const comparators: Record<
   "doc-nhieu": (a, b) => b.views - a.views,
 };
 
-/** Filtered + sorted (not yet paginated) list for one category. */
+/** Filtered + sorted (not yet paginated) list for one category — or a whole
+ *  topic when categorySlug is omitted. */
 function filterSort(
   topicSlug: string,
-  categorySlug: string,
+  categorySlug?: string,
   sort: ArticleSort = DEFAULT_SORT,
   flag?: ArticleFlag,
 ) {
   let list = portalArticles.filter(
-    (a) => a.topic === topicSlug && a.category === categorySlug,
+    (a) =>
+      a.topic === topicSlug &&
+      (categorySlug === undefined || a.category === categorySlug),
   );
   if (flag) list = list.filter(flagTest[flag]);
 
@@ -714,7 +832,8 @@ export const ARTICLES_PAGE_SIZE = 6;
 
 export interface ArticleQuery {
   topic: string;
-  category: string;
+  /** Omit to query across the whole topic (topic-page pagination). */
+  category?: string;
   sort?: ArticleSort;
   flag?: ArticleFlag;
   page?: number;
@@ -751,6 +870,42 @@ export function availableFlags(topicSlug: string, categorySlug: string) {
     (a) => a.topic === topicSlug && a.category === categorySlug,
   );
   return articleFlags.filter((f) => pool.some(flagTest[f]));
+}
+
+/** Lowercase + strip Vietnamese diacritics, so "chinh sach" matches
+ *  "chính sách". NFD splits base letters from combining marks; đ/Đ have no
+ *  combining form and need their own replace. */
+const fold = (s: string) =>
+  s
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/\p{Diacritic}/gu, "")
+    .replace(/đ/g, "d");
+
+/** Searchable haystack per article, folded once and cached. */
+const haystackCache = new WeakMap<PortalArticle, string>();
+const haystack = (a: PortalArticle) => {
+  let h = haystackCache.get(a);
+  if (h === undefined) {
+    const bodyText = a.body
+      .map((b) =>
+        typeof b === "string" ? b : "box" in b ? b.box : (b.caption ?? ""),
+      )
+      .join(" ");
+    h = fold([a.title, a.summary, a.tags.join(" "), bodyText].join(" "));
+    haystackCache.set(a, h);
+  }
+  return h;
+};
+
+/** Keyword search ("từ khóa - tìm kiếm" utility in the brief). Every
+ *  whitespace-separated term must match (AND), newest first. */
+export function searchArticles(query: string) {
+  const terms = fold(query.trim()).split(/\s+/).filter(Boolean);
+  if (terms.length === 0) return [];
+  return portalArticles
+    .filter((a) => terms.every((t) => haystack(a).includes(t)))
+    .sort(comparators["moi-nhat"]);
 }
 
 /** Same-category articles for the article-page rail (5 per the brief —

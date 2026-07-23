@@ -13,6 +13,8 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as NewsRouteImport } from './routes/news'
 import { Route as PortalRouteImport } from './routes/portal'
 import { Route as NewsIndexRouteImport } from './routes/news.index'
+import { Route as NewsDaLuuRouteImport } from './routes/news.da-luu'
+import { Route as NewsTimKiemRouteImport } from './routes/news.tim-kiem'
 import { Route as NewsTopicIndexRouteImport } from './routes/news.$topic.index'
 import { Route as NewsTopicCategoryRouteImport } from './routes/news.$topic.$category'
 import { Route as NewsArticleIdRouteImport } from './routes/news.article.$id'
@@ -37,6 +39,16 @@ const NewsIndexRoute = NewsIndexRouteImport.update({
   path: '/',
   getParentRoute: () => NewsRoute,
 } as any)
+const NewsDaLuuRoute = NewsDaLuuRouteImport.update({
+  id: '/da-luu',
+  path: '/da-luu',
+  getParentRoute: () => NewsRoute,
+} as any)
+const NewsTimKiemRoute = NewsTimKiemRouteImport.update({
+  id: '/tim-kiem',
+  path: '/tim-kiem',
+  getParentRoute: () => NewsRoute,
+} as any)
 const NewsTopicIndexRoute = NewsTopicIndexRouteImport.update({
   id: '/$topic/',
   path: '/$topic/',
@@ -57,6 +69,8 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/news': typeof NewsRouteWithChildren
   '/portal': typeof PortalRoute
+  '/news/da-luu': typeof NewsDaLuuRoute
+  '/news/tim-kiem': typeof NewsTimKiemRoute
   '/news/': typeof NewsIndexRoute
   '/news/$topic/$category': typeof NewsTopicCategoryRoute
   '/news/article/$id': typeof NewsArticleIdRoute
@@ -65,6 +79,8 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/portal': typeof PortalRoute
+  '/news/da-luu': typeof NewsDaLuuRoute
+  '/news/tim-kiem': typeof NewsTimKiemRoute
   '/news': typeof NewsIndexRoute
   '/news/$topic/$category': typeof NewsTopicCategoryRoute
   '/news/article/$id': typeof NewsArticleIdRoute
@@ -75,6 +91,8 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/news': typeof NewsRouteWithChildren
   '/portal': typeof PortalRoute
+  '/news/da-luu': typeof NewsDaLuuRoute
+  '/news/tim-kiem': typeof NewsTimKiemRoute
   '/news/': typeof NewsIndexRoute
   '/news/$topic/$category': typeof NewsTopicCategoryRoute
   '/news/article/$id': typeof NewsArticleIdRoute
@@ -86,6 +104,8 @@ export interface FileRouteTypes {
     | '/'
     | '/news'
     | '/portal'
+    | '/news/da-luu'
+    | '/news/tim-kiem'
     | '/news/'
     | '/news/$topic/$category'
     | '/news/article/$id'
@@ -94,6 +114,8 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/portal'
+    | '/news/da-luu'
+    | '/news/tim-kiem'
     | '/news'
     | '/news/$topic/$category'
     | '/news/article/$id'
@@ -103,6 +125,8 @@ export interface FileRouteTypes {
     | '/'
     | '/news'
     | '/portal'
+    | '/news/da-luu'
+    | '/news/tim-kiem'
     | '/news/'
     | '/news/$topic/$category'
     | '/news/article/$id'
@@ -145,6 +169,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof NewsIndexRouteImport
       parentRoute: typeof NewsRoute
     }
+    '/news/da-luu': {
+      id: '/news/da-luu'
+      path: '/da-luu'
+      fullPath: '/news/da-luu'
+      preLoaderRoute: typeof NewsDaLuuRouteImport
+      parentRoute: typeof NewsRoute
+    }
+    '/news/tim-kiem': {
+      id: '/news/tim-kiem'
+      path: '/tim-kiem'
+      fullPath: '/news/tim-kiem'
+      preLoaderRoute: typeof NewsTimKiemRouteImport
+      parentRoute: typeof NewsRoute
+    }
     '/news/$topic/': {
       id: '/news/$topic/'
       path: '/$topic'
@@ -170,6 +208,8 @@ declare module '@tanstack/react-router' {
 }
 
 interface NewsRouteChildren {
+  NewsDaLuuRoute: typeof NewsDaLuuRoute
+  NewsTimKiemRoute: typeof NewsTimKiemRoute
   NewsIndexRoute: typeof NewsIndexRoute
   NewsTopicCategoryRoute: typeof NewsTopicCategoryRoute
   NewsArticleIdRoute: typeof NewsArticleIdRoute
@@ -177,6 +217,8 @@ interface NewsRouteChildren {
 }
 
 const NewsRouteChildren: NewsRouteChildren = {
+  NewsDaLuuRoute: NewsDaLuuRoute,
+  NewsTimKiemRoute: NewsTimKiemRoute,
   NewsIndexRoute: NewsIndexRoute,
   NewsTopicCategoryRoute: NewsTopicCategoryRoute,
   NewsArticleIdRoute: NewsArticleIdRoute,

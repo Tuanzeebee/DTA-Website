@@ -1,6 +1,12 @@
 import { useState, useEffect } from "react";
-import { Link } from "@tanstack/react-router";
-import { ChevronDown, Newspaper } from "lucide-react";
+import { Link, useNavigate } from "@tanstack/react-router";
+import {
+  ChevronDown,
+  Newspaper,
+  Search,
+  Bookmark,
+  LayoutGrid,
+} from "lucide-react";
 import { mainTopics } from "@/newsData";
 
 /**
@@ -35,6 +41,10 @@ export function PortalMenuBar() {
      With state, any click closes it immediately. */
   const [openTopic, setOpenTopic] = useState<string | null>(null);
 
+  /* Mobile: a swipeable strip felt fiddly — below md the topics collapse
+     into one "Chuyên mục" button that drops a grouped panel instead. */
+  const [mobileOpen, setMobileOpen] = useState(false);
+
   return (
     /* top-16 = height of the fixed shared header, so the bar docks right
        under it while scrolling. */
@@ -48,12 +58,29 @@ export function PortalMenuBar() {
           <span>DTA News</span>
         </Link>
 
-        {/* overflow-x-auto only below md (horizontal swipe for narrow screens,
-            where hover dropdowns don't exist anyway). From md up the row must
-            be overflow-visible: an auto overflow on EITHER axis forces the
-            other axis to auto too, so the absolute dropdown was creating an
-            inner vertical scrollbar on hover — the "scroll down" glitch. */}
-        <div className="flex items-stretch gap-1 overflow-x-auto md:overflow-visible">
+        {/* Mobile trigger: one button replaces the topic strip below md —
+            tapping drops the grouped panel underneath (no swiping). */}
+        <button
+          onClick={() => setMobileOpen((v) => !v)}
+          aria-expanded={mobileOpen}
+          aria-controls="portal-mobile-menu"
+          className="md:hidden flex items-center gap-1.5 h-11 px-3 text-[12px] font-bold uppercase tracking-wide text-white hover:text-cyan-300 transition-colors cursor-pointer"
+        >
+          <LayoutGrid className="w-3.5 h-3.5" />
+          <span>Chuyên mục</span>
+          <ChevronDown
+            className={`w-3 h-3 opacity-60 transition-transform duration-300 ${
+              mobileOpen ? "rotate-180" : ""
+            }`}
+          />
+        </button>
+
+        {/* Desktop topic strip (md+). flex-1 min-w-0 keeps the bar one row:
+            the strip absorbs leftover space instead of pushing the row wider.
+            Must stay overflow-visible from md up — an auto overflow on
+            EITHER axis forces the other to auto, and the absolute dropdown
+            then creates an inner scrollbar on hover (the old glitch). */}
+        <div className="hidden md:flex flex-1 min-w-0 items-stretch gap-1 overflow-visible">
           {mainTopics.map((t) => {
             const isOpen = openTopic === t.slug;
             return (
@@ -115,22 +142,144 @@ export function PortalMenuBar() {
           })}
         </div>
 
-        {/* Live date-time ("góc thời gian" in the brief). */}
-        <span className="ml-auto hidden lg:block pl-4 text-[11px] text-white/50 capitalize whitespace-nowrap shrink-0">
-          {clock}
-        </span>
+        {/* Right cluster: keyword search + saved articles + live date-time
+            ("góc thời gian" in the brief). Everything here is shrink-0 and
+            width-staged (input grows md->xl, labels/clock appear xl+) so the
+            cluster never forces the bar to wrap. */}
+        <div className="ml-auto flex items-center gap-1 md:gap-2 pl-2 md:pl-3 shrink-0">
+          <MenuSearchForm />
+          <Link
+            to="/news/da-luu"
+            title="Bài đã lưu"
+            aria-label="Bài đã lưu"
+            className="flex items-center gap-1 h-8 px-2 rounded-lg text-white/60 hover:text-cyan-300 transition-colors shrink-0"
+          >
+            <Bookmark className="w-3.5 h-3.5" />
+            <span className="hidden xl:inline text-[11px] font-bold uppercase tracking-wide">
+              Đã lưu
+            </span>
+          </Link>
+          <span className="hidden xl:block text-[11px] text-white/50 capitalize whitespace-nowrap">
+            {clock}
+          </span>
+        </div>
       </div>
+
+      {/* Mobile drop panel: all 4 topics with their categories, grouped —
+          tap anywhere on the backdrop or any link to close. Scrolls inside
+          itself past 70vh so long lists never trap the page. */}
+      {mobileOpen && (
+        <>
+          <div
+            aria-hidden
+            onClick={() => setMobileOpen(false)}
+            className="md:hidden fixed inset-0 top-[6.75rem] z-40 bg-black/50"
+          />
+          <div
+            id="portal-mobile-menu"
+            className="md:hidden absolute left-0 right-0 top-full z-50 border-b border-white/10 bg-[oklch(0.14_0.06_265_/_0.97)] backdrop-blur-md max-h-[70vh] overflow-y-auto"
+          >
+            <div className="px-4 py-3 grid grid-cols-1 gap-1">
+              {mainTopics.map((t) => (
+                <div key={t.slug} className="py-1.5">
+                  <Link
+                    to="/news/$topic"
+                    params={{ topic: t.slug }}
+                    onClick={() => setMobileOpen(false)}
+                    className="block text-[12px] font-black uppercase tracking-wide text-accent hover:text-cyan-300 transition-colors"
+                  >
+                    {t.name}
+                  </Link>
+                  <div className="mt-1">
+                    {t.categories.map((c) => (
+                      <Link
+                        key={c.slug}
+                        to="/news/$topic/$category"
+                        params={{ topic: t.slug, category: c.slug }}
+                        onClick={() => setMobileOpen(false)}
+                        className="block py-1.5 pl-3 border-l border-white/10 text-[13px] text-white/80 hover:text-cyan-300 transition-colors"
+                      >
+                        {c.name}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </>
+      )}
     </nav>
   );
 }
 
-/** Banner zone: propaganda / campaign area; carries paid placement when no
- *  campaign is running (per brief). Placeholder until real creative. */
+/** Keyword search ("từ khóa - tìm kiếm" utility). Inline input from md up;
+ *  below md just an icon link to the search page, which has its own input. */
+function MenuSearchForm() {
+  const navigate = useNavigate();
+  const [q, setQ] = useState("");
+
+  return (
+    <>
+      <form
+        role="search"
+        className="hidden md:flex items-center h-8 rounded-lg border border-white/10 bg-white/[0.04] focus-within:border-cyan-400/50 transition-colors"
+        onSubmit={(e) => {
+          e.preventDefault();
+          const query = q.trim();
+          if (!query) return;
+          navigate({ to: "/news/tim-kiem", search: { q: query } });
+          setQ("");
+        }}
+      >
+        <input
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+          placeholder="Tìm kiếm…"
+          aria-label="Tìm kiếm tin bài"
+          className="w-24 xl:w-36 bg-transparent pl-3 pr-1 text-[12px] text-white placeholder:text-white/35 focus:outline-none"
+        />
+        <button
+          type="submit"
+          aria-label="Tìm kiếm"
+          className="h-full px-2 text-white/50 hover:text-cyan-300 transition-colors cursor-pointer"
+        >
+          <Search className="w-3.5 h-3.5" />
+        </button>
+      </form>
+      <Link
+        to="/news/tim-kiem"
+        aria-label="Tìm kiếm"
+        className="md:hidden flex items-center h-8 px-2 rounded-lg text-white/60 hover:text-cyan-300 transition-colors"
+      >
+        <Search className="w-3.5 h-3.5" />
+      </Link>
+    </>
+  );
+}
+
+/** Banner zone, laid out per the brief's illustration: one large
+ *  propaganda/campaign banner on the left (carries paid placement when no
+ *  campaign runs), and to its right two stacked slots — "quảng cáo" and
+ *  "tài trợ" — separated by breathing room ("khoảng cách vừa đủ").
+ *  All placeholders until real creative. */
 export function PortalBanner() {
+  const slot =
+    "rounded-2xl border border-dashed border-white/15 bg-white/[0.03] flex items-center justify-center text-white/40 uppercase tracking-[0.2em]";
   return (
     <div className="max-w-7xl mx-auto px-4 md:px-6 mt-6">
-      <div className="rounded-2xl border border-dashed border-white/15 bg-white/[0.03] h-20 md:h-28 flex items-center justify-center text-white/40 text-xs uppercase tracking-[0.2em]">
-        Khu vực banner tuyên truyền / quảng cáo
+      <div className="grid md:grid-cols-3 gap-3 md:gap-4">
+        <div className={`${slot} md:col-span-2 h-20 md:h-28 text-xs`}>
+          Banner tuyên truyền / cổ động
+        </div>
+        <div className="grid grid-cols-2 md:grid-cols-1 gap-3 md:gap-4">
+          <div className={`${slot} h-14 md:h-12 text-[10px]`}>
+            Dành cho quảng cáo
+          </div>
+          <div className={`${slot} h-14 md:h-12 text-[10px]`}>
+            Dành cho tài trợ
+          </div>
+        </div>
       </div>
     </div>
   );

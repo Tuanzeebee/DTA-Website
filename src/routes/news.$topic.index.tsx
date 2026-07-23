@@ -1,10 +1,24 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { ChevronRight } from "lucide-react";
-import { topicBySlug, articlesByCategory } from "@/newsData";
-import { ArticleCard, PortalSidebar } from "@/compenents/news/PortalBlocks";
+import { useMemo } from "react";
+import { ChevronRight, Newspaper } from "lucide-react";
+import { topicBySlug, articlesByCategory, queryArticles } from "@/newsData";
+import {
+  ArticleCard,
+  PortalSidebar,
+  TopicPagination,
+} from "@/compenents/news/PortalBlocks";
 
-/** Main-topic page: one section per sub-category, sidebar always present. */
+/**
+ * Main-topic page: one teaser section per sub-category (2–4 articles each,
+ * per the brief), then a flat, PAGINATED list of every article in the topic
+ * (?page= in the URL) so large topics stay browsable without opening each
+ * category.
+ */
 export const Route = createFileRoute("/news/$topic/")({
+  validateSearch: (search: Record<string, unknown>): { page?: number } => {
+    const page = Number(search.page);
+    return Number.isInteger(page) && page > 1 ? { page } : {};
+  },
   loader: ({ params }) => {
     const topic = topicBySlug(params.topic);
     if (!topic) throw notFound();
@@ -15,6 +29,13 @@ export const Route = createFileRoute("/news/$topic/")({
 
 function TopicPage() {
   const { topic } = Route.useLoaderData();
+  const { page } = Route.useSearch();
+
+  // Whole-topic flat list, newest first, paginated.
+  const all = useMemo(
+    () => queryArticles({ topic: topic.slug, page, pageSize: 8 }),
+    [topic.slug, page],
+  );
 
   return (
     <div className="grid lg:grid-cols-12 gap-x-10 gap-y-14">
@@ -64,6 +85,32 @@ function TopicPage() {
             );
           })}
         </div>
+
+        {/* Flat, paginated list of everything in the topic — the way to
+            browse deep archives without opening each category. */}
+        {all.total > 0 && (
+          <section className="mt-14">
+            <div className="flex items-baseline justify-between border-b-2 border-accent/60 pb-2 mb-5">
+              <h2 className="flex items-center gap-2 text-sm md:text-base font-black uppercase tracking-wide text-white">
+                <Newspaper className="w-4 h-4 text-accent" />
+                Tất cả bài viết
+              </h2>
+              <span className="text-[11px] text-white/45 font-mono">
+                {all.total} bài viết
+              </span>
+            </div>
+            <div className="space-y-5">
+              {all.items.map((a) => (
+                <ArticleCard key={a.id} article={a} />
+              ))}
+            </div>
+            <TopicPagination
+              topic={topic.slug}
+              page={all.page}
+              pageCount={all.pageCount}
+            />
+          </section>
+        )}
       </div>
 
       <div className="lg:col-span-3">
