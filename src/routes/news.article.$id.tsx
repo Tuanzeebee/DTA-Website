@@ -1,7 +1,14 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { Eye, Tag } from "lucide-react";
 import { portalArticles, topicBySlug, categoryBySlug } from "@/newsData";
-import { PortalSidebar, ArticleActions } from "@/compenents/news/PortalBlocks";
+import {
+  ArticleActions,
+  ReaderUtilityBar,
+  SidebarAds,
+  SidebarSameCategory,
+  SidebarAssociation,
+  SidebarLogos,
+} from "@/compenents/news/PortalBlocks";
 
 /** Single-article page — the third of the three mandated layout types. */
 export const Route = createFileRoute("/news/article/$id")({
@@ -72,6 +79,12 @@ function ArticlePage() {
           ))}
         </div>
 
+        {/* Reader utility menu, directly under the header block — and
+            repeated after the body, per the brief. */}
+        <div className="mt-5">
+          <ReaderUtilityBar title={article.title} />
+        </div>
+
         <p className="mt-5 text-sm md:text-base text-white/85 font-medium leading-relaxed border-l-2 border-accent/60 pl-4">
           {article.summary}
         </p>
@@ -91,12 +104,30 @@ function ArticlePage() {
           ))}
         </div>
 
+        {/* Author, end of body, right-aligned per the brief. */}
+        <p className="mt-6 max-w-[70ch] text-right text-sm text-white/85">
+          <span className="text-white/50 font-normal">Tác giả: </span>
+          <span className="font-bold">
+            {article.author ?? "Ban Biên tập DTA"}
+          </span>
+        </p>
+
         <ArticleActions article={article} />
+
+        {/* Utility menu repeated at the end of the article. */}
+        <div className="mt-8">
+          <ReaderUtilityBar title={article.title} />
+        </div>
       </article>
 
-      <div className="lg:col-span-3">
-        <PortalSidebar />
-      </div>
+      {/* Column 3, top-down order fixed by the brief: 3 ad banners ->
+          5 same-category articles -> association -> member logos. */}
+      <aside className="lg:col-span-3 space-y-6">
+        <SidebarAds count={3} />
+        <SidebarSameCategory article={article} />
+        <SidebarAssociation />
+        <SidebarLogos />
+      </aside>
     </div>
   );
 }

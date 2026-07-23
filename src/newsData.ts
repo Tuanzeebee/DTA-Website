@@ -130,6 +130,9 @@ export interface PortalArticle {
   memberUrl?: string;
   /** Recruitment: intern posts get priority placement. */
   isIntern?: boolean;
+  /** Shown right-aligned at the end of the article; defaults to the
+   *  editorial board when absent. */
+  author?: string;
   body: string[];
 }
 
@@ -148,6 +151,7 @@ export const portalArticles: PortalArticle[] = [
     tags: ["Chính sách", "Giao dịch điện tử"],
     views: 1240,
     pdfUrl: "/documents/nghi-dinh-giao-dich-dien-tu.pdf",
+    author: "Minh Châu",
     body: [
       "Văn bản quy định chi tiết về giá trị pháp lý của chữ ký điện tử chuyên dùng và điều kiện bảo đảm an toàn.",
       "Hội viên có thể tải toàn văn văn bản (PDF) ở nút bên dưới để lưu trữ và phổ biến nội bộ.",
@@ -298,6 +302,7 @@ export const portalArticles: PortalArticle[] = [
     tags: ["Hội viên", "Chuyển đổi số"],
     views: 2100,
     memberUrl: "https://example-member.vn",
+    author: "Hội viên DTA Logistics",
     body: [
       "Chuyên mục diễn đàn của hội viên: mỗi bài viết là một giải pháp, một bài học thực tế từ chính doanh nghiệp trong hiệp hội.",
       "Xem chi tiết giải pháp tại website của hội viên theo liên kết bên dưới.",
@@ -507,6 +512,7 @@ export const portalArticles: PortalArticle[] = [
     image: "https://picsum.photos/seed/dta-dn-1/800/450",
     tags: ["Đà Nẵng", "Nhân lực"],
     views: 2650,
+    author: "Quang Huy",
     body: [
       "Góc nhìn của hiệp hội về sự phát triển của hệ sinh thái công nghệ thành phố.",
     ],
@@ -745,6 +751,14 @@ export function availableFlags(topicSlug: string, categorySlug: string) {
     (a) => a.topic === topicSlug && a.category === categorySlug,
   );
   return articleFlags.filter((f) => pool.some(flagTest[f]));
+}
+
+/** Same-category articles for the article-page rail (5 per the brief —
+ *  the count is meant to be admin-configurable, hence the parameter). */
+export function relatedArticles(article: PortalArticle, n = 5) {
+  return filterSort(article.topic, article.category)
+    .filter((a) => a.id !== article.id)
+    .slice(0, n);
 }
 
 export function latestArticles(n = 5) {

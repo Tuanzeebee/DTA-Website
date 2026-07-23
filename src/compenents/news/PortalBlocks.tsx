@@ -1,5 +1,6 @@
 import { useMemo, useState, useEffect } from "react";
 import { Link } from "@tanstack/react-router";
+import { toast } from "sonner";
 import {
   Clock,
   Flame,
@@ -9,11 +10,18 @@ import {
   ChevronLeft,
   ChevronRight,
   X,
+  Newspaper,
+  Share2,
+  Link as LinkIcon,
+  Printer,
 } from "lucide-react";
 import { membersData } from "@/data";
 import {
   latestArticles,
   mostReadArticles,
+  relatedArticles,
+  articlesByTopic,
+  mainTopics,
   boardMembers,
   articleSorts,
   articleSortLabels,
@@ -282,59 +290,238 @@ export function ArticlePagination({
   );
 }
 
+/* ------------------------------------------------------------------ *
+ * Column-3 building blocks. The brief prescribes a DIFFERENT rail per
+ * page type (topic: news + logos; category: 3 ads + logos; article:
+ * 3 ads + same-category + association + logos), so each block is
+ * exported separately and pages compose them in the mandated order.
+ * ------------------------------------------------------------------ */
+
+/** 5 latest — "tin-bài mới đăng, số lượng 5" per the brief. */
+export function SidebarLatest() {
+  return (
+    <section className="card-surface rounded-2xl p-4">
+      <h4 className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-accent mb-3">
+        <Clock className="w-3.5 h-3.5" /> Tin mới
+      </h4>
+      <ul className="divide-y divide-white/5">
+        {latestArticles(5).map((a) => (
+          <li key={a.id}>
+            <Link
+              to="/news/article/$id"
+              params={{ id: a.id }}
+              className="block py-2.5 text-[12.5px] text-white/85 hover:text-cyan-300 leading-snug transition-colors line-clamp-2"
+            >
+              {a.title}
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
+export function SidebarMostRead() {
+  return (
+    <section className="card-surface rounded-2xl p-4">
+      <h4 className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-accent mb-3">
+        <Flame className="w-3.5 h-3.5" /> Đọc nhiều
+      </h4>
+      <ol className="space-y-3">
+        {mostReadArticles(5).map((a, i) => (
+          <li key={a.id} className="flex gap-2.5 items-start">
+            <span className="display text-lg font-black text-gradient-cyan leading-none w-5 shrink-0">
+              {i + 1}
+            </span>
+            <Link
+              to="/news/article/$id"
+              params={{ id: a.id }}
+              className="text-[12.5px] text-white/85 hover:text-cyan-300 leading-snug transition-colors line-clamp-2"
+            >
+              {a.title}
+            </Link>
+          </li>
+        ))}
+      </ol>
+    </section>
+  );
+}
+
+/** Ad banners — the brief pins 3 stacked banners atop the rail on
+ *  category and article pages. */
+export function SidebarAds({ count = 3 }: { count?: number }) {
+  return (
+    <div className="space-y-3">
+      {Array.from({ length: count }, (_, i) => (
+        <div
+          key={i}
+          className="rounded-2xl border border-dashed border-white/15 bg-white/[0.03] h-28 flex items-center justify-center text-white/40 text-[10px] uppercase tracking-[0.2em]"
+        >
+          Quảng cáo {count > 1 ? i + 1 : ""}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/** "Lặp lại như trang chủ: Logo hội viên" — member logos on every rail. */
+export function SidebarLogos() {
+  return (
+    <section className="card-surface rounded-2xl p-4">
+      <h4 className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-accent mb-3">
+        <BadgeCheck className="w-3.5 h-3.5" /> Hội viên DTA
+      </h4>
+      <MemberLogoGrid compact />
+    </section>
+  );
+}
+
+/** Association card — the article-page rail repeats "Hiệp hội" above the
+ *  member logos. */
+export function SidebarAssociation() {
+  return (
+    <section className="card-surface card-surface-gold rounded-2xl p-4">
+      <h4 className="text-xs font-black uppercase tracking-wider text-white mb-1.5">
+        Hiệp hội Công nghệ số Đà Nẵng
+      </h4>
+      <p className="text-[11px] text-white/60 leading-relaxed">
+        Mái nhà chung của cộng đồng doanh nghiệp công nghệ số thành phố — hợp
+        tác, liên kết, phát triển bền vững.
+      </p>
+      <Link
+        to="/"
+        className="inline-flex items-center gap-1 mt-2.5 text-[10px] font-bold uppercase text-accent hover:text-cyan-300 transition-colors"
+      >
+        <ExternalLink className="w-3 h-3" />
+        Trang giới thiệu Hiệp hội
+      </Link>
+    </section>
+  );
+}
+
+/** 5 articles from the same category — article-page rail. */
+export function SidebarSameCategory({ article }: { article: PortalArticle }) {
+  const related = relatedArticles(article, 5);
+  if (related.length === 0) return null;
+  return (
+    <section className="card-surface rounded-2xl p-4">
+      <h4 className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-accent mb-3">
+        <Newspaper className="w-3.5 h-3.5" /> Cùng chuyên mục
+      </h4>
+      <ul className="divide-y divide-white/5">
+        {related.map((a) => (
+          <li key={a.id}>
+            <Link
+              to="/news/article/$id"
+              params={{ id: a.id }}
+              className="block py-2.5 text-[12.5px] text-white/85 hover:text-cyan-300 leading-snug transition-colors line-clamp-2"
+            >
+              {a.title}
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
 /**
- * Column 3, repeated on every portal page per the brief:
- * latest + most-read + ad banner + member logos.
+ * Default rail for the portal home and topic pages, per the brief:
+ * 5 latest (+ most-read) then the member logos, exactly like the homepage.
  */
 export function PortalSidebar() {
   return (
     <aside className="space-y-6">
-      <section className="card-surface rounded-2xl p-4">
-        <h4 className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-accent mb-3">
-          <Clock className="w-3.5 h-3.5" /> Tin mới
-        </h4>
-        <ul className="divide-y divide-white/5">
-          {latestArticles(5).map((a) => (
-            <li key={a.id}>
-              <Link
-                to="/news/article/$id"
-                params={{ id: a.id }}
-                className="block py-2.5 text-[12.5px] text-white/85 hover:text-cyan-300 leading-snug transition-colors line-clamp-2"
-              >
-                {a.title}
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </section>
-
-      <section className="card-surface rounded-2xl p-4">
-        <h4 className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-accent mb-3">
-          <Flame className="w-3.5 h-3.5" /> Đọc nhiều
-        </h4>
-        <ol className="space-y-3">
-          {mostReadArticles(5).map((a, i) => (
-            <li key={a.id} className="flex gap-2.5 items-start">
-              <span className="display text-lg font-black text-gradient-cyan leading-none w-5 shrink-0">
-                {i + 1}
-              </span>
-              <Link
-                to="/news/article/$id"
-                params={{ id: a.id }}
-                className="text-[12.5px] text-white/85 hover:text-cyan-300 leading-snug transition-colors line-clamp-2"
-              >
-                {a.title}
-              </Link>
-            </li>
-          ))}
-        </ol>
-      </section>
-
-      {/* Ad slot */}
-      <div className="rounded-2xl border border-dashed border-white/15 bg-white/[0.03] h-40 flex items-center justify-center text-white/40 text-[10px] uppercase tracking-[0.2em]">
-        Quảng cáo
-      </div>
+      <SidebarLatest />
+      <SidebarMostRead />
+      <SidebarAds count={1} />
+      <SidebarLogos />
     </aside>
+  );
+}
+
+/**
+ * Compact repeat of the homepage for the category page's COLUMN 2 —
+ * "Cột 2: Lặp lại nội dung của trang chủ". Each main topic: header link
+ * plus its newest headlines, text-only so the column stays narrow.
+ */
+export function HomeDigest() {
+  return (
+    <div className="space-y-8">
+      {mainTopics.map((t) => {
+        const heads = articlesByTopic(t.slug).slice(0, 3);
+        return (
+          <section key={t.slug}>
+            <Link
+              to="/news/$topic"
+              params={{ topic: t.slug }}
+              className="block border-b-2 border-accent/60 pb-1.5 mb-2.5 text-[11px] font-black uppercase tracking-wide text-white hover:text-cyan-300 transition-colors"
+            >
+              {t.name}
+            </Link>
+            <ul className="divide-y divide-white/5">
+              {heads.map((a) => (
+                <li key={a.id}>
+                  <Link
+                    to="/news/article/$id"
+                    params={{ id: a.id }}
+                    className="block py-2 text-[12.5px] text-white/80 hover:text-cyan-300 leading-snug transition-colors line-clamp-2"
+                  >
+                    {a.title}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </section>
+        );
+      })}
+    </div>
+  );
+}
+
+/**
+ * Reader utility menu — mandated both directly under the article header
+ * AND repeated at the end of the body, so readers never scroll back up
+ * to act on the article.
+ */
+export function ReaderUtilityBar({ title }: { title: string }) {
+  const share = () => {
+    const url = window.location.href;
+    if (navigator.share) {
+      navigator.share({ title, url }).catch(() => {});
+    } else {
+      window.open(
+        `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`,
+        "_blank",
+        "noopener",
+      );
+    }
+  };
+  const copy = () => {
+    navigator.clipboard
+      .writeText(window.location.href)
+      .then(() => toast.success("Đã sao chép liên kết bài viết."))
+      .catch(() => toast.error("Không sao chép được liên kết."));
+  };
+
+  const btn =
+    "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider border border-white/10 bg-white/[0.03] text-white/65 hover:text-white hover:border-white/25 transition-colors cursor-pointer";
+
+  return (
+    <div className="flex flex-wrap items-center gap-2 border-y border-white/10 py-2.5">
+      <span className="text-[10px] uppercase tracking-wider text-white/40 font-bold mr-1">
+        Tiện ích
+      </span>
+      <button onClick={share} className={btn}>
+        <Share2 className="w-3 h-3" /> Chia sẻ
+      </button>
+      <button onClick={copy} className={btn}>
+        <LinkIcon className="w-3 h-3" /> Sao chép link
+      </button>
+      <button onClick={() => window.print()} className={btn}>
+        <Printer className="w-3 h-3" /> In bài
+      </button>
+    </div>
   );
 }
 

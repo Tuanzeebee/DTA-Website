@@ -14,9 +14,11 @@ import {
 } from "@/newsData";
 import {
   ArticleCard,
-  PortalSidebar,
   ArticleListControls,
   ArticlePagination,
+  HomeDigest,
+  SidebarAds,
+  SidebarLogos,
   type ArticleListSearch,
 } from "@/compenents/news/PortalBlocks";
 
@@ -229,9 +231,13 @@ function CategoryPage() {
   // Distinguish "category is empty" from "the active filter matches nothing".
   const categoryHasArticles = result.total > 0 || search.flag !== undefined;
 
+  /* Brief-mandated 3-column layout for a category page:
+     col 1 — the category's own articles (list, filters, pagination)
+     col 2 — compact repeat of the homepage
+     col 3 — 3 ad banners on top, then the member logos */
   return (
-    <div className="grid lg:grid-cols-12 gap-x-10 gap-y-14">
-      <div className="lg:col-span-9">
+    <div className="grid lg:grid-cols-12 gap-x-8 gap-y-14">
+      <div className="lg:col-span-6">
         <nav className="text-[11px] text-white/50 mb-4">
           <Link to="/news" className="hover:text-cyan-300 transition-colors">
             Trang chủ
@@ -318,9 +324,19 @@ function CategoryPage() {
         )}
       </div>
 
+      {/* Column 2: homepage repeat. */}
       <div className="lg:col-span-3">
-        <PortalSidebar />
+        <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40 mb-4">
+          Trên trang chủ
+        </h2>
+        <HomeDigest />
       </div>
+
+      {/* Column 3: ads then member logos, in that order per the brief. */}
+      <aside className="lg:col-span-3 space-y-6">
+        <SidebarAds count={3} />
+        <SidebarLogos />
+      </aside>
     </div>
   );
 }

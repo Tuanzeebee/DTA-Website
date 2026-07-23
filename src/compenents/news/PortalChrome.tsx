@@ -136,6 +136,48 @@ export function PortalBanner() {
   );
 }
 
+/**
+ * Bottom repeat of the FULL topic menu — main topics AND their categories —
+ * placed at the end of every portal page so readers reaching the bottom can
+ * jump anywhere without scrolling back up (brief: "Lặp lại danh mục chủ đề
+ * chính... và các chuyên mục... ở chân trang"; reference: laodong.vn).
+ */
+export function PortalBottomMenu() {
+  return (
+    <nav
+      aria-label="Chuyên mục (cuối trang)"
+      className="border-t border-white/10 bg-black/25 mt-16"
+    >
+      <div className="max-w-7xl mx-auto px-4 md:px-6 py-8 grid grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-8">
+        {mainTopics.map((t) => (
+          <div key={t.slug}>
+            <Link
+              to="/news/$topic"
+              params={{ topic: t.slug }}
+              className="block text-[11px] font-black uppercase tracking-wider text-accent hover:text-cyan-300 transition-colors border-b border-white/10 pb-2 mb-2.5"
+            >
+              {t.name}
+            </Link>
+            <ul className="space-y-1.5">
+              {t.categories.map((c) => (
+                <li key={c.slug}>
+                  <Link
+                    to="/news/$topic/$category"
+                    params={{ topic: t.slug, category: c.slug }}
+                    className="text-xs text-white/60 hover:text-cyan-300 transition-colors leading-snug"
+                  >
+                    {c.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+    </nav>
+  );
+}
+
 export function PortalFooter() {
   return (
     <footer className="border-t border-white/10 bg-black/40 mt-16">

@@ -2,7 +2,11 @@ import { createFileRoute, Outlet } from "@tanstack/react-router";
 import { useLang, useSession } from "@/hooks/useLang";
 import { PageShell } from "@/compenents/layout/PageShell";
 import { Nav } from "@/compenents/layout/Nav";
-import { PortalMenuBar, PortalBanner } from "@/compenents/news/PortalChrome";
+import {
+  PortalMenuBar,
+  PortalBanner,
+  PortalBottomMenu,
+} from "@/compenents/news/PortalChrome";
 import { Footer } from "@/compenents/layout/Footer";
 
 /**
@@ -34,9 +38,13 @@ function NewsPortalLayout() {
         <PortalMenuBar />
         <PortalBanner />
 
-        <main className="max-w-7xl mx-auto px-4 md:px-6 mt-10 pb-20 min-h-[50vh]">
+        <main className="max-w-7xl mx-auto px-4 md:px-6 mt-10 pb-4 min-h-[50vh]">
           <Outlet />
         </main>
+
+        {/* Full topic+category menu repeated at the bottom of every portal
+            page (brief requirement, laodong.vn pattern). */}
+        <PortalBottomMenu />
 
         <Footer lang={lang} />
 
