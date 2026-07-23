@@ -54,17 +54,41 @@ function NewsPortalLayout() {
             very bottom, under the shared footer. */}
         <div className="border-t border-white/10 bg-black/50">
           <div className="max-w-7xl mx-auto px-4 md:px-6 py-3 text-[10px] font-light leading-relaxed text-white/45 text-center space-y-0.5">
-            <p>
-              DTA News — Trang thông tin điện tử tổng hợp của Hiệp hội Công nghệ
-              số Đà Nẵng. Giấy phép số{" "}
-              <span className="font-normal text-white/70">447/GP-STTTT</span>{" "}
-              ngày 29/05/2019 do Sở Thông tin và Truyền thông TP. Đà Nẵng cấp.
-            </p>
-            <p>
-              Chịu trách nhiệm xuất bản: Ông Phạm Kim Sơn – Chủ tịch Hiệp hội ·
-              Thư ký tòa soạn: Nhà báo Trần Ngọc · © DTA — Ghi rõ nguồn
-              "dta.org.vn" khi phát hành lại thông tin từ website này.
-            </p>
+            {lang === "vn" ? (
+              <>
+                <p>
+                  DTA News — Trang thông tin điện tử tổng hợp của Hiệp hội Công
+                  nghệ số Đà Nẵng. Giấy phép số{" "}
+                  <span className="font-normal text-white/70">
+                    447/GP-STTTT
+                  </span>{" "}
+                  ngày 29/05/2019 do Sở Thông tin và Truyền thông TP. Đà Nẵng
+                  cấp.
+                </p>
+                <p>
+                  Chịu trách nhiệm xuất bản: Ông Phạm Kim Sơn – Chủ tịch Hiệp
+                  hội · Thư ký tòa soạn: Nhà báo Trần Ngọc · © DTA — Ghi rõ
+                  nguồn "dta.org.vn" khi phát hành lại thông tin từ website này.
+                </p>
+              </>
+            ) : (
+              <>
+                <p>
+                  DTA News — the aggregated e-information page of the Danang
+                  Digital Technology Association. Licence No.{" "}
+                  <span className="font-normal text-white/70">
+                    447/GP-STTTT
+                  </span>{" "}
+                  dated 29/05/2019, issued by the Danang Department of
+                  Information and Communications.
+                </p>
+                <p>
+                  Publisher-in-charge: Mr. Pham Kim Son – Association Chairman ·
+                  Managing editor: Journalist Tran Ngoc · © DTA — cite
+                  "dta.org.vn" when republishing content from this website.
+                </p>
+              </>
+            )}
           </div>
         </div>
       </div>

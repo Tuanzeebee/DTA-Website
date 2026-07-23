@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 import { SectionBackground, seamTint } from "@/compenents/SectionBackground";
 import { SectionHeader } from "@/compenents/SectionHeader";
-import { membersData } from "@/data";
+import { allMembers } from "@/data";
 import type { Lang } from "@/types";
 import type { LucideIcon } from "lucide-react";
 import doiTacBg from "@/assets/DoiTac.png";
@@ -106,7 +106,7 @@ function MemberCard({ org, lang }: { org: SliderOrg; lang: Lang }) {
 }
 
 export function MembersDirectorySection({ lang }: { lang: Lang }) {
-  const sliderOrganizations = membersData.map((m) => {
+  const sliderOrganizations = allMembers().map((m) => {
     let meta = {
       gradient: "from-slate-500/10 to-slate-600/10",
       borderColor: "rgba(148, 163, 184, 0.2)",

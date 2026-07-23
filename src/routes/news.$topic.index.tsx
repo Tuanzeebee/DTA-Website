@@ -1,12 +1,20 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useMemo } from "react";
 import { ChevronRight, Newspaper } from "lucide-react";
-import { topicBySlug, articlesByCategory, queryArticles } from "@/newsData";
+import {
+  topicBySlug,
+  articlesByCategory,
+  queryArticles,
+  topicName,
+  categoryName,
+  categoryDesc,
+} from "@/newsData";
 import {
   ArticleCard,
   PortalSidebar,
   TopicPagination,
 } from "@/compenents/news/PortalBlocks";
+import { useLang } from "@/hooks/useLang";
 
 /**
  * Main-topic page: one teaser section per sub-category (2–4 articles each,
@@ -28,6 +36,7 @@ export const Route = createFileRoute("/news/$topic/")({
 });
 
 function TopicPage() {
+  const { lang } = useLang();
   const { topic } = Route.useLoaderData();
   const { page } = Route.useSearch();
 
@@ -42,14 +51,14 @@ function TopicPage() {
       <div className="lg:col-span-9">
         <nav className="text-[11px] text-white/50 mb-4">
           <Link to="/news" className="hover:text-cyan-300 transition-colors">
-            Trang chủ
+            {lang === "vn" ? "Trang chủ" : "Home"}
           </Link>
           <span className="mx-1.5">/</span>
-          <span className="text-white/80">{topic.name}</span>
+          <span className="text-white/80">{topicName(topic, lang)}</span>
         </nav>
 
         <h1 className="display text-2xl md:text-4xl font-black text-white uppercase tracking-tight mb-10">
-          {topic.name}
+          {topicName(topic, lang)}
         </h1>
 
         <div className="space-y-14">
@@ -63,12 +72,12 @@ function TopicPage() {
                   className="group flex items-center justify-between border-b border-white/10 pb-2 mb-2"
                 >
                   <h2 className="text-sm md:text-base font-black uppercase tracking-wide text-accent group-hover:text-cyan-300 transition-colors">
-                    {c.name}
+                    {categoryName(c, lang)}
                   </h2>
                   <ChevronRight className="w-4 h-4 text-accent group-hover:translate-x-1 transition-transform" />
                 </Link>
                 <p className="text-xs text-white/55 leading-relaxed mb-5 max-w-2xl">
-                  {c.desc}
+                  {categoryDesc(c, lang)}
                 </p>
                 {articles.length > 0 ? (
                   <div className="grid sm:grid-cols-2 gap-5">
@@ -78,7 +87,9 @@ function TopicPage() {
                   </div>
                 ) : (
                   <div className="rounded-xl border border-dashed border-white/10 p-6 text-center text-xs text-white/45">
-                    Chuyên mục đang chờ bài viết đầu tiên từ Ban Biên tập.
+                    {lang === "vn"
+                      ? "Chuyên mục đang chờ bài viết đầu tiên từ Ban Biên tập."
+                      : "This category is awaiting its first article."}
                   </div>
                 )}
               </section>
@@ -93,10 +104,10 @@ function TopicPage() {
             <div className="flex items-baseline justify-between border-b-2 border-accent/60 pb-2 mb-5">
               <h2 className="flex items-center gap-2 text-sm md:text-base font-black uppercase tracking-wide text-white">
                 <Newspaper className="w-4 h-4 text-accent" />
-                Tất cả bài viết
+                {lang === "vn" ? "Tất cả bài viết" : "All articles"}
               </h2>
               <span className="text-[11px] text-white/45 font-mono">
-                {all.total} bài viết
+                {all.total} {lang === "vn" ? "bài viết" : "articles"}
               </span>
             </div>
             <div className="space-y-5">

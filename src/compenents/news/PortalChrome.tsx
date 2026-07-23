@@ -7,7 +7,9 @@ import {
   Bookmark,
   LayoutGrid,
 } from "lucide-react";
-import { mainTopics } from "@/newsData";
+import { mainTopics, topicName, topicShort, categoryName } from "@/newsData";
+import { useLang } from "@/hooks/useLang";
+import type { Lang } from "@/types";
 
 /**
  * Portal chrome that lives UNDER the shared site header (layout/Nav):
@@ -17,13 +19,13 @@ import { mainTopics } from "@/newsData";
  * brief sits at the right end of the bar.
  */
 
-function useClock() {
+function useClock(lang: Lang) {
   const [now, setNow] = useState(() => new Date());
   useEffect(() => {
     const id = setInterval(() => setNow(new Date()), 30_000);
     return () => clearInterval(id);
   }, []);
-  return new Intl.DateTimeFormat("vi-VN", {
+  return new Intl.DateTimeFormat(lang === "vn" ? "vi-VN" : "en-GB", {
     weekday: "long",
     day: "2-digit",
     month: "2-digit",
@@ -33,7 +35,8 @@ function useClock() {
 }
 
 export function PortalMenuBar() {
-  const clock = useClock();
+  const { lang } = useLang();
+  const clock = useClock(lang);
 
   /* State-driven dropdown instead of pure CSS hover/focus-within: navigation
      here is client-side (no page reload), so a clicked link KEEPS focus and a
@@ -67,7 +70,7 @@ export function PortalMenuBar() {
           className="md:hidden flex items-center gap-1.5 h-11 px-3 text-[12px] font-bold uppercase tracking-wide text-white hover:text-cyan-300 transition-colors cursor-pointer"
         >
           <LayoutGrid className="w-3.5 h-3.5" />
-          <span>Chuyên mục</span>
+          <span>{lang === "vn" ? "Chuyên mục" : "Categories"}</span>
           <ChevronDown
             className={`w-3 h-3 opacity-60 transition-transform duration-300 ${
               mobileOpen ? "rotate-180" : ""
@@ -104,7 +107,7 @@ export function PortalMenuBar() {
                   onClick={() => setOpenTopic(null)}
                   className="flex items-center gap-1 px-3 md:px-4 h-11 text-[12px] md:text-[13px] font-bold uppercase tracking-wide text-white hover:text-cyan-300 transition-colors whitespace-nowrap"
                 >
-                  <span>{t.short}</span>
+                  <span>{topicShort(t, lang)}</span>
                   <ChevronDown
                     className={`w-3 h-3 opacity-60 transition-transform duration-300 ${
                       isOpen ? "rotate-180" : ""
@@ -132,7 +135,7 @@ export function PortalMenuBar() {
                         }}
                         className="block px-4 py-2 text-[12px] text-white/85 hover:text-cyan-300 hover:bg-white/5 transition-colors"
                       >
-                        {c.name}
+                        {categoryName(c, lang)}
                       </Link>
                     ))}
                   </div>
@@ -150,13 +153,13 @@ export function PortalMenuBar() {
           <MenuSearchForm />
           <Link
             to="/news/da-luu"
-            title="Bài đã lưu"
-            aria-label="Bài đã lưu"
+            title={lang === "vn" ? "Bài đã lưu" : "Saved articles"}
+            aria-label={lang === "vn" ? "Bài đã lưu" : "Saved articles"}
             className="flex items-center gap-1 h-8 px-2 rounded-lg text-white/60 hover:text-cyan-300 transition-colors shrink-0"
           >
             <Bookmark className="w-3.5 h-3.5" />
             <span className="hidden xl:inline text-[11px] font-bold uppercase tracking-wide">
-              Đã lưu
+              {lang === "vn" ? "Đã lưu" : "Saved"}
             </span>
           </Link>
           <span className="hidden xl:block text-[11px] text-white/50 capitalize whitespace-nowrap">
@@ -188,7 +191,7 @@ export function PortalMenuBar() {
                     onClick={() => setMobileOpen(false)}
                     className="block text-[12px] font-black uppercase tracking-wide text-accent hover:text-cyan-300 transition-colors"
                   >
-                    {t.name}
+                    {topicName(t, lang)}
                   </Link>
                   <div className="mt-1">
                     {t.categories.map((c) => (
@@ -199,7 +202,7 @@ export function PortalMenuBar() {
                         onClick={() => setMobileOpen(false)}
                         className="block py-1.5 pl-3 border-l border-white/10 text-[13px] text-white/80 hover:text-cyan-300 transition-colors"
                       >
-                        {c.name}
+                        {categoryName(c, lang)}
                       </Link>
                     ))}
                   </div>
@@ -216,6 +219,7 @@ export function PortalMenuBar() {
 /** Keyword search ("từ khóa - tìm kiếm" utility). Inline input from md up;
  *  below md just an icon link to the search page, which has its own input. */
 function MenuSearchForm() {
+  const { lang } = useLang();
   const navigate = useNavigate();
   const [q, setQ] = useState("");
 
@@ -235,8 +239,8 @@ function MenuSearchForm() {
         <input
           value={q}
           onChange={(e) => setQ(e.target.value)}
-          placeholder="Tìm kiếm…"
-          aria-label="Tìm kiếm tin bài"
+          placeholder={lang === "vn" ? "Tìm kiếm…" : "Search…"}
+          aria-label={lang === "vn" ? "Tìm kiếm tin bài" : "Search articles"}
           className="w-24 xl:w-36 bg-transparent pl-3 pr-1 text-[12px] text-white placeholder:text-white/35 focus:outline-none"
         />
         <button
@@ -264,20 +268,23 @@ function MenuSearchForm() {
  *  "tài trợ" — separated by breathing room ("khoảng cách vừa đủ").
  *  All placeholders until real creative. */
 export function PortalBanner() {
+  const { lang } = useLang();
   const slot =
     "rounded-2xl border border-dashed border-white/15 bg-white/[0.03] flex items-center justify-center text-white/40 uppercase tracking-[0.2em]";
   return (
     <div className="max-w-7xl mx-auto px-4 md:px-6 mt-6">
       <div className="grid md:grid-cols-3 gap-3 md:gap-4">
         <div className={`${slot} md:col-span-2 h-20 md:h-28 text-xs`}>
-          Banner tuyên truyền / cổ động
+          {lang === "vn"
+            ? "Banner tuyên truyền / cổ động"
+            : "Campaign / promotional banner"}
         </div>
         <div className="grid grid-cols-2 md:grid-cols-1 gap-3 md:gap-4">
           <div className={`${slot} h-14 md:h-12 text-[10px]`}>
-            Dành cho quảng cáo
+            {lang === "vn" ? "Dành cho quảng cáo" : "Advertising slot"}
           </div>
           <div className={`${slot} h-14 md:h-12 text-[10px]`}>
-            Dành cho tài trợ
+            {lang === "vn" ? "Dành cho tài trợ" : "Sponsorship slot"}
           </div>
         </div>
       </div>
@@ -292,9 +299,12 @@ export function PortalBanner() {
  * chính... và các chuyên mục... ở chân trang"; reference: laodong.vn).
  */
 export function PortalBottomMenu() {
+  const { lang } = useLang();
   return (
     <nav
-      aria-label="Chuyên mục (cuối trang)"
+      aria-label={
+        lang === "vn" ? "Chuyên mục (cuối trang)" : "Categories (footer)"
+      }
       className="border-t border-white/10 bg-black/25 mt-16"
     >
       <div className="max-w-7xl mx-auto px-4 md:px-6 py-8 grid grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-8">
@@ -305,7 +315,7 @@ export function PortalBottomMenu() {
               params={{ topic: t.slug }}
               className="block text-[11px] font-black uppercase tracking-wider text-accent hover:text-cyan-300 transition-colors border-b border-white/10 pb-2 mb-2.5"
             >
-              {t.name}
+              {topicName(t, lang)}
             </Link>
             <ul className="space-y-1.5">
               {t.categories.map((c) => (
@@ -315,7 +325,7 @@ export function PortalBottomMenu() {
                     params={{ topic: t.slug, category: c.slug }}
                     className="text-xs text-white/60 hover:text-cyan-300 transition-colors leading-snug"
                   >
-                    {c.name}
+                    {categoryName(c, lang)}
                   </Link>
                 </li>
               ))}

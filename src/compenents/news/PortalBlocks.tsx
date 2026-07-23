@@ -19,13 +19,15 @@ import {
   BookmarkCheck,
 } from "lucide-react";
 import { useSavedArticles } from "@/hooks/useSavedArticles";
-import { membersData } from "@/data";
+import { useLang } from "@/hooks/useLang";
+import { allMembers } from "@/data";
 import {
   latestArticles,
   mostReadArticles,
   relatedArticles,
   articlesByTopic,
   mainTopics,
+  topicName,
   boardMembers,
   articleSorts,
   articleSortLabels,
@@ -53,6 +55,7 @@ export function ArticleCard({
   article: PortalArticle;
   featured?: boolean;
 }) {
+  const { lang } = useLang();
   return (
     <Link
       to="/news/article/$id"
@@ -83,12 +86,12 @@ export function ArticleCard({
           <div className="flex items-center gap-2 flex-wrap mb-2">
             {article.isIntern && (
               <span className="px-2 py-0.5 rounded-md bg-emerald-500/15 text-emerald-300 text-[9px] font-black uppercase tracking-wider">
-                Thực tập sinh
+                {lang === "vn" ? "Thực tập sinh" : "Intern"}
               </span>
             )}
             {article.pdfUrl && (
               <span className="px-2 py-0.5 rounded-md bg-accent/15 text-accent text-[9px] font-black uppercase tracking-wider">
-                Có văn bản PDF
+                {lang === "vn" ? "Có văn bản PDF" : "PDF attached"}
               </span>
             )}
             <span className="text-[10px] text-white/45 font-mono">
@@ -133,6 +136,7 @@ export function ArticleListControls({
   /** Flags with >=1 match in this category — zero-result chips are hidden. */
   flags: ArticleFlag[];
 }) {
+  const { lang } = useLang();
   const sort = search.sort ?? DEFAULT_SORT;
 
   return (
@@ -140,7 +144,7 @@ export function ArticleListControls({
       {/* Segmented sort control */}
       <div
         role="group"
-        aria-label="Sắp xếp bài viết"
+        aria-label={lang === "vn" ? "Sắp xếp bài viết" : "Sort articles"}
         className="flex rounded-full border border-white/10 bg-white/[0.03] p-0.5"
       >
         {articleSorts.map((s) => (
@@ -160,7 +164,7 @@ export function ArticleListControls({
                 : "text-white/55 hover:text-white"
             }`}
           >
-            {articleSortLabels[s]}
+            {articleSortLabels[s][lang]}
           </Link>
         ))}
       </div>
@@ -187,7 +191,7 @@ export function ArticleListControls({
                     : "border-white/10 bg-white/[0.03] text-white/55 hover:text-white hover:border-white/25"
                 }`}
               >
-                {articleFlagLabels[f]}
+                {articleFlagLabels[f][lang]}
                 {active && <X className="w-3 h-3" />}
               </Link>
             );
@@ -196,7 +200,7 @@ export function ArticleListControls({
       )}
 
       <span className="ml-auto text-[11px] text-white/45 font-mono">
-        {total} bài viết
+        {total} {lang === "vn" ? "bài viết" : "articles"}
       </span>
     </div>
   );
@@ -237,6 +241,7 @@ export function ArticlePagination({
   page: number;
   pageCount: number;
 }) {
+  const { lang } = useLang();
   if (pageCount <= 1) return null;
 
   const pageLink = (p: number) => ({
@@ -249,14 +254,14 @@ export function ArticlePagination({
 
   return (
     <nav
-      aria-label="Phân trang"
+      aria-label={lang === "vn" ? "Phân trang" : "Pagination"}
       className="mt-10 flex items-center justify-center gap-1.5"
     >
       {page > 1 && (
         <Link
           {...pageLink(page - 1)}
           onClick={jumpTop}
-          aria-label="Trang trước"
+          aria-label={lang === "vn" ? "Trang trước" : "Previous page"}
           className={PAGE_ARROW}
         >
           <ChevronLeft className="w-4 h-4" />
@@ -289,7 +294,7 @@ export function ArticlePagination({
         <Link
           {...pageLink(page + 1)}
           onClick={jumpTop}
-          aria-label="Trang sau"
+          aria-label={lang === "vn" ? "Trang sau" : "Next page"}
           className={PAGE_ARROW}
         >
           <ChevronRight className="w-4 h-4" />
@@ -310,6 +315,7 @@ export function TopicPagination({
   page: number;
   pageCount: number;
 }) {
+  const { lang } = useLang();
   if (pageCount <= 1) return null;
 
   const pageLink = (p: number) => ({
@@ -321,14 +327,14 @@ export function TopicPagination({
 
   return (
     <nav
-      aria-label="Phân trang"
+      aria-label={lang === "vn" ? "Phân trang" : "Pagination"}
       className="mt-10 flex items-center justify-center gap-1.5"
     >
       {page > 1 && (
         <Link
           {...pageLink(page - 1)}
           onClick={jumpTop}
-          aria-label="Trang trước"
+          aria-label={lang === "vn" ? "Trang trước" : "Previous page"}
           className={PAGE_ARROW}
         >
           <ChevronLeft className="w-4 h-4" />
@@ -361,7 +367,7 @@ export function TopicPagination({
         <Link
           {...pageLink(page + 1)}
           onClick={jumpTop}
-          aria-label="Trang sau"
+          aria-label={lang === "vn" ? "Trang sau" : "Next page"}
           className={PAGE_ARROW}
         >
           <ChevronRight className="w-4 h-4" />
@@ -381,10 +387,11 @@ export function TopicPagination({
 /** 5 latest — "tin-bài mới đăng, số lượng 5" per the brief. Thumbnail-first
  *  rows so the rail scans visually, not just by title. */
 export function SidebarLatest() {
+  const { lang } = useLang();
   return (
     <section className="card-surface rounded-2xl p-4">
       <h4 className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-accent mb-3">
-        <Clock className="w-3.5 h-3.5" /> Tin mới
+        <Clock className="w-3.5 h-3.5" /> {lang === "vn" ? "Tin mới" : "Latest"}
       </h4>
       <ul className="divide-y divide-white/5">
         {latestArticles(5).map((a) => (
@@ -420,10 +427,12 @@ export function SidebarLatest() {
 }
 
 export function SidebarMostRead() {
+  const { lang } = useLang();
   return (
     <section className="card-surface rounded-2xl p-4">
       <h4 className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-accent mb-3">
-        <Flame className="w-3.5 h-3.5" /> Đọc nhiều
+        <Flame className="w-3.5 h-3.5" />{" "}
+        {lang === "vn" ? "Đọc nhiều" : "Most read"}
       </h4>
       <ol className="divide-y divide-white/5">
         {mostReadArticles(5).map((a, i) => (
@@ -451,7 +460,8 @@ export function SidebarMostRead() {
                   {a.title}
                 </span>
                 <span className="block mt-1 text-[10px] text-white/40 font-mono">
-                  {a.views.toLocaleString("vi-VN")} lượt đọc
+                  {a.views.toLocaleString("vi-VN")}{" "}
+                  {lang === "vn" ? "lượt đọc" : "reads"}
                 </span>
               </div>
             </Link>
@@ -465,6 +475,7 @@ export function SidebarMostRead() {
 /** Ad banners — the brief pins 3 stacked banners atop the rail on
  *  category and article pages. */
 export function SidebarAds({ count = 3 }: { count?: number }) {
+  const { lang } = useLang();
   return (
     <div className="space-y-3">
       {Array.from({ length: count }, (_, i) => (
@@ -472,7 +483,8 @@ export function SidebarAds({ count = 3 }: { count?: number }) {
           key={i}
           className="rounded-2xl border border-dashed border-white/15 bg-white/[0.03] h-28 flex items-center justify-center text-white/40 text-[10px] uppercase tracking-[0.2em]"
         >
-          Quảng cáo {count > 1 ? i + 1 : ""}
+          {lang === "vn" ? "Quảng cáo" : "Advertisement"}{" "}
+          {count > 1 ? i + 1 : ""}
         </div>
       ))}
     </div>
@@ -481,10 +493,12 @@ export function SidebarAds({ count = 3 }: { count?: number }) {
 
 /** "Lặp lại như trang chủ: Logo hội viên" — member logos on every rail. */
 export function SidebarLogos() {
+  const { lang } = useLang();
   return (
     <section className="card-surface rounded-2xl p-4">
       <h4 className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-accent mb-3">
-        <BadgeCheck className="w-3.5 h-3.5" /> Hội viên DTA
+        <BadgeCheck className="w-3.5 h-3.5" />{" "}
+        {lang === "vn" ? "Hội viên DTA" : "DTA Members"}
       </h4>
       <MemberLogoGrid compact />
     </section>
@@ -494,21 +508,25 @@ export function SidebarLogos() {
 /** Association card — the article-page rail repeats "Hiệp hội" above the
  *  member logos. */
 export function SidebarAssociation() {
+  const { lang } = useLang();
   return (
     <section className="card-surface card-surface-gold rounded-2xl p-4">
       <h4 className="text-xs font-black uppercase tracking-wider text-white mb-1.5">
-        Hiệp hội Công nghệ số Đà Nẵng
+        {lang === "vn"
+          ? "Hiệp hội Công nghệ số Đà Nẵng"
+          : "Danang Digital Technology Association"}
       </h4>
       <p className="text-[11px] text-white/60 leading-relaxed">
-        Mái nhà chung của cộng đồng doanh nghiệp công nghệ số thành phố — hợp
-        tác, liên kết, phát triển bền vững.
+        {lang === "vn"
+          ? "Mái nhà chung của cộng đồng doanh nghiệp công nghệ số thành phố — hợp tác, liên kết, phát triển bền vững."
+          : "The common home of the city's digital technology community — collaboration, connection, sustainable growth."}
       </p>
       <Link
         to="/"
         className="inline-flex items-center gap-1 mt-2.5 text-[10px] font-bold uppercase text-accent hover:text-cyan-300 transition-colors"
       >
         <ExternalLink className="w-3 h-3" />
-        Trang giới thiệu Hiệp hội
+        {lang === "vn" ? "Trang giới thiệu Hiệp hội" : "About the Association"}
       </Link>
     </section>
   );
@@ -517,12 +535,14 @@ export function SidebarAssociation() {
 /** 5 articles from the same category — article-page rail, with a thumbnail
  *  per row so the list scans faster than titles alone. */
 export function SidebarSameCategory({ article }: { article: PortalArticle }) {
+  const { lang } = useLang();
   const related = relatedArticles(article, 5);
   if (related.length === 0) return null;
   return (
     <section className="card-surface rounded-2xl p-4">
       <h4 className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-accent mb-3">
-        <Newspaper className="w-3.5 h-3.5" /> Cùng chuyên mục
+        <Newspaper className="w-3.5 h-3.5" />{" "}
+        {lang === "vn" ? "Cùng chuyên mục" : "Same category"}
       </h4>
       <ul className="divide-y divide-white/5">
         {related.map((a) => (
@@ -578,6 +598,7 @@ export function PortalSidebar() {
  * plus its newest headlines, text-only so the column stays narrow.
  */
 export function HomeDigest() {
+  const { lang } = useLang();
   return (
     <div className="space-y-8">
       {mainTopics.map((t) => {
@@ -589,7 +610,7 @@ export function HomeDigest() {
               params={{ topic: t.slug }}
               className="block border-b-2 border-accent/60 pb-1.5 mb-2.5 text-[11px] font-black uppercase tracking-wide text-white hover:text-cyan-300 transition-colors"
             >
-              {t.name}
+              {topicName(t, lang)}
             </Link>
             <ul className="divide-y divide-white/5">
               {heads.map((a) => (
@@ -624,6 +645,7 @@ export function ReaderUtilityBar({
   title: string;
   articleId: string;
 }) {
+  const { lang } = useLang();
   const router = useRouter();
   const { isSaved, toggle } = useSavedArticles();
   const saved = isSaved(articleId);
@@ -631,7 +653,13 @@ export function ReaderUtilityBar({
   const save = () => {
     toggle(articleId);
     toast.success(
-      saved ? "Đã bỏ lưu bài viết." : "Đã lưu bài viết — xem lại ở mục Đã lưu.",
+      saved
+        ? lang === "vn"
+          ? "Đã bỏ lưu bài viết."
+          : "Removed from saved articles."
+        : lang === "vn"
+          ? "Đã lưu bài viết — xem lại ở mục Đã lưu."
+          : "Saved — find it under Saved articles.",
     );
   };
 
@@ -650,8 +678,18 @@ export function ReaderUtilityBar({
   const copy = () => {
     navigator.clipboard
       .writeText(window.location.href)
-      .then(() => toast.success("Đã sao chép liên kết bài viết."))
-      .catch(() => toast.error("Không sao chép được liên kết."));
+      .then(() =>
+        toast.success(
+          lang === "vn" ? "Đã sao chép liên kết bài viết." : "Link copied.",
+        ),
+      )
+      .catch(() =>
+        toast.error(
+          lang === "vn"
+            ? "Không sao chép được liên kết."
+            : "Could not copy the link.",
+        ),
+      );
   };
 
   const btn =
@@ -660,16 +698,17 @@ export function ReaderUtilityBar({
   return (
     <div className="flex flex-wrap items-center gap-2 border-y border-white/10 py-2.5">
       <span className="text-[10px] uppercase tracking-wider text-white/40 font-bold mr-1">
-        Tiện ích
+        {lang === "vn" ? "Tiện ích" : "Utilities"}
       </span>
       <button onClick={() => router.history.back()} className={btn}>
-        <ArrowLeft className="w-3 h-3" /> Quay lại
+        <ArrowLeft className="w-3 h-3" /> {lang === "vn" ? "Quay lại" : "Back"}
       </button>
       <button onClick={share} className={btn}>
-        <Share2 className="w-3 h-3" /> Chia sẻ
+        <Share2 className="w-3 h-3" /> {lang === "vn" ? "Chia sẻ" : "Share"}
       </button>
       <button onClick={copy} className={btn}>
-        <LinkIcon className="w-3 h-3" /> Sao chép link
+        <LinkIcon className="w-3 h-3" />{" "}
+        {lang === "vn" ? "Sao chép link" : "Copy link"}
       </button>
       <button
         onClick={save}
@@ -682,16 +721,18 @@ export function ReaderUtilityBar({
       >
         {saved ? (
           <>
-            <BookmarkCheck className="w-3 h-3" /> Đã lưu
+            <BookmarkCheck className="w-3 h-3" />{" "}
+            {lang === "vn" ? "Đã lưu" : "Saved"}
           </>
         ) : (
           <>
-            <Bookmark className="w-3 h-3" /> Lưu bài
+            <Bookmark className="w-3 h-3" />{" "}
+            {lang === "vn" ? "Lưu bài" : "Save"}
           </>
         )}
       </button>
       <button onClick={() => window.print()} className={btn}>
-        <Printer className="w-3 h-3" /> In bài
+        <Printer className="w-3 h-3" /> {lang === "vn" ? "In bài" : "Print"}
       </button>
     </div>
   );
@@ -717,9 +758,13 @@ function useShuffled<T>(items: readonly T[]) {
  * and every logo links out to the member's site.
  */
 export function MemberLogoGrid({ compact = false }: { compact?: boolean }) {
+  // allMembers() is raw-string memoised (stable ref), so this memo only
+  // recomputes when the admin overlay actually changes — and useShuffled's
+  // effect keys off a stable array, avoiding a shuffle loop.
+  const all = allMembers();
   const orgs = useMemo(
-    () => membersData.filter((m) => m.type === "organization"),
-    [],
+    () => all.filter((m) => m.type === "organization"),
+    [all],
   );
   const shuffled = useShuffled(orgs);
 
@@ -813,6 +858,7 @@ export function BoardSection() {
 
 /** Row with a PDF download action — mandatory for the policy library. */
 export function ArticleActions({ article }: { article: PortalArticle }) {
+  const { lang } = useLang();
   if (!article.pdfUrl && !article.memberUrl) return null;
   return (
     <div className="flex flex-wrap gap-3 mt-6">
@@ -827,7 +873,7 @@ export function ArticleActions({ article }: { article: PortalArticle }) {
           }}
         >
           <Download className="w-4 h-4" />
-          Tải văn bản (PDF)
+          {lang === "vn" ? "Tải văn bản (PDF)" : "Download document (PDF)"}
         </a>
       )}
       {article.memberUrl && (
@@ -838,7 +884,7 @@ export function ArticleActions({ article }: { article: PortalArticle }) {
           className="px-5 py-2.5 rounded-full text-xs font-bold text-white border border-white/15 bg-white/[0.04] flex items-center gap-2 hover:bg-white/10 active:scale-95 transition-all"
         >
           <ExternalLink className="w-4 h-4" />
-          Xem tại website hội viên
+          {lang === "vn" ? "Xem tại website hội viên" : "View on member site"}
         </a>
       )}
     </div>

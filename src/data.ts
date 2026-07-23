@@ -340,6 +340,61 @@ export const membersData: DtaMember[] = [
   },
 ];
 
+/* ------------------------------------------------------------------ *
+ * Member store: the admin dashboard writes created/edited members to
+ * localStorage as an OVERLAY on membersData above — an override with a
+ * base id replaces that row, new ids append, hidden ids remove base rows.
+ * Every consumer (landing marquee, portal logo grids, admin) reads
+ * through allMembers(), so admin edits are live site-wide. Swapping this
+ * for a real API later only touches this block + the admin memberStore.
+ * ------------------------------------------------------------------ */
+
+export const ADMIN_MEMBERS_KEY = "dta-admin-members";
+export const ADMIN_MEMBERS_HIDDEN_KEY = "dta-admin-members-hidden";
+
+interface MemberCache {
+  key: string;
+  all: DtaMember[];
+}
+let memberCache: MemberCache | null = null;
+
+export function allMembers(): DtaMember[] {
+  let rawA = "";
+  let rawH = "";
+  try {
+    rawA = localStorage.getItem(ADMIN_MEMBERS_KEY) ?? "";
+    rawH = localStorage.getItem(ADMIN_MEMBERS_HIDDEN_KEY) ?? "";
+  } catch {
+    return membersData;
+  }
+  const key = `${rawA} ${rawH}`;
+  // Raw-string memo keeps the returned array referentially stable for
+  // hooks/useSyncExternalStore.
+  if (memberCache?.key === key) return memberCache.all;
+
+  let overrides: DtaMember[] = [];
+  let hidden: string[] = [];
+  try {
+    const a: unknown = rawA ? JSON.parse(rawA) : [];
+    if (Array.isArray(a)) overrides = a as DtaMember[];
+    const h: unknown = rawH ? JSON.parse(rawH) : [];
+    if (Array.isArray(h)) hidden = h.filter((x) => typeof x === "string");
+  } catch {
+    return membersData;
+  }
+
+  const byId = new Map(overrides.map((o) => [o.id, o]));
+  const baseIds = new Set(membersData.map((m) => m.id));
+  const all = [
+    ...membersData
+      .filter((m) => !hidden.includes(m.id))
+      .map((m) => byId.get(m.id) ?? m),
+    ...overrides.filter((o) => !baseIds.has(o.id)),
+  ];
+  memberCache = { key, all };
+  return all;
+}
+
 export interface DtaNews {
   title: { vn: string; en: string };
   date: string;

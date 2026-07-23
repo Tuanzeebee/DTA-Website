@@ -3,13 +3,13 @@ import { TraditionalClouds, AssociationSeal } from "@/compenents/Aesthetic";
 import { TrongDongDisc } from "@/compenents/TrongDongDisc";
 import { SectionBackground, seamTint } from "@/compenents/SectionBackground";
 import { ScrollReveal } from "@/compenents/ScrollReveal";
-import { membersData, translationStrings } from "@/data";
+import { allMembers, translationStrings } from "@/data";
 import type { Lang } from "@/types";
 
 function credentials(lang: Lang) {
-  const orgs = membersData.filter((m) => m.type === "organization").length;
-  const people = membersData.filter((m) => m.type === "individual").length;
-  const advisors = membersData.filter((m) => m.type === "advisory").length;
+  const orgs = allMembers().filter((m) => m.type === "organization").length;
+  const people = allMembers().filter((m) => m.type === "individual").length;
+  const advisors = allMembers().filter((m) => m.type === "advisory").length;
 
   return [
     {

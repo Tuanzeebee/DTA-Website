@@ -10,11 +10,20 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as NewsRouteImport } from './routes/news'
 import { Route as PortalRouteImport } from './routes/portal'
+import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as AdminDangKyRouteImport } from './routes/admin.dang-ky'
+import { Route as AdminHoiPhiRouteImport } from './routes/admin.hoi-phi'
+import { Route as AdminHoiVienRouteImport } from './routes/admin.hoi-vien'
+import { Route as AdminPhanBienRouteImport } from './routes/admin.phan-bien'
+import { Route as AdminTaiNguyenRouteImport } from './routes/admin.tai-nguyen'
 import { Route as NewsIndexRouteImport } from './routes/news.index'
 import { Route as NewsDaLuuRouteImport } from './routes/news.da-luu'
 import { Route as NewsTimKiemRouteImport } from './routes/news.tim-kiem'
+import { Route as AdminBaiVietIndexRouteImport } from './routes/admin.bai-viet.index'
+import { Route as AdminBaiVietIdRouteImport } from './routes/admin.bai-viet.$id'
 import { Route as NewsTopicIndexRouteImport } from './routes/news.$topic.index'
 import { Route as NewsTopicCategoryRouteImport } from './routes/news.$topic.$category'
 import { Route as NewsArticleIdRouteImport } from './routes/news.article.$id'
@@ -22,6 +31,11 @@ import { Route as NewsArticleIdRouteImport } from './routes/news.article.$id'
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
 const NewsRoute = NewsRouteImport.update({
@@ -33,6 +47,36 @@ const PortalRoute = PortalRouteImport.update({
   id: '/portal',
   path: '/portal',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminDangKyRoute = AdminDangKyRouteImport.update({
+  id: '/dang-ky',
+  path: '/dang-ky',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminHoiPhiRoute = AdminHoiPhiRouteImport.update({
+  id: '/hoi-phi',
+  path: '/hoi-phi',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminHoiVienRoute = AdminHoiVienRouteImport.update({
+  id: '/hoi-vien',
+  path: '/hoi-vien',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminPhanBienRoute = AdminPhanBienRouteImport.update({
+  id: '/phan-bien',
+  path: '/phan-bien',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminTaiNguyenRoute = AdminTaiNguyenRouteImport.update({
+  id: '/tai-nguyen',
+  path: '/tai-nguyen',
+  getParentRoute: () => AdminRoute,
 } as any)
 const NewsIndexRoute = NewsIndexRouteImport.update({
   id: '/',
@@ -48,6 +92,16 @@ const NewsTimKiemRoute = NewsTimKiemRouteImport.update({
   id: '/tim-kiem',
   path: '/tim-kiem',
   getParentRoute: () => NewsRoute,
+} as any)
+const AdminBaiVietIndexRoute = AdminBaiVietIndexRouteImport.update({
+  id: '/bai-viet/',
+  path: '/bai-viet/',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminBaiVietIdRoute = AdminBaiVietIdRouteImport.update({
+  id: '/bai-viet/$id',
+  path: '/bai-viet/$id',
+  getParentRoute: () => AdminRoute,
 } as any)
 const NewsTopicIndexRoute = NewsTopicIndexRouteImport.update({
   id: '/$topic/',
@@ -67,74 +121,127 @@ const NewsArticleIdRoute = NewsArticleIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteWithChildren
   '/news': typeof NewsRouteWithChildren
   '/portal': typeof PortalRoute
+  '/admin/dang-ky': typeof AdminDangKyRoute
+  '/admin/hoi-phi': typeof AdminHoiPhiRoute
+  '/admin/hoi-vien': typeof AdminHoiVienRoute
+  '/admin/phan-bien': typeof AdminPhanBienRoute
+  '/admin/tai-nguyen': typeof AdminTaiNguyenRoute
   '/news/da-luu': typeof NewsDaLuuRoute
   '/news/tim-kiem': typeof NewsTimKiemRoute
+  '/admin/': typeof AdminIndexRoute
   '/news/': typeof NewsIndexRoute
+  '/admin/bai-viet/$id': typeof AdminBaiVietIdRoute
   '/news/$topic/$category': typeof NewsTopicCategoryRoute
   '/news/article/$id': typeof NewsArticleIdRoute
+  '/admin/bai-viet/': typeof AdminBaiVietIndexRoute
   '/news/$topic/': typeof NewsTopicIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/portal': typeof PortalRoute
+  '/admin/dang-ky': typeof AdminDangKyRoute
+  '/admin/hoi-phi': typeof AdminHoiPhiRoute
+  '/admin/hoi-vien': typeof AdminHoiVienRoute
+  '/admin/phan-bien': typeof AdminPhanBienRoute
+  '/admin/tai-nguyen': typeof AdminTaiNguyenRoute
   '/news/da-luu': typeof NewsDaLuuRoute
   '/news/tim-kiem': typeof NewsTimKiemRoute
+  '/admin': typeof AdminIndexRoute
   '/news': typeof NewsIndexRoute
+  '/admin/bai-viet/$id': typeof AdminBaiVietIdRoute
   '/news/$topic/$category': typeof NewsTopicCategoryRoute
   '/news/article/$id': typeof NewsArticleIdRoute
+  '/admin/bai-viet': typeof AdminBaiVietIndexRoute
   '/news/$topic': typeof NewsTopicIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteWithChildren
   '/news': typeof NewsRouteWithChildren
   '/portal': typeof PortalRoute
+  '/admin/dang-ky': typeof AdminDangKyRoute
+  '/admin/hoi-phi': typeof AdminHoiPhiRoute
+  '/admin/hoi-vien': typeof AdminHoiVienRoute
+  '/admin/phan-bien': typeof AdminPhanBienRoute
+  '/admin/tai-nguyen': typeof AdminTaiNguyenRoute
   '/news/da-luu': typeof NewsDaLuuRoute
   '/news/tim-kiem': typeof NewsTimKiemRoute
+  '/admin/': typeof AdminIndexRoute
   '/news/': typeof NewsIndexRoute
+  '/admin/bai-viet/$id': typeof AdminBaiVietIdRoute
   '/news/$topic/$category': typeof NewsTopicCategoryRoute
   '/news/article/$id': typeof NewsArticleIdRoute
+  '/admin/bai-viet/': typeof AdminBaiVietIndexRoute
   '/news/$topic/': typeof NewsTopicIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/admin'
     | '/news'
     | '/portal'
+    | '/admin/dang-ky'
+    | '/admin/hoi-phi'
+    | '/admin/hoi-vien'
+    | '/admin/phan-bien'
+    | '/admin/tai-nguyen'
     | '/news/da-luu'
     | '/news/tim-kiem'
+    | '/admin/'
     | '/news/'
+    | '/admin/bai-viet/$id'
     | '/news/$topic/$category'
     | '/news/article/$id'
+    | '/admin/bai-viet/'
     | '/news/$topic/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/portal'
+    | '/admin/dang-ky'
+    | '/admin/hoi-phi'
+    | '/admin/hoi-vien'
+    | '/admin/phan-bien'
+    | '/admin/tai-nguyen'
     | '/news/da-luu'
     | '/news/tim-kiem'
+    | '/admin'
     | '/news'
+    | '/admin/bai-viet/$id'
     | '/news/$topic/$category'
     | '/news/article/$id'
+    | '/admin/bai-viet'
     | '/news/$topic'
   id:
     | '__root__'
     | '/'
+    | '/admin'
     | '/news'
     | '/portal'
+    | '/admin/dang-ky'
+    | '/admin/hoi-phi'
+    | '/admin/hoi-vien'
+    | '/admin/phan-bien'
+    | '/admin/tai-nguyen'
     | '/news/da-luu'
     | '/news/tim-kiem'
+    | '/admin/'
     | '/news/'
+    | '/admin/bai-viet/$id'
     | '/news/$topic/$category'
     | '/news/article/$id'
+    | '/admin/bai-viet/'
     | '/news/$topic/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminRoute: typeof AdminRouteWithChildren
   NewsRoute: typeof NewsRouteWithChildren
   PortalRoute: typeof PortalRoute
 }
@@ -146,6 +253,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/news': {
@@ -161,6 +275,48 @@ declare module '@tanstack/react-router' {
       fullPath: '/portal'
       preLoaderRoute: typeof PortalRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/admin/': {
+      id: '/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/dang-ky': {
+      id: '/admin/dang-ky'
+      path: '/dang-ky'
+      fullPath: '/admin/dang-ky'
+      preLoaderRoute: typeof AdminDangKyRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/hoi-phi': {
+      id: '/admin/hoi-phi'
+      path: '/hoi-phi'
+      fullPath: '/admin/hoi-phi'
+      preLoaderRoute: typeof AdminHoiPhiRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/hoi-vien': {
+      id: '/admin/hoi-vien'
+      path: '/hoi-vien'
+      fullPath: '/admin/hoi-vien'
+      preLoaderRoute: typeof AdminHoiVienRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/phan-bien': {
+      id: '/admin/phan-bien'
+      path: '/phan-bien'
+      fullPath: '/admin/phan-bien'
+      preLoaderRoute: typeof AdminPhanBienRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/tai-nguyen': {
+      id: '/admin/tai-nguyen'
+      path: '/tai-nguyen'
+      fullPath: '/admin/tai-nguyen'
+      preLoaderRoute: typeof AdminTaiNguyenRouteImport
+      parentRoute: typeof AdminRoute
     }
     '/news/': {
       id: '/news/'
@@ -182,6 +338,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/news/tim-kiem'
       preLoaderRoute: typeof NewsTimKiemRouteImport
       parentRoute: typeof NewsRoute
+    }
+    '/admin/bai-viet/': {
+      id: '/admin/bai-viet/'
+      path: '/bai-viet'
+      fullPath: '/admin/bai-viet/'
+      preLoaderRoute: typeof AdminBaiVietIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/bai-viet/$id': {
+      id: '/admin/bai-viet/$id'
+      path: '/bai-viet/$id'
+      fullPath: '/admin/bai-viet/$id'
+      preLoaderRoute: typeof AdminBaiVietIdRouteImport
+      parentRoute: typeof AdminRoute
     }
     '/news/$topic/': {
       id: '/news/$topic/'
@@ -207,6 +377,30 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AdminRouteChildren {
+  AdminDangKyRoute: typeof AdminDangKyRoute
+  AdminHoiPhiRoute: typeof AdminHoiPhiRoute
+  AdminHoiVienRoute: typeof AdminHoiVienRoute
+  AdminPhanBienRoute: typeof AdminPhanBienRoute
+  AdminTaiNguyenRoute: typeof AdminTaiNguyenRoute
+  AdminIndexRoute: typeof AdminIndexRoute
+  AdminBaiVietIdRoute: typeof AdminBaiVietIdRoute
+  AdminBaiVietIndexRoute: typeof AdminBaiVietIndexRoute
+}
+
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminDangKyRoute: AdminDangKyRoute,
+  AdminHoiPhiRoute: AdminHoiPhiRoute,
+  AdminHoiVienRoute: AdminHoiVienRoute,
+  AdminPhanBienRoute: AdminPhanBienRoute,
+  AdminTaiNguyenRoute: AdminTaiNguyenRoute,
+  AdminIndexRoute: AdminIndexRoute,
+  AdminBaiVietIdRoute: AdminBaiVietIdRoute,
+  AdminBaiVietIndexRoute: AdminBaiVietIndexRoute,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
+
 interface NewsRouteChildren {
   NewsDaLuuRoute: typeof NewsDaLuuRoute
   NewsTimKiemRoute: typeof NewsTimKiemRoute
@@ -229,6 +423,7 @@ const NewsRouteWithChildren = NewsRoute._addFileChildren(NewsRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminRoute: AdminRouteWithChildren,
   NewsRoute: NewsRouteWithChildren,
   PortalRoute: PortalRoute,
 }

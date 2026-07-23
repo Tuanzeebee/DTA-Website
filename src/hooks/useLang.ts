@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useSyncExternalStore } from "react";
 import { toast } from "sonner";
 import type { Lang } from "@/types";
 
@@ -9,36 +9,66 @@ function isLang(value: string | null): value is Lang {
   return value === "vn" || value === "en";
 }
 
+/* Locale is a GLOBAL store, not per-component state: the portal chrome
+   (menu bar, sidebar blocks, cards) reads the locale directly instead of
+   prop-drilling, so every subscriber must flip together when the header
+   toggle fires. */
+const langListeners = new Set<() => void>();
+let langCache: Lang = "vn";
+let langInitialized = false;
+
+const readLang = (): Lang => {
+  if (!langInitialized) {
+    try {
+      const saved = localStorage.getItem(LANG_KEY);
+      if (isLang(saved)) langCache = saved;
+    } catch {
+      /* storage unavailable -> default vn */
+    }
+    langInitialized = true;
+  }
+  return langCache;
+};
+
+const writeLang = (next: Lang) => {
+  langCache = next;
+  langInitialized = true;
+  try {
+    localStorage.setItem(LANG_KEY, next);
+  } catch {
+    /* session-only */
+  }
+  langListeners.forEach((l) => l());
+};
+
+const subscribeLang = (cb: () => void) => {
+  langListeners.add(cb);
+  return () => {
+    langListeners.delete(cb);
+  };
+};
+
 /**
- * Locale state persisted to localStorage.
- *
- * Reads on mount rather than in the initialiser so the hook stays safe if the
- * app is ever server-rendered — localStorage does not exist during SSR.
- * This logic was previously copy-pasted into index, news, and portal.
+ * Locale state persisted to localStorage and shared across the whole tree —
+ * any component may call useLang() and it stays in sync with the header
+ * toggle.
  */
 export function useLang() {
-  const [lang, setLang] = useState<Lang>("vn");
+  const lang = useSyncExternalStore(
+    subscribeLang,
+    readLang,
+    () => "vn" as Lang,
+  );
 
-  useEffect(() => {
-    const saved = localStorage.getItem(LANG_KEY);
-    if (isLang(saved)) setLang(saved);
-  }, []);
-
-  const changeLang = useCallback((next: Lang) => {
-    setLang(next);
-    localStorage.setItem(LANG_KEY, next);
-  }, []);
+  const changeLang = useCallback((next: Lang) => writeLang(next), []);
 
   /** Flip locale and announce it — the shared behaviour behind every EN/VN button. */
   const toggleLang = useCallback(() => {
-    setLang((current) => {
-      const next: Lang = current === "vn" ? "en" : "vn";
-      localStorage.setItem(LANG_KEY, next);
-      toast.info(
-        next === "vn" ? "Đã chuyển sang tiếng Việt" : "Switched to English",
-      );
-      return next;
-    });
+    const next: Lang = readLang() === "vn" ? "en" : "vn";
+    writeLang(next);
+    toast.info(
+      next === "vn" ? "Đã chuyển sang tiếng Việt" : "Switched to English",
+    );
   }, []);
 
   return { lang, setLang: changeLang, toggleLang };

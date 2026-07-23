@@ -2,12 +2,14 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { Eye, Tag, Newspaper } from "lucide-react";
 import {
-  portalArticles,
+  publishedArticles,
   topicBySlug,
   categoryBySlug,
-  type ArticleBlock,
-  type ArticleImage,
+  topicShort,
+  categoryName,
 } from "@/newsData";
+import { ArticleBody } from "@/compenents/news/ArticleBody";
+import { useLang } from "@/hooks/useLang";
 import {
   ArticleActions,
   ReaderUtilityBar,
@@ -20,7 +22,7 @@ import {
 /** Single-article page — the third of the three mandated layout types. */
 export const Route = createFileRoute("/news/article/$id")({
   loader: ({ params }) => {
-    const article = portalArticles.find((a) => a.id === params.id);
+    const article = publishedArticles().find((a) => a.id === params.id);
     if (!article) throw notFound();
     const topic = topicBySlug(article.topic);
     const category = categoryBySlug(article.topic, article.category);
@@ -55,109 +57,8 @@ function AuthorAvatar({ author }: { author?: string }) {
   );
 }
 
-/**
- * Article body renderer — Word-style layout options. `body` is a block list
- * the editor arranges freely:
- *  - string           -> paragraph
- *  - { box }          -> highlight box between paragraphs
- *  - { src, align, wrap, width } -> image; wrap "square" floats it so text
- *    flows around (Word: Square), wrap "none" puts it on its own line
- *    (Word: Top and Bottom) anchored left/right/center at the chosen width.
- * flow-root contains the floats so the author line and actions below never
- * wrap around a trailing image.
- */
-function ArticleBody({ body }: { body: ArticleBlock[] }) {
-  return (
-    /* Full column width — the right edge of text and centred images lines
-       up exactly with the lead image above (no narrower 70ch column). */
-    <div className="mt-6 flow-root text-sm text-white/75 leading-relaxed">
-      {body.map((block, i) => {
-        if (typeof block === "string") {
-          return (
-            <p key={i} className="mb-4">
-              {block}
-            </p>
-          );
-        }
-
-        if ("box" in block) {
-          return (
-            <aside
-              key={i}
-              className="clear-both my-6 rounded-xl border-l-2 border-accent/60 bg-white/[0.04] px-5 py-4 text-[13.5px] font-medium text-white/85 leading-relaxed"
-            >
-              {block.box}
-            </aside>
-          );
-        }
-
-        // Word defaults: left/right wraps text (Square), center is own-line.
-        const wrap =
-          block.wrap ?? (block.align === "center" ? "none" : "square");
-        const width = block.width ?? (wrap === "square" ? 46 : 100);
-        const style = { width: `${width}%` };
-
-        if (wrap === "square" && block.align !== "center") {
-          // Text flows around the image.
-          const float =
-            block.align === "left"
-              ? "float-left mr-5 mb-3 mt-1"
-              : "float-right ml-5 mb-3 mt-1";
-          return (
-            <figure
-              key={i}
-              style={style}
-              className={`${float} min-w-[180px] max-w-full`}
-            >
-              <ArticleImageBox block={block} />
-            </figure>
-          );
-        }
-
-        // Own line (Top and Bottom), anchored by align at the chosen width.
-        const anchor =
-          block.align === "left"
-            ? "mr-auto"
-            : block.align === "right"
-              ? "ml-auto"
-              : "mx-auto";
-        return (
-          <figure
-            key={i}
-            style={style}
-            className={`clear-both my-6 ${anchor} min-w-[220px] max-w-full`}
-          >
-            <ArticleImageBox block={block} />
-          </figure>
-        );
-      })}
-    </div>
-  );
-}
-
-/** Image + caption, shared by every image placement. */
-function ArticleImageBox({ block }: { block: ArticleImage }) {
-  return (
-    <>
-      <div className="rounded-xl overflow-hidden border border-white/10">
-        <img
-          src={block.src}
-          alt={block.caption ?? ""}
-          loading="lazy"
-          referrerPolicy="no-referrer"
-          className="w-full object-cover"
-        />
-      </div>
-      {block.caption && (
-        <figcaption className="mt-1.5 text-[10px] font-semibold text-white/50 leading-snug">
-          {block.caption}
-        </figcaption>
-      )}
-    </>
-  );
-}
-
 function ArticlePage() {
+  const { lang } = useLang();
   const { article, topic, category } = Route.useLoaderData();
 
   /* Tab/history title follows the article (helps "Quay lại" and sharing).
@@ -175,7 +76,7 @@ function ArticlePage() {
       <article className="lg:col-span-9">
         <nav className="text-[11px] text-white/50 mb-4">
           <Link to="/news" className="hover:text-cyan-300 transition-colors">
-            Trang chủ
+            {lang === "vn" ? "Trang chủ" : "Home"}
           </Link>
           {topic && (
             <>
@@ -185,7 +86,7 @@ function ArticlePage() {
                 params={{ topic: topic.slug }}
                 className="hover:text-cyan-300 transition-colors"
               >
-                {topic.short}
+                {topicShort(topic, lang)}
               </Link>
             </>
           )}
@@ -197,7 +98,7 @@ function ArticlePage() {
                 params={{ topic: topic.slug, category: category.slug }}
                 className="hover:text-cyan-300 transition-colors"
               >
-                {category.name}
+                {categoryName(category, lang)}
               </Link>
             </>
           )}
@@ -221,7 +122,8 @@ function ArticlePage() {
                 <span aria-hidden>·</span>
                 <span className="flex items-center gap-1">
                   <Eye className="w-3 h-3" />
-                  {article.views.toLocaleString("vi-VN")} lượt đọc
+                  {article.views.toLocaleString("vi-VN")}{" "}
+                  {lang === "vn" ? "lượt đọc" : "reads"}
                 </span>
               </div>
             </div>
@@ -263,7 +165,9 @@ function ArticlePage() {
         {/* Author, end of body, right-aligned per the brief — same right
             edge as the lead image and body. */}
         <p className="mt-6 text-right text-sm text-white/85">
-          <span className="text-white/50 font-normal">Tác giả: </span>
+          <span className="text-white/50 font-normal">
+            {lang === "vn" ? "Tác giả: " : "Author: "}
+          </span>
           <span className="font-bold">
             {article.author ?? "Ban Biên tập DTA"}
           </span>

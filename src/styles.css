@@ -62,6 +62,10 @@
 }
 
 :root {
+  /* The whole site is dark; telling the browser so makes NATIVE controls
+     (select dropdown lists, date pickers, scrollbars) render their dark
+     variant — without this, <option> lists open as white-on-white. */
+  color-scheme: dark;
   --radius: 0.625rem;
   /* Dark space-blue theme with electric cyan + gold accents */
   --background: oklch(0.14 0.08 265);
@@ -760,4 +764,11 @@
   .drum-sheen {
     opacity: 0;
   }
+}
+
+/* Belt-and-suspenders for native select dropdowns: some browsers ignore
+   color-scheme for the popup list, leaving white-on-white options. */
+select option {
+  background-color: oklch(0.16 0.05 265);
+  color: oklch(0.98 0.01 250);
 }

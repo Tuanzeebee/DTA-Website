@@ -6,13 +6,14 @@ export function Footer({ lang }: { lang: Lang }) {
     <footer className="border-t border-white/10 py-16 px-6 bg-black/40">
       <div className="max-w-6xl mx-auto grid md:grid-cols-4 gap-10 text-xs text-muted-foreground">
         <div className="md:col-span-2">
-          <div className="flex items-center gap-2.5 font-black tracking-widest mb-4 text-white">
-            <span
-              className="inline-block w-8 h-8 rounded-md flex items-center justify-center text-[10px] text-white font-black"
-              style={{ background: "var(--gradient-primary)" }}
-            >
-              DTA
-            </span>
+          <div className="flex items-center gap-3 font-black tracking-widest mb-4 text-white">
+            {/* Same association logo as the header (Nav). */}
+            <img
+              src="https://dsa.org.vn/wp-content/uploads/2017/11/logoSVG_1411.svg"
+              alt="DTA Logo"
+              referrerPolicy="no-referrer"
+              className="h-10 w-auto object-contain shrink-0"
+            />
             <div className="flex flex-col">
               <span className="text-xs font-black tracking-wider leading-none">
                 DTA DANANG

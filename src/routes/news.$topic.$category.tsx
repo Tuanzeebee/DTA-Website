@@ -2,7 +2,7 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { Download, Send, ExternalLink, UserPlus } from "lucide-react";
-import { membersData } from "@/data";
+import { allMembers } from "@/data";
 import {
   topicBySlug,
   categoryBySlug,
@@ -11,7 +11,11 @@ import {
   isArticleSort,
   isArticleFlag,
   DEFAULT_SORT,
+  topicShort,
+  categoryName,
+  categoryDesc,
 } from "@/newsData";
+import { useLang } from "@/hooks/useLang";
 import {
   ArticleCard,
   ArticleListControls,
@@ -135,7 +139,7 @@ function PartnershipForm() {
 function CommunityGrid() {
   return (
     <div className="grid sm:grid-cols-2 gap-5 mb-10">
-      {membersData
+      {allMembers()
         .filter((m) => m.type === "organization")
         .map((m) => (
           <div key={m.id} className="card-surface rounded-2xl p-4 flex gap-4">
@@ -209,6 +213,7 @@ function JoinPortalCta() {
 }
 
 function CategoryPage() {
+  const { lang } = useLang();
   const { topic, category } = Route.useLoaderData();
   const search = Route.useSearch();
 
@@ -240,7 +245,7 @@ function CategoryPage() {
       <div className="lg:col-span-6">
         <nav className="text-[11px] text-white/50 mb-4">
           <Link to="/news" className="hover:text-cyan-300 transition-colors">
-            Trang chủ
+            {lang === "vn" ? "Trang chủ" : "Home"}
           </Link>
           <span className="mx-1.5">/</span>
           <Link
@@ -248,17 +253,17 @@ function CategoryPage() {
             params={{ topic: topic.slug }}
             className="hover:text-cyan-300 transition-colors"
           >
-            {topic.short}
+            {topicShort(topic, lang)}
           </Link>
           <span className="mx-1.5">/</span>
-          <span className="text-white/80">{category.name}</span>
+          <span className="text-white/80">{categoryName(category, lang)}</span>
         </nav>
 
         <h1 className="display text-2xl md:text-3xl font-black text-white tracking-tight mb-2">
-          {category.name}
+          {categoryName(category, lang)}
         </h1>
         <p className="text-xs md:text-sm text-white/55 leading-relaxed max-w-2xl mb-8">
-          {category.desc}
+          {categoryDesc(category, lang)}
         </p>
 
         {category.slug === "gia-nhap" && <JoinPortalCta />}
@@ -288,7 +293,7 @@ function CategoryPage() {
                         className="absolute bottom-3 right-4 flex items-center gap-1 text-[10px] font-bold uppercase text-accent hover:text-cyan-300 transition-colors"
                       >
                         <Download className="w-3 h-3" />
-                        Tải PDF
+                        {lang === "vn" ? "Tải PDF" : "PDF"}
                       </a>
                     )}
                   </div>
@@ -297,14 +302,16 @@ function CategoryPage() {
             ) : (
               /* Filter matched nothing — offer the way back out. */
               <div className="rounded-xl border border-dashed border-white/10 p-8 text-center text-xs text-white/45">
-                Không có bài viết nào khớp bộ lọc.{" "}
+                {lang === "vn"
+                  ? "Không có bài viết nào khớp bộ lọc."
+                  : "No articles match the filter."}{" "}
                 <Link
                   to="/news/$topic/$category"
                   params={{ topic: topic.slug, category: category.slug }}
                   search={{ ...search, flag: undefined, page: undefined }}
                   className="text-accent hover:text-cyan-300 font-bold transition-colors"
                 >
-                  Bỏ lọc
+                  {lang === "vn" ? "Bỏ lọc" : "Clear filter"}
                 </Link>
               </div>
             )}
@@ -319,7 +326,9 @@ function CategoryPage() {
           </>
         ) : (
           <div className="rounded-xl border border-dashed border-white/10 p-8 text-center text-xs text-white/45">
-            Chuyên mục đang chờ bài viết đầu tiên từ Ban Biên tập.
+            {lang === "vn"
+              ? "Chuyên mục đang chờ bài viết đầu tiên từ Ban Biên tập."
+              : "This category is awaiting its first article."}
           </div>
         )}
       </div>
@@ -327,7 +336,7 @@ function CategoryPage() {
       {/* Column 2: homepage repeat. */}
       <div className="lg:col-span-3">
         <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40 mb-4">
-          Trên trang chủ
+          {lang === "vn" ? "Trên trang chủ" : "On the homepage"}
         </h2>
         <HomeDigest />
       </div>

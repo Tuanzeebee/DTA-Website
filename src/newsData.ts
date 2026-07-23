@@ -17,6 +17,9 @@ export interface NewsCategory {
   slug: string;
   name: string;
   desc: string;
+  /** English labels; VN is the source of truth and the fallback. */
+  nameEn?: string;
+  descEn?: string;
 }
 
 export interface MainTopic {
@@ -24,24 +27,45 @@ export interface MainTopic {
   name: string;
   /** Short label used where the full name is too long (menu, breadcrumbs). */
   short: string;
+  nameEn?: string;
+  shortEn?: string;
   categories: NewsCategory[];
 }
+
+/* Locale-aware label helpers — EN falls back to VN when untranslated. */
+import type { Lang } from "@/types";
+export const topicName = (t: MainTopic, lang: Lang) =>
+  lang === "en" ? (t.nameEn ?? t.name) : t.name;
+export const topicShort = (t: MainTopic, lang: Lang) =>
+  lang === "en" ? (t.shortEn ?? t.short) : t.short;
+export const categoryName = (c: NewsCategory, lang: Lang) =>
+  lang === "en" ? (c.nameEn ?? c.name) : c.name;
+export const categoryDesc = (c: NewsCategory, lang: Lang) =>
+  lang === "en" ? (c.descEn ?? c.desc) : c.desc;
 
 export const mainTopics: MainTopic[] = [
   {
     slug: "su-kien",
     name: "Sự kiện",
     short: "Sự kiện",
+    nameEn: "Events",
+    shortEn: "Events",
     categories: [
       {
         slug: "tai-nguyen-chinh-sach",
         name: "Tài nguyên – Chính sách mới",
         desc: "Kho chính sách, quy định, hướng dẫn; cập nhật văn bản Trung ương và thành phố. Tải văn bản (PDF) về máy.",
+        nameEn: "Resources – New Policies",
+        descEn:
+          "Library of policies, regulations and guidelines; central and city documents kept up to date. Download full texts (PDF).",
       },
       {
         slug: "tin-trong-nganh",
         name: "Tin trong ngành",
         desc: 'Diễn đàn "Từ suy nghĩ đến bàn phím" — hội viên chia sẻ giải pháp, thành tựu; dẫn link về website hội viên.',
+        nameEn: "Industry News",
+        descEn:
+          '"From Thought to Keyboard" forum — members share solutions and achievements, linking back to their own websites.',
       },
     ],
   },
@@ -49,16 +73,24 @@ export const mainTopics: MainTopic[] = [
     slug: "digi-tech",
     name: "Nguồn nhân lực Digi-Tech",
     short: "Digi-Tech",
+    nameEn: "Digi-Tech Human Resources",
+    shortEn: "Digi-Tech",
     categories: [
       {
         slug: "dao-tao",
         name: "Đào tạo nguồn nhân lực",
         desc: "Chương trình đào tạo, bồi dưỡng kỹ năng số cho nhân lực công nghệ Đà Nẵng.",
+        nameEn: "Workforce Training",
+        descEn:
+          "Training programmes upskilling Danang's digital technology workforce.",
       },
       {
         slug: "tuyen-dung",
         name: "Tuyển dụng",
         desc: "Tổng hợp nhu cầu tuyển dụng của hội viên và tìm việc — ưu tiên tin Thực tập sinh.",
+        nameEn: "Recruitment",
+        descEn:
+          "Member hiring needs and job seeking in one place — intern postings get priority.",
       },
     ],
   },
@@ -66,31 +98,47 @@ export const mainTopics: MainTopic[] = [
     slug: "mai-nha-chung",
     name: "Mái nhà chung DTA",
     short: "Mái nhà chung",
+    nameEn: "DTA Common Home",
+    shortEn: "Common Home",
     categories: [
       {
         slug: "tu-dsa-den-dta",
         name: "Từ DSA đến DTA",
         desc: "Lịch sử, sứ mệnh; Ban Chấp hành – Ban Kiểm tra các nhiệm kỳ.",
+        nameEn: "From DSA to DTA",
+        descEn:
+          "History and mission; Executive and Inspection Boards through the terms.",
       },
       {
         slug: "cong-dong",
         name: "DTA – Cộng đồng chúng ta",
         desc: "Mỗi hội viên một logo (nhúng link) và bài tự giới thiệu; hội viên tự cập nhật, tòa soạn duyệt xuất bản.",
+        nameEn: "DTA – Our Community",
+        descEn:
+          "One logo (linked) and a self-introduction per member; members update their own page, the editors approve.",
       },
       {
         slug: "gia-nhap",
         name: "Gia nhập DTA",
         desc: "Portal gia nhập: hướng dẫn thủ tục, nộp hồ sơ trực tuyến, biểu mẫu và quy định hội phí.",
+        nameEn: "Join DTA",
+        descEn:
+          "Membership portal: procedures, online application, forms and fee regulations.",
       },
       {
         slug: "noi-vong-tay-lon",
         name: "Nối vòng tay lớn",
         desc: "Kết nối hợp tác: mời thầu, mời cung ứng, tìm đối tác — gửi nhu cầu trực tiếp trên trang.",
+        nameEn: "Joining Hands",
+        descEn:
+          "Cooperation hub: tenders, supply calls, partner search — submit a request right on the page.",
       },
       {
         slug: "xa-hoi",
         name: "Xã hội",
         desc: "Tin hoạt động thiện nguyện của cộng đồng DTA.",
+        nameEn: "Social",
+        descEn: "Charitable activities across the DTA community.",
       },
     ],
   },
@@ -98,16 +146,24 @@ export const mainTopics: MainTopic[] = [
     slug: "da-nang-24h",
     name: "Đà Nẵng 24h – Góc nhìn DSA",
     short: "Đà Nẵng 24h",
+    nameEn: "Danang 24h – DSA Perspective",
+    shortEn: "Danang 24h",
     categories: [
       {
         slug: "tin-tuc",
         name: "Tin tức",
         desc: "Tin công nghệ số Đà Nẵng qua góc nhìn của hiệp hội.",
+        nameEn: "News",
+        descEn:
+          "Danang digital technology news through the association's lens.",
       },
       {
         slug: "su-kien-sap-den",
         name: "Sự kiện sắp đến",
         desc: "Lịch tổng hợp sự kiện công nghệ số tại Đà Nẵng: DevDay, Ngày hội việc làm, Techfest…",
+        nameEn: "Upcoming Events",
+        descEn:
+          "The Danang tech-event calendar: DevDay, IT Job Fair, Techfest and more.",
       },
     ],
   },
@@ -162,6 +218,9 @@ export interface PortalArticle {
   /** Shown right-aligned at the end of the article; defaults to the
    *  editorial board when absent. */
   author?: string;
+  /** Editorial state. Absent = published (all mock rows are live).
+   *  Drafts exist only in the admin dashboard, never on the portal. */
+  status?: "draft" | "published";
   body: ArticleBlock[];
 }
 
@@ -717,6 +776,71 @@ export const boardMembers: BoardMember[] = [
   },
 ];
 
+/* ------------------------------------------------------------------ *
+ * Article store: the admin dashboard writes created/edited articles to
+ * localStorage as an OVERLAY on the mock data above — an override with a
+ * mock id replaces that row, new ids append, and hidden ids remove mock
+ * rows. Every portal helper reads through this merge, so publishing from
+ * /admin is immediately live on /news. Swapping this for a real API later
+ * only touches this block.
+ * ------------------------------------------------------------------ */
+
+export const ADMIN_ARTICLES_KEY = "dta-admin-articles";
+export const ADMIN_HIDDEN_KEY = "dta-admin-hidden";
+
+interface MergedCache {
+  key: string;
+  all: PortalArticle[];
+  published: PortalArticle[];
+}
+let mergedCache: MergedCache | null = null;
+
+function readMerged(): MergedCache {
+  let rawA = "";
+  let rawH = "";
+  try {
+    rawA = localStorage.getItem(ADMIN_ARTICLES_KEY) ?? "";
+    rawH = localStorage.getItem(ADMIN_HIDDEN_KEY) ?? "";
+  } catch {
+    /* storage unavailable -> mock data only */
+  }
+  const key = `${rawA} ${rawH}`;
+  // Raw-string memo: repeat calls return the SAME array/objects, keeping
+  // the WeakMap caches (dates, search haystacks) effective.
+  if (mergedCache?.key === key) return mergedCache;
+
+  let overrides: PortalArticle[] = [];
+  let hidden: string[] = [];
+  try {
+    const a: unknown = rawA ? JSON.parse(rawA) : [];
+    if (Array.isArray(a)) overrides = a as PortalArticle[];
+    const h: unknown = rawH ? JSON.parse(rawH) : [];
+    if (Array.isArray(h)) hidden = h.filter((x) => typeof x === "string");
+  } catch {
+    /* corrupted storage -> ignore overlay */
+  }
+
+  const byId = new Map(overrides.map((o) => [o.id, o]));
+  const baseIds = new Set(portalArticles.map((a) => a.id));
+  const all = [
+    ...portalArticles
+      .filter((a) => !hidden.includes(a.id))
+      .map((a) => byId.get(a.id) ?? a),
+    ...overrides.filter((o) => !baseIds.has(o.id)),
+  ];
+  mergedCache = {
+    key,
+    all,
+    published: all.filter((a) => a.status !== "draft"),
+  };
+  return mergedCache;
+}
+
+/** Everything, drafts included — the admin dashboard's view. */
+export const allArticles = () => readMerged().all;
+/** What the portal shows. */
+export const publishedArticles = () => readMerged().published;
+
 /** Helpers shared by the portal pages. */
 export function topicBySlug(slug: string) {
   return mainTopics.find((t) => t.slug === slug);
@@ -729,7 +853,7 @@ export function categoryBySlug(topicSlug: string, categorySlug: string) {
 }
 
 export function articlesByTopic(topicSlug: string) {
-  return portalArticles.filter((a) => a.topic === topicSlug);
+  return publishedArticles().filter((a) => a.topic === topicSlug);
 }
 
 /* ------------------------------------------------------------------ *
@@ -743,20 +867,26 @@ export function articlesByTopic(topicSlug: string) {
 
 export const articleSorts = ["moi-nhat", "cu-nhat", "doc-nhieu"] as const;
 export type ArticleSort = (typeof articleSorts)[number];
-export const articleSortLabels: Record<ArticleSort, string> = {
-  "moi-nhat": "Mới nhất",
-  "cu-nhat": "Cũ nhất",
-  "doc-nhieu": "Đọc nhiều",
+export const articleSortLabels: Record<
+  ArticleSort,
+  { vn: string; en: string }
+> = {
+  "moi-nhat": { vn: "Mới nhất", en: "Newest" },
+  "cu-nhat": { vn: "Cũ nhất", en: "Oldest" },
+  "doc-nhieu": { vn: "Đọc nhiều", en: "Most read" },
 };
 export const DEFAULT_SORT: ArticleSort = "moi-nhat";
 
 /** Facet filters derived from article capabilities, not editor tags. */
 export const articleFlags = ["pdf", "thuc-tap", "lien-ket"] as const;
 export type ArticleFlag = (typeof articleFlags)[number];
-export const articleFlagLabels: Record<ArticleFlag, string> = {
-  pdf: "Có văn bản PDF",
-  "thuc-tap": "Thực tập sinh",
-  "lien-ket": "Link hội viên",
+export const articleFlagLabels: Record<
+  ArticleFlag,
+  { vn: string; en: string }
+> = {
+  pdf: { vn: "Có văn bản PDF", en: "PDF attached" },
+  "thuc-tap": { vn: "Thực tập sinh", en: "Interns" },
+  "lien-ket": { vn: "Link hội viên", en: "Member link" },
 };
 
 const flagTest: Record<ArticleFlag, (a: PortalArticle) => boolean> = {
@@ -804,7 +934,7 @@ function filterSort(
   sort: ArticleSort = DEFAULT_SORT,
   flag?: ArticleFlag,
 ) {
-  let list = portalArticles.filter(
+  let list = publishedArticles().filter(
     (a) =>
       a.topic === topicSlug &&
       (categorySlug === undefined || a.category === categorySlug),
@@ -866,7 +996,7 @@ export function queryArticles(q: ArticleQuery): ArticlePageResult {
 /** Flags that match at least one article in the category — lets the UI hide
  *  filter chips that could only ever produce an empty list. */
 export function availableFlags(topicSlug: string, categorySlug: string) {
-  const pool = portalArticles.filter(
+  const pool = publishedArticles().filter(
     (a) => a.topic === topicSlug && a.category === categorySlug,
   );
   return articleFlags.filter((f) => pool.some(flagTest[f]));
@@ -903,7 +1033,7 @@ const haystack = (a: PortalArticle) => {
 export function searchArticles(query: string) {
   const terms = fold(query.trim()).split(/\s+/).filter(Boolean);
   if (terms.length === 0) return [];
-  return portalArticles
+  return publishedArticles()
     .filter((a) => terms.every((t) => haystack(a).includes(t)))
     .sort(comparators["moi-nhat"]);
 }
@@ -917,9 +1047,9 @@ export function relatedArticles(article: PortalArticle, n = 5) {
 }
 
 export function latestArticles(n = 5) {
-  return [...portalArticles].sort(comparators["moi-nhat"]).slice(0, n);
+  return [...publishedArticles()].sort(comparators["moi-nhat"]).slice(0, n);
 }
 
 export function mostReadArticles(n = 5) {
-  return [...portalArticles].sort(comparators["doc-nhieu"]).slice(0, n);
+  return [...publishedArticles()].sort(comparators["doc-nhieu"]).slice(0, n);
 }

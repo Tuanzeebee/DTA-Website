@@ -1,7 +1,13 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ChevronRight } from "lucide-react";
-import { mainTopics, articlesByTopic, type MainTopic } from "@/newsData";
+import {
+  mainTopics,
+  articlesByTopic,
+  topicName,
+  type MainTopic,
+} from "@/newsData";
 import { ArticleCard, PortalSidebar } from "@/compenents/news/PortalBlocks";
+import { useLang } from "@/hooks/useLang";
 
 /**
  * Portal homepage: three horizontal columns, per the brief
@@ -15,6 +21,7 @@ export const Route = createFileRoute("/news/")({
 });
 
 function TopicBlock({ topic }: { topic: MainTopic }) {
+  const { lang } = useLang();
   const articles = articlesByTopic(topic.slug);
   const [featured, ...rest] = articles;
 
@@ -26,10 +33,10 @@ function TopicBlock({ topic }: { topic: MainTopic }) {
         className="group flex items-center justify-between border-b-2 border-accent/60 pb-2.5 mb-5"
       >
         <h2 className="display text-base md:text-lg font-black uppercase tracking-wide text-white group-hover:text-cyan-300 transition-colors">
-          {topic.name}
+          {topicName(topic, lang)}
         </h2>
         <span className="flex items-center gap-0.5 text-[10px] font-bold uppercase text-accent">
-          Xem tất cả
+          {lang === "vn" ? "Xem tất cả" : "View all"}
           <ChevronRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
         </span>
       </Link>
