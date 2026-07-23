@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import {
   Globe,
   Building,
@@ -13,7 +14,7 @@ import { SectionHeader } from "@/compenents/SectionHeader";
 import { allMembers } from "@/data";
 import type { Lang } from "@/types";
 import type { LucideIcon } from "lucide-react";
-import doiTacBg from "@/assets/DoiTac.png";
+import doiTacBg from "@/assets/DoiTac.webp";
 
 interface SliderOrg {
   id: string;
@@ -105,13 +106,15 @@ function MemberCard({ org, lang }: { org: SliderOrg; lang: Lang }) {
   );
 }
 
-export function MembersDirectorySection({ lang }: { lang: Lang }) {
-  const sliderOrganizations = allMembers().map((m) => {
+/** Brand styling per member card — pure, so it lives at module level and
+ *  the component memoises over the member list reference. */
+function buildSliderOrgs(members: ReturnType<typeof allMembers>): SliderOrg[] {
+  return members.map((m) => {
     let meta = {
       gradient: "from-slate-500/10 to-slate-600/10",
       borderColor: "rgba(148, 163, 184, 0.2)",
       textColor: "text-slate-400",
-      icon: Building,
+      icon: Building as LucideIcon,
     };
 
     if (m.logoInitials === "FPT") {
@@ -177,9 +180,25 @@ export function MembersDirectorySection({ lang }: { lang: Lang }) {
       textColor: meta.textColor,
     };
   });
+}
 
-  const track1 = [...sliderOrganizations, ...sliderOrganizations];
-  const track2 = [...sliderOrganizations, ...sliderOrganizations].reverse();
+export function MembersDirectorySection({ lang }: { lang: Lang }) {
+  /* allMembers() is raw-string memoised (stable ref), so this memo only
+     recomputes when membership actually changes — not on every lang toggle
+     or parent re-render of the marquee. */
+  const members = allMembers();
+  const sliderOrganizations = useMemo(
+    () => buildSliderOrgs(members),
+    [members],
+  );
+
+  const [track1, track2] = useMemo(
+    () => [
+      [...sliderOrganizations, ...sliderOrganizations],
+      [...sliderOrganizations, ...sliderOrganizations].reverse(),
+    ],
+    [sliderOrganizations],
+  );
 
   return (
     <section id="members" className="py-20 md:py-28 relative overflow-hidden">

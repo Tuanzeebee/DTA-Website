@@ -10,7 +10,7 @@ import {
 import { SectionHeader } from "@/compenents/SectionHeader";
 import { dtaNews, dtaEvents } from "@/data";
 import type { Lang } from "@/types";
-import tinTucCutout from "@/assets/image 1566.png";
+import tinTucCutout from "@/assets/image-1566.webp";
 import leftGradientBg from "@/assets/left-gradient-start-background.webp";
 
 /** Landing-page teaser -> portal article mapping, by card position. The

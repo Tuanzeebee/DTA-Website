@@ -1,5 +1,5 @@
 import type { CSSProperties } from "react";
-import trongDong from "@/assets/TrongDongV3.jpg";
+import trongDong from "@/assets/TrongDongV3.webp";
 
 /**
  * Rotating Đông Sơn bronze drum with a metallic light-sweep and gold dust.

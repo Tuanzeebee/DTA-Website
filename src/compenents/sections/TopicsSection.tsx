@@ -8,7 +8,7 @@ import {
 import { TechAreaIcon } from "@/compenents/icons/SectionIcons";
 import { coreTechAreas } from "@/data";
 import type { Lang } from "@/types";
-import linhVucBg from "@/assets/LinhVuc.png";
+import linhVucBg from "@/assets/LinhVuc.webp";
 
 export function TopicsSection({ lang }: { lang: Lang }) {
   return (

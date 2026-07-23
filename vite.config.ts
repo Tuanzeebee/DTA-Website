@@ -8,6 +8,10 @@ export default defineConfig({
     TanStackRouterVite({
       routesDirectory: "./src/routes",
       generatedRouteTree: "./src/routeTree.gen.ts",
+      /* Each route becomes its own lazy chunk: the landing page no longer
+         downloads the admin editor/portal code (and vice versa), cutting
+         the initial JS payload roughly in half. */
+      autoCodeSplitting: true,
     }),
     react(),
     tailwindcss(),
