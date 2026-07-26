@@ -31,8 +31,12 @@ export function MobileNavSheet({
           exit={{ opacity: 0 }}
           transition={{ duration: 0.25, ease: [0.32, 0.72, 0, 1] }}
           /* top-16 clears the header bar; dvh (not vh) so iOS Safari's
-             collapsing address bar cannot cut off the CTA at the bottom. */
-          className="lg:hidden fixed inset-x-0 top-16 bottom-0 z-40 flex flex-col bg-[oklch(0.09_0.05_265_/_0.96)] backdrop-blur-2xl overflow-y-auto overscroll-contain"
+             collapsing address bar cannot cut off the CTA at the bottom.
+             Solid fill (no backdrop-blur): the panel was already 96% opaque, so
+             the blur was invisible yet forced the GPU to re-sample the whole
+             viewport every frame while the sheet animated in — the source of the
+             open-lag on phones. An opaque fill reads identically and is free. */
+          className="lg:hidden fixed inset-x-0 top-16 bottom-0 z-40 flex flex-col bg-[oklch(0.09_0.05_265)] overflow-y-auto overscroll-contain"
         >
           <nav className="flex flex-col px-5 pt-4 pb-8 gap-1">
             {navItems.map((n, i) => {
@@ -53,11 +57,11 @@ export function MobileNavSheet({
               return (
                 <motion.div
                   key={n.href}
-                  initial={reduce ? false : { opacity: 0, y: 14 }}
+                  initial={reduce ? false : { opacity: 0, y: 12 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{
-                    duration: 0.4,
-                    delay: reduce ? 0 : 0.04 + i * 0.04,
+                    duration: 0.28,
+                    delay: reduce ? 0 : 0.03 + i * 0.03,
                     ease: [0.32, 0.72, 0, 1],
                   }}
                 >
