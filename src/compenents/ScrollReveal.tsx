@@ -1,5 +1,38 @@
 import React from "react";
-import { motion, HTMLMotionProps } from "motion/react";
+import { motion, HTMLMotionProps, useReducedMotion } from "motion/react";
+
+/**
+ * True when scroll-reveal animations should be skipped: either the OS asks for
+ * reduced motion, or we're on a phone.
+ *
+ * On mobile the per-section reveal (a JS-driven transform + opacity on every
+ * one of ~60 blocks, each firing as it scrolls into view) is the main source of
+ * scroll jank — so phones get the content statically and scroll stays smooth.
+ * The desktop reveal is untouched.
+ *
+ * matchMedia is read synchronously in the initialiser (this is a client-only
+ * SPA, so `window` always exists at first render) — that avoids a first-paint
+ * flash of the animated variant before an effect could correct it.
+ */
+const MOBILE_QUERY = "(max-width: 767px)";
+
+function useStaticReveal() {
+  const reduce = useReducedMotion();
+  const [isMobile, setIsMobile] = React.useState(
+    () =>
+      typeof window !== "undefined" && window.matchMedia(MOBILE_QUERY).matches,
+  );
+
+  React.useEffect(() => {
+    const mql = window.matchMedia(MOBILE_QUERY);
+    const onChange = () => setIsMobile(mql.matches);
+    mql.addEventListener("change", onChange);
+    onChange();
+    return () => mql.removeEventListener("change", onChange);
+  }, []);
+
+  return reduce || isMobile;
+}
 
 interface ScrollRevealProps extends HTMLMotionProps<"div"> {
   children: React.ReactNode;
@@ -39,6 +72,20 @@ export function ScrollReveal({
   };
 
   const initialPos = getInitialPosition();
+  const isStatic = useStaticReveal();
+
+  // Mobile / reduced-motion: render the content immediately, with no
+  // transform/opacity animation work.
+  if (isStatic) {
+    return (
+      <div
+        className={className}
+        {...(props as React.HTMLAttributes<HTMLDivElement>)}
+      >
+        {children}
+      </div>
+    );
+  }
 
   return (
     <motion.div
@@ -71,6 +118,12 @@ export function StaggerContainer({
   delay?: number;
   once?: boolean;
 }) {
+  const isStatic = useStaticReveal();
+
+  if (isStatic) {
+    return <div className={className}>{children}</div>;
+  }
+
   return (
     <motion.div
       initial="hidden"
@@ -120,6 +173,11 @@ export function StaggerItem({
   };
 
   const initialPos = getInitialPosition();
+  const isStatic = useStaticReveal();
+
+  if (isStatic) {
+    return <div className={className}>{children}</div>;
+  }
 
   return (
     <motion.div

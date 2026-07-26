@@ -585,6 +585,28 @@
   .bg-dots {
     background-size: 20px 20px;
   }
+
+  /* Full-screen mix-blend layers are the single biggest scroll-jank source on
+     phones: the GPU must re-blend the whole viewport against the moving page on
+     every frame. The grain (fixed, mix-blend-overlay) and the per-section noise
+     (mix-blend-overlay) both sit near 3-4% opacity, so dropping them on mobile
+     costs almost nothing visually and removes those per-frame blends. */
+  .grain-overlay,
+  .noise-layer {
+    display: none;
+  }
+
+  /* Trống Đồng disc sits at opacity-40 BEHIND the content, so its two most
+     expensive layers barely read on a phone yet run forever. Drop them:
+       - .drum-sheen: an animated blur() + mix-blend-screen sweep (the most GPU-
+         costly effect on the page);
+       - .gold-mote: 12 continuously-animating box-shadow particles.
+     The slow disc rotation itself is a cheap composited transform, so it stays
+     and keeps the artifact alive. */
+  .drum-sheen,
+  .gold-mote {
+    display: none;
+  }
 }
 
 /* Touch devices have no hover; the lift on tap-and-hold reads as a glitch. */

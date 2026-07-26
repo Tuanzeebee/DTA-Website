@@ -30,11 +30,16 @@ export function PageShell({
         aria-hidden
         className="fixed inset-0 z-0 pointer-events-none bg-aurora"
       />
+      {/* The fixed GradientMid lift is a full-screen mix-blend-screen layer,
+          which the GPU must re-blend against the moving page on every scroll
+          frame — the main cause of scroll jank on phones. It is hidden below md;
+          the fixed bg-aurora gradient above still carries the colour field, so
+          mobile keeps the palette without the per-frame blend cost. */}
       <img
         aria-hidden
         src={gradientMid}
         alt=""
-        className="fixed inset-0 z-0 w-full h-full object-cover pointer-events-none mix-blend-screen opacity-40"
+        className="hidden md:block fixed inset-0 z-0 w-full h-full object-cover pointer-events-none mix-blend-screen opacity-40"
       />
       <GrainOverlay />
       <div className="relative z-10">{children}</div>
