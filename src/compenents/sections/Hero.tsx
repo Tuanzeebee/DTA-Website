@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { MapPin, Plus, Search } from "lucide-react";
-import heroImage from "@/assets/HerosectionBackGroundV4.jpg";
+import heroImage from "@/assets/HerosectionBackGroundV4.webp";
 import { ScrollReveal } from "@/compenents/ScrollReveal";
 import { SectionBackground } from "@/compenents/SectionBackground";
 import { seamTint } from "@/compenents/seamTint";
