@@ -22,6 +22,8 @@ import { Route as AdminTaiNguyenRouteImport } from './routes/admin.tai-nguyen'
 import { Route as NewsIndexRouteImport } from './routes/news.index'
 import { Route as NewsDaLuuRouteImport } from './routes/news.da-luu'
 import { Route as NewsTimKiemRouteImport } from './routes/news.tim-kiem'
+import { Route as PortalIndexRouteImport } from './routes/portal/index'
+import { Route as PortalDangKyRouteImport } from './routes/portal/dang-ky'
 import { Route as AdminBaiVietIndexRouteImport } from './routes/admin.bai-viet.index'
 import { Route as AdminBaiVietIdRouteImport } from './routes/admin.bai-viet.$id'
 import { Route as NewsTopicIndexRouteImport } from './routes/news.$topic.index'
@@ -93,6 +95,16 @@ const NewsTimKiemRoute = NewsTimKiemRouteImport.update({
   path: '/tim-kiem',
   getParentRoute: () => NewsRoute,
 } as any)
+const PortalIndexRoute = PortalIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => PortalRoute,
+} as any)
+const PortalDangKyRoute = PortalDangKyRouteImport.update({
+  id: '/dang-ky',
+  path: '/dang-ky',
+  getParentRoute: () => PortalRoute,
+} as any)
 const AdminBaiVietIndexRoute = AdminBaiVietIndexRouteImport.update({
   id: '/bai-viet/',
   path: '/bai-viet/',
@@ -123,7 +135,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
   '/news': typeof NewsRouteWithChildren
-  '/portal': typeof PortalRoute
+  '/portal': typeof PortalRouteWithChildren
   '/admin/dang-ky': typeof AdminDangKyRoute
   '/admin/hoi-phi': typeof AdminHoiPhiRoute
   '/admin/hoi-vien': typeof AdminHoiVienRoute
@@ -131,8 +143,10 @@ export interface FileRoutesByFullPath {
   '/admin/tai-nguyen': typeof AdminTaiNguyenRoute
   '/news/da-luu': typeof NewsDaLuuRoute
   '/news/tim-kiem': typeof NewsTimKiemRoute
+  '/portal/dang-ky': typeof PortalDangKyRoute
   '/admin/': typeof AdminIndexRoute
   '/news/': typeof NewsIndexRoute
+  '/portal/': typeof PortalIndexRoute
   '/admin/bai-viet/$id': typeof AdminBaiVietIdRoute
   '/news/$topic/$category': typeof NewsTopicCategoryRoute
   '/news/article/$id': typeof NewsArticleIdRoute
@@ -141,7 +155,6 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/portal': typeof PortalRoute
   '/admin/dang-ky': typeof AdminDangKyRoute
   '/admin/hoi-phi': typeof AdminHoiPhiRoute
   '/admin/hoi-vien': typeof AdminHoiVienRoute
@@ -149,8 +162,10 @@ export interface FileRoutesByTo {
   '/admin/tai-nguyen': typeof AdminTaiNguyenRoute
   '/news/da-luu': typeof NewsDaLuuRoute
   '/news/tim-kiem': typeof NewsTimKiemRoute
+  '/portal/dang-ky': typeof PortalDangKyRoute
   '/admin': typeof AdminIndexRoute
   '/news': typeof NewsIndexRoute
+  '/portal': typeof PortalIndexRoute
   '/admin/bai-viet/$id': typeof AdminBaiVietIdRoute
   '/news/$topic/$category': typeof NewsTopicCategoryRoute
   '/news/article/$id': typeof NewsArticleIdRoute
@@ -162,7 +177,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
   '/news': typeof NewsRouteWithChildren
-  '/portal': typeof PortalRoute
+  '/portal': typeof PortalRouteWithChildren
   '/admin/dang-ky': typeof AdminDangKyRoute
   '/admin/hoi-phi': typeof AdminHoiPhiRoute
   '/admin/hoi-vien': typeof AdminHoiVienRoute
@@ -170,8 +185,10 @@ export interface FileRoutesById {
   '/admin/tai-nguyen': typeof AdminTaiNguyenRoute
   '/news/da-luu': typeof NewsDaLuuRoute
   '/news/tim-kiem': typeof NewsTimKiemRoute
+  '/portal/dang-ky': typeof PortalDangKyRoute
   '/admin/': typeof AdminIndexRoute
   '/news/': typeof NewsIndexRoute
+  '/portal/': typeof PortalIndexRoute
   '/admin/bai-viet/$id': typeof AdminBaiVietIdRoute
   '/news/$topic/$category': typeof NewsTopicCategoryRoute
   '/news/article/$id': typeof NewsArticleIdRoute
@@ -192,8 +209,10 @@ export interface FileRouteTypes {
     | '/admin/tai-nguyen'
     | '/news/da-luu'
     | '/news/tim-kiem'
+    | '/portal/dang-ky'
     | '/admin/'
     | '/news/'
+    | '/portal/'
     | '/admin/bai-viet/$id'
     | '/news/$topic/$category'
     | '/news/article/$id'
@@ -202,7 +221,6 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/portal'
     | '/admin/dang-ky'
     | '/admin/hoi-phi'
     | '/admin/hoi-vien'
@@ -210,8 +228,10 @@ export interface FileRouteTypes {
     | '/admin/tai-nguyen'
     | '/news/da-luu'
     | '/news/tim-kiem'
+    | '/portal/dang-ky'
     | '/admin'
     | '/news'
+    | '/portal'
     | '/admin/bai-viet/$id'
     | '/news/$topic/$category'
     | '/news/article/$id'
@@ -230,8 +250,10 @@ export interface FileRouteTypes {
     | '/admin/tai-nguyen'
     | '/news/da-luu'
     | '/news/tim-kiem'
+    | '/portal/dang-ky'
     | '/admin/'
     | '/news/'
+    | '/portal/'
     | '/admin/bai-viet/$id'
     | '/news/$topic/$category'
     | '/news/article/$id'
@@ -243,7 +265,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRouteWithChildren
   NewsRoute: typeof NewsRouteWithChildren
-  PortalRoute: typeof PortalRoute
+  PortalRoute: typeof PortalRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
@@ -339,6 +361,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof NewsTimKiemRouteImport
       parentRoute: typeof NewsRoute
     }
+    '/portal/': {
+      id: '/portal/'
+      path: '/'
+      fullPath: '/portal/'
+      preLoaderRoute: typeof PortalIndexRouteImport
+      parentRoute: typeof PortalRoute
+    }
+    '/portal/dang-ky': {
+      id: '/portal/dang-ky'
+      path: '/dang-ky'
+      fullPath: '/portal/dang-ky'
+      preLoaderRoute: typeof PortalDangKyRouteImport
+      parentRoute: typeof PortalRoute
+    }
     '/admin/bai-viet/': {
       id: '/admin/bai-viet/'
       path: '/bai-viet'
@@ -421,11 +457,24 @@ const NewsRouteChildren: NewsRouteChildren = {
 
 const NewsRouteWithChildren = NewsRoute._addFileChildren(NewsRouteChildren)
 
+interface PortalRouteChildren {
+  PortalDangKyRoute: typeof PortalDangKyRoute
+  PortalIndexRoute: typeof PortalIndexRoute
+}
+
+const PortalRouteChildren: PortalRouteChildren = {
+  PortalDangKyRoute: PortalDangKyRoute,
+  PortalIndexRoute: PortalIndexRoute,
+}
+
+const PortalRouteWithChildren =
+  PortalRoute._addFileChildren(PortalRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRouteWithChildren,
   NewsRoute: NewsRouteWithChildren,
-  PortalRoute: PortalRoute,
+  PortalRoute: PortalRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useSyncExternalStore } from "react";
+import { useState, useCallback, useSyncExternalStore } from "react";
 import { toast } from "sonner";
 import type { Lang } from "@/types";
 
@@ -81,11 +81,14 @@ export function useLang() {
  * view renders and nothing more.
  */
 export function useSession(lang: Lang) {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-
-  useEffect(() => {
-    setIsLoggedIn(localStorage.getItem(LOGIN_KEY) === "true");
-  }, []);
+  /* Lazy initializer reads storage synchronously: this is a client-only SPA
+     (no SSR), so window/localStorage always exist at first render — and the
+     logged-in dashboard never flashes the signed-out lobby on reload. */
+  const [isLoggedIn, setIsLoggedIn] = useState(
+    () =>
+      typeof window !== "undefined" &&
+      localStorage.getItem(LOGIN_KEY) === "true",
+  );
 
   const handleLogin = useCallback(
     (status: boolean) => {

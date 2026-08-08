@@ -96,7 +96,7 @@ export function MobileNavSheet({
               never wrap the way a cramped header pill would. */}
           <div className="mt-auto px-5 pb-8 pt-4 border-t border-white/10">
             <Link
-              to="/portal"
+              to={isLoggedIn ? "/portal" : "/portal/dang-ky"}
               onClick={onClose}
               className="w-full min-h-13 px-6 rounded-full font-bold text-sm text-primary-foreground active:scale-[0.98] transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer"
               style={{

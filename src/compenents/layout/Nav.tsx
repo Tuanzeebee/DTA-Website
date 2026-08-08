@@ -141,7 +141,7 @@ export function Nav({ lang, toggleLang, isLoggedIn }: NavProps) {
               </Link>
             ) : (
               <Link
-                to="/portal"
+                to="/portal/dang-ky"
                 className="hidden lg:block px-4 py-1.5 rounded-full text-xs font-bold text-primary-foreground hover:opacity-90 active:scale-95 transition-all duration-300 cursor-pointer whitespace-nowrap shrink-0"
                 style={{
                   background: "var(--gradient-primary)",
