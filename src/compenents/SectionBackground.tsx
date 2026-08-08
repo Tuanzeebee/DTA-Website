@@ -67,7 +67,7 @@ const layerClass: Record<Variant, string> = {
   spotlight: "bg-spotlight",
   horizon: "bg-horizon",
   vignette:
-    "bg-[radial-gradient(ellipse_75%_60%_at_50%_50%,transparent_35%,oklch(0.10_0.05_265_/_0.35)_100%)]",
+    "bg-[radial-gradient(ellipse_75%_60%_at_50%_50%,transparent_35%,oklch(0.10_0.03_160_/_0.35)_100%)]",
 };
 
 /**
@@ -94,7 +94,7 @@ export function RuleFade({ className = "" }: { className?: string }) {
   return (
     <div
       aria-hidden
-      className={`pointer-events-none h-32 bg-[radial-gradient(ellipse_90%_140%_at_50%_0%,oklch(0.75_0.19_235_/_0.1),transparent_70%)] ${className}`}
+      className={`pointer-events-none h-32 bg-[radial-gradient(ellipse_90%_140%_at_50%_0%,oklch(0.62_0.11_158_/_0.1),transparent_70%)] ${className}`}
     />
   );
 }

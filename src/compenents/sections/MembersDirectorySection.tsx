@@ -205,8 +205,8 @@ export function MembersDirectorySection({ lang }: { lang: Lang }) {
     <section id="members" className="py-20 md:py-28 relative overflow-hidden">
       <SectionBackground
         variant="none"
-        tintTop={seamTint.indigo}
-        tintBottom={seamTint.cyan}
+        tintTop={seamTint.deepMoss}
+        tintBottom={seamTint.moss}
       />
 
       {/* Background contrast stack (same recipe as TopicsSection):

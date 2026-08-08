@@ -8,9 +8,9 @@
  * keep fast-refresh: mixing constant and component exports breaks HMR.
  */
 export const seamTint = {
-  cyan: "oklch(0.45 0.14 235 / 0.25)",
+  moss: "oklch(0.40 0.10 158 / 0.25)",
   /** Stronger grade for seams between heavy image/colour backgrounds. */
-  cyanStrong: "oklch(0.52 0.16 235 / 0.45)",
-  indigo: "oklch(0.45 0.13 275 / 0.25)",
-  gold: "oklch(0.62 0.12 90 / 0.18)",
+  mossStrong: "oklch(0.48 0.11 158 / 0.45)",
+  deepMoss: "oklch(0.38 0.08 168 / 0.25)",
+  bronze: "oklch(0.56 0.10 78 / 0.18)",
 };

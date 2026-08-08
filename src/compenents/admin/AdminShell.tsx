@@ -27,7 +27,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
   if (!isAuthed) return <LoginCard onLogin={login} />;
 
   return (
-    <div className="min-h-dvh bg-[oklch(0.12_0.03_265)] text-white flex">
+    <div className="min-h-dvh bg-[oklch(0.12_0.03_160)] text-white flex">
       <Sidebar onLogout={logout} />
       <div className="flex-1 min-w-0 flex flex-col">
         <header className="h-14 shrink-0 border-b border-white/10 bg-white/[0.02] flex items-center justify-between px-4 md:px-6">
@@ -154,7 +154,7 @@ function LoginCard({ onLogin }: { onLogin: (password: string) => boolean }) {
   const [error, setError] = useState(false);
 
   return (
-    <div className="min-h-dvh bg-[oklch(0.12_0.03_265)] text-white flex items-center justify-center p-6">
+    <div className="min-h-dvh bg-[oklch(0.12_0.03_160)] text-white flex items-center justify-center p-6">
       <form
         onSubmit={(e) => {
           e.preventDefault();

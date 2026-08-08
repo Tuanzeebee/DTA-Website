@@ -38,7 +38,7 @@ function Index() {
       <div className="relative">
         <div
           aria-hidden
-          className="absolute inset-0 pointer-events-none bg-[oklch(0.28_0.05_262_/_0.4)] [mask-image:linear-gradient(to_bottom,transparent,black_12rem)]"
+          className="absolute inset-0 pointer-events-none bg-[oklch(0.26_0.04_158_/_0.4)] [mask-image:linear-gradient(to_bottom,transparent,black_12rem)]"
         />
         <TopicsSection lang={lang} />
         <ServicesSection lang={lang} />

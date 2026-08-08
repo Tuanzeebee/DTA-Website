@@ -11,7 +11,7 @@ export function FAQSection({ lang }: { lang: Lang }) {
       id="faq"
       className="py-20 md:py-28 px-5 md:px-6 relative overflow-hidden"
     >
-      <SectionBackground variant="vignette" tintTop={seamTint.gold} />
+      <SectionBackground variant="vignette" tintTop={seamTint.bronze} />
 
       <div className="max-w-4xl mx-auto relative z-10">
         <SectionHeader

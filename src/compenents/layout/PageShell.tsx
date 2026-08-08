@@ -24,7 +24,7 @@ export function PageShell({
 }) {
   return (
     <div
-      className={`min-h-screen text-foreground overflow-x-hidden relative bg-[oklch(0.10_0.06_265)] ${className}`}
+      className={`min-h-screen text-foreground overflow-x-hidden relative bg-[oklch(0.10_0.03_160)] ${className}`}
     >
       <div
         aria-hidden

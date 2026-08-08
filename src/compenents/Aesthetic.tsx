@@ -7,7 +7,7 @@ interface AestheticProps {
 
 export function TrongDongWatermark({
   className = "",
-  glowColor = "rgba(0, 251, 252, 0.15)",
+  glowColor = "rgba(122, 170, 106, 0.15)",
 }: AestheticProps) {
   return (
     <div className={`pointer-events-none select-none relative ${className}`}>
@@ -47,7 +47,7 @@ export function TrongDongWatermark({
           stroke="currentColor"
           strokeWidth="1"
           strokeDasharray="8 8"
-          className="text-[#3DBEFF]/40"
+          className="text-[#5A9A4A]/40"
         />
         <circle
           cx="400"
@@ -55,11 +55,11 @@ export function TrongDongWatermark({
           r="350"
           stroke="currentColor"
           strokeWidth="2"
-          className="text-[#00FBFC]/30"
+          className="text-[#7AAA6A]/30"
         />
 
         {/* Ring 2: Chim Lac Flying Cranes Silhouettes Rotating around the ring */}
-        <g className="text-[#3DBEFF]/50 animate-[spin_120s_linear_infinite] origin-center">
+        <g className="text-[#5A9A4A]/50 animate-[spin_120s_linear_infinite] origin-center">
           {[0, 45, 90, 135, 180, 225, 270, 315].map((angle, index) => (
             <g key={index} transform={`rotate(${angle} 400 400)`}>
               <path
@@ -71,7 +71,7 @@ export function TrongDongWatermark({
                 cy="80"
                 r="2"
                 fill="currentColor"
-                className="text-[#00FBFC]"
+                className="text-[#7AAA6A]"
               />
               <line
                 x1="395"
@@ -101,7 +101,7 @@ export function TrongDongWatermark({
           stroke="currentColor"
           strokeWidth="2.5"
           strokeDasharray="15 5"
-          className="text-[#0059EE]/40"
+          className="text-[#3A6A2A]/40"
         />
         <circle
           cx="400"
@@ -109,7 +109,7 @@ export function TrongDongWatermark({
           r="285"
           stroke="currentColor"
           strokeWidth="1.5"
-          className="text-[#3DBEFF]/30"
+          className="text-[#5A9A4A]/30"
         />
 
         {/* Ring 4: Human and animal stylized dancing patterns */}
@@ -135,7 +135,7 @@ export function TrongDongWatermark({
           r="240"
           stroke="currentColor"
           strokeWidth="1"
-          className="text-[#00FBFC]/20"
+          className="text-[#7AAA6A]/20"
         />
         <circle
           cx="400"
@@ -144,7 +144,7 @@ export function TrongDongWatermark({
           stroke="currentColor"
           strokeWidth="2"
           strokeDasharray="4 6"
-          className="text-[#3DBEFF]/30"
+          className="text-[#5A9A4A]/30"
         />
         <circle
           cx="400"
@@ -156,14 +156,14 @@ export function TrongDongWatermark({
         />
 
         {/* Ring 5: Starburst of 14 Rays in the Center */}
-        <g className="text-[#00FBFC]/60 animate-[spin_240s_linear_infinite] origin-center">
+        <g className="text-[#7AAA6A]/60 animate-[spin_240s_linear_infinite] origin-center">
           <circle
             cx="400"
             cy="400"
             r="130"
             stroke="currentColor"
             strokeWidth="1.5"
-            className="text-[#00FBFC]/30"
+          className="text-[#7AAA6A]/30"
           />
           <circle
             cx="400"
@@ -200,7 +200,7 @@ export function TrongDongWatermark({
                 <path
                   d={`M 400 400 L ${x2} ${y2} L ${xMid} ${yMid} Z`}
                   fill="currentColor"
-                  className="text-[#00FBFC]/10"
+                  className="text-[#7AAA6A]/10"
                 />
               </g>
             );
@@ -211,7 +211,7 @@ export function TrongDongWatermark({
             cy="400"
             r="40"
             fill="currentColor"
-            className="text-[#00FBFC]/20"
+            className="text-[#7AAA6A]/20"
             stroke="currentColor"
             strokeWidth="2"
           />
@@ -220,7 +220,7 @@ export function TrongDongWatermark({
             cy="400"
             r="15"
             fill="currentColor"
-            className="text-[#00FBFC]/50"
+            className="text-[#7AAA6A]/50"
           />
         </g>
       </svg>
@@ -262,12 +262,12 @@ export function AssociationSeal({
             a larger radius here would run them into the ring. */}
         <path id="dta-seal-arc" d="M 34,120 A 86,86 0 0 1 206,120" />
         <radialGradient id="dta-seal-core" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stopColor="#00FBFC" stopOpacity="0.28" />
-          <stop offset="100%" stopColor="#00FBFC" stopOpacity="0" />
+          <stop offset="0%" stopColor="#7AAA6A" stopOpacity="0.28" />
+          <stop offset="100%" stopColor="#7AAA6A" stopOpacity="0" />
         </radialGradient>
         <linearGradient id="dta-seal-ring" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#00FBFC" stopOpacity="0.75" />
-          <stop offset="100%" stopColor="#818CF8" stopOpacity="0.45" />
+          <stop offset="0%" stopColor="#7AAA6A" stopOpacity="0.75" />
+          <stop offset="100%" stopColor="#5A8A4A" stopOpacity="0.45" />
         </linearGradient>
       </defs>
 
@@ -286,7 +286,7 @@ export function AssociationSeal({
         cx="120"
         cy="120"
         r="103"
-        stroke="#00FBFC"
+        stroke="#7AAA6A"
         strokeOpacity="0.22"
         strokeWidth="1"
       />
@@ -294,7 +294,7 @@ export function AssociationSeal({
         cx="120"
         cy="120"
         r="99"
-        stroke="#00FBFC"
+        stroke="#7AAA6A"
         strokeOpacity="0.35"
         strokeWidth="3"
         strokeDasharray="1 6"
@@ -310,7 +310,7 @@ export function AssociationSeal({
 
       {/* Ring caption */}
       <text
-        fill="#E8FBFF"
+        fill="#F0F4E8"
         fillOpacity="0.85"
         fontSize="11"
         fontWeight="700"
@@ -329,8 +329,8 @@ export function AssociationSeal({
       </text>
 
       {/* Anchor stars where the caption arc terminates */}
-      <circle cx="34" cy="120" r="2.5" fill="#00FBFC" fillOpacity="0.8" />
-      <circle cx="206" cy="120" r="2.5" fill="#00FBFC" fillOpacity="0.8" />
+      <circle cx="34" cy="120" r="2.5" fill="#7AAA6A" fillOpacity="0.8" />
+      <circle cx="206" cy="120" r="2.5" fill="#7AAA6A" fillOpacity="0.8" />
 
       {/* Trống Đồng 14-ray core — same motif as the page watermark */}
       <g>
@@ -355,9 +355,9 @@ export function AssociationSeal({
             <path
               key={i}
               d={`M ${tip[0]} ${tip[1]} L ${a[0]} ${a[1]} L ${b[0]} ${b[1]} Z`}
-              fill="#00FBFC"
+              fill="#7AAA6A"
               fillOpacity="0.16"
-              stroke="#00FBFC"
+              stroke="#7AAA6A"
               strokeOpacity="0.4"
               strokeWidth="0.75"
               strokeLinejoin="round"
@@ -368,8 +368,8 @@ export function AssociationSeal({
           cx="120"
           cy="120"
           r="22"
-          fill="#0B1220"
-          stroke="#00FBFC"
+          fill="#0D1A0F"
+          stroke="#7AAA6A"
           strokeOpacity="0.55"
           strokeWidth="1.5"
         />
@@ -381,7 +381,7 @@ export function AssociationSeal({
         y="120"
         textAnchor="middle"
         dominantBaseline="central"
-        fill="#00FBFC"
+        fill="#7AAA6A"
         fontSize="17"
         fontWeight="900"
         letterSpacing="0.5"
@@ -402,7 +402,7 @@ export function TraditionalClouds({
         viewBox="0 0 400 200"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
-        className="w-full h-full opacity-15 md:opacity-25 text-[#E8A56F]/40"
+        className="w-full h-full opacity-15 md:opacity-25 text-[#D4A460]/40"
       >
         <g
           stroke={color}

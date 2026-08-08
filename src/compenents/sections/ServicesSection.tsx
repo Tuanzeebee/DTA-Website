@@ -18,8 +18,8 @@ export function ServicesSection({ lang }: { lang: Lang }) {
     >
       <SectionBackground
         variant="horizon"
-        tintTop={seamTint.indigo}
-        tintBottom={seamTint.cyan}
+        tintTop={seamTint.deepMoss}
+        tintBottom={seamTint.moss}
       />
 
       <div className="max-w-7xl mx-auto relative z-10">

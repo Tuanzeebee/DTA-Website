@@ -32,8 +32,8 @@ export function TimelineSection({ lang }: { lang: Lang }) {
     >
       <SectionBackground
         variant="grid"
-        tintTop={seamTint.cyan}
-        tintBottom={seamTint.indigo}
+        tintTop={seamTint.moss}
+        tintBottom={seamTint.deepMoss}
       />
 
       {/* Diagonal image panel, right side, lg+ only (stacked mobile columns
@@ -62,14 +62,14 @@ export function TimelineSection({ lang }: { lang: Lang }) {
           />
           {/* Left-weighted fade only, for the text column's contrast — no
               full dark overlay. */}
-          <div className="absolute inset-0 bg-gradient-to-r from-[oklch(0.10_0.06_265_/_0.92)] via-[oklch(0.10_0.06_265_/_0.3)] to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-r from-[oklch(0.10_0.03_160_/_0.92)] via-[oklch(0.10_0.03_160_/_0.3)] to-transparent" />
           <div className="noise-layer" />
 
           {/* Seam accents: two gradient beams stitched along the diagonal
               cut — cyan hairline plus a gold thread, the page's two accent
               hues. Skewed with the wrapper, so always parallel to the edge. */}
           <div className="absolute inset-y-0 left-0 w-px bg-gradient-to-b from-transparent via-cyan-400/60 to-transparent" />
-          <div className="absolute inset-y-0 left-2.5 w-[2px] bg-gradient-to-b from-transparent via-[oklch(0.85_0.16_90_/_0.35)] to-transparent" />
+          <div className="absolute inset-y-0 left-2.5 w-[2px] bg-gradient-to-b from-transparent via-[oklch(0.78_0.12_78_/_0.35)] to-transparent" />
           {/* Soft bloom along the seam so the cut reads as lit, not sliced. */}
           <div className="absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-cyan-400/10 to-transparent" />
         </div>

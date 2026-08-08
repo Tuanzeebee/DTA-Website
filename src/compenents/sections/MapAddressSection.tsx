@@ -20,8 +20,8 @@ export function MapAddressSection({ lang }: { lang: Lang }) {
           and the gold wave crosses into FAQ unpolluted. */}
       <SectionBackground
         variant="dots"
-        tintTop={seamTint.cyan}
-        tintBottom={seamTint.gold}
+        tintTop={seamTint.moss}
+        tintBottom={seamTint.bronze}
       />
 
       <div className="max-w-7xl mx-auto relative z-10">

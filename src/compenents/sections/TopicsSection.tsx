@@ -19,8 +19,8 @@ export function TopicsSection({ lang }: { lang: Lang }) {
     >
       <SectionBackground
         variant="none"
-        tintTop={seamTint.cyan}
-        tintBottom={seamTint.indigo}
+        tintTop={seamTint.moss}
+        tintBottom={seamTint.deepMoss}
       />
 
       {/* Background contrast stack, bottom to top:

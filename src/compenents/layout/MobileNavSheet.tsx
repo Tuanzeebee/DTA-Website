@@ -40,7 +40,7 @@ export function MobileNavSheet({
              at top-16) so the sheet cleanly covers it when open, but still below
              the header (z-50) so the logo and the close trigger stay on top. On
              the landing page there is no portal bar, so this is inert there. */
-          className="lg:hidden fixed inset-x-0 top-16 bottom-0 z-[45] flex flex-col bg-[oklch(0.09_0.05_265)] overflow-y-auto overscroll-contain"
+          className="lg:hidden fixed inset-x-0 top-16 bottom-0 z-[45] flex flex-col bg-[oklch(0.09_0.03_160)] overflow-y-auto overscroll-contain"
         >
           <nav className="flex flex-col px-5 pt-4 pb-8 gap-1">
             {navItems.map((n, i) => {

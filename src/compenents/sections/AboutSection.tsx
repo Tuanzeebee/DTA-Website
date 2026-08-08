@@ -62,8 +62,8 @@ export function AboutSection({
           cyan on to Topics — the same handoff chain as the rest of the page. */}
       <SectionBackground
         variant={["spotlight", "grid"]}
-        tintTop={seamTint.cyan}
-        tintBottom={seamTint.cyan}
+        tintTop={seamTint.moss}
+        tintBottom={seamTint.moss}
       />
 
       {/* Rotating Đông Sơn bronze drum, centred behind the content. Kept at a

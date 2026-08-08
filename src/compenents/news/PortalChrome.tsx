@@ -51,7 +51,7 @@ export function PortalMenuBar() {
   return (
     /* top-16 = height of the fixed shared header, so the bar docks right
        under it while scrolling. */
-    <nav className="sticky top-16 z-40 border-y border-white/10 bg-[oklch(0.14_0.06_265_/_0.88)] backdrop-blur-md">
+    <nav className="sticky top-16 z-40 border-y border-white/10 bg-[oklch(0.14_0.03_160_/_0.88)] backdrop-blur-md">
       <div className="max-w-7xl mx-auto px-4 md:px-6 flex items-center gap-1">
         <Link
           to="/news"
@@ -180,7 +180,7 @@ export function PortalMenuBar() {
           />
           <div
             id="portal-mobile-menu"
-            className="md:hidden absolute left-0 right-0 top-full z-50 border-b border-white/10 bg-[oklch(0.14_0.06_265_/_0.97)] backdrop-blur-md max-h-[70vh] overflow-y-auto"
+            className="md:hidden absolute left-0 right-0 top-full z-50 border-b border-white/10 bg-[oklch(0.14_0.03_160_/_0.97)] backdrop-blur-md max-h-[70vh] overflow-y-auto"
           >
             <div className="px-4 py-3 grid grid-cols-1 gap-1">
               {mainTopics.map((t) => (

@@ -67,98 +67,109 @@
      variant — without this, <option> lists open as white-on-white. */
   color-scheme: dark;
   --radius: 0.625rem;
-  /* Dark space-blue theme with electric cyan + gold accents */
-  --background: oklch(0.14 0.08 265);
-  --foreground: oklch(0.98 0.01 250);
-  --card: oklch(0.19 0.09 265 / 0.6);
-  --card-foreground: oklch(0.98 0.01 250);
-  --popover: oklch(0.19 0.09 265);
-  --popover-foreground: oklch(0.98 0.01 250);
-  --primary: oklch(0.75 0.19 235);
-  --primary-foreground: oklch(0.12 0.08 265);
-  --secondary: oklch(0.22 0.09 265);
-  --secondary-foreground: oklch(0.98 0.01 250);
-  --muted: oklch(0.22 0.06 265);
-  --muted-foreground: oklch(0.85 0.02 245);
-  --accent: oklch(0.85 0.16 90);
-  --accent-foreground: oklch(0.14 0.08 265);
-  --destructive: oklch(0.6 0.24 27);
-  --destructive-foreground: oklch(0.98 0.01 250);
-  --border: oklch(0.98 0.01 250 / 0.12);
-  --input: oklch(0.98 0.01 250 / 0.15);
-  --ring: oklch(0.75 0.19 235);
+  /* Dark moss-green theme with soft green + warm bronze accents */
+  --background: oklch(0.14 0.04 160);
+  --foreground: oklch(0.97 0.01 155);
+  --card: oklch(0.19 0.04 160 / 0.6);
+  --card-foreground: oklch(0.97 0.01 155);
+  --popover: oklch(0.19 0.04 160);
+  --popover-foreground: oklch(0.97 0.01 155);
+  --primary: oklch(0.62 0.11 158);
+  --primary-foreground: oklch(0.12 0.03 160);
+  --secondary: oklch(0.21 0.03 160);
+  --secondary-foreground: oklch(0.97 0.01 155);
+  --muted: oklch(0.20 0.02 160);
+  --muted-foreground: oklch(0.82 0.02 150);
+  --accent: oklch(0.78 0.12 78);
+  --accent-foreground: oklch(0.13 0.03 160);
+  --destructive: oklch(0.55 0.20 25);
+  --destructive-foreground: oklch(0.97 0.01 155);
+  --border: oklch(0.97 0.01 155 / 0.12);
+  --input: oklch(0.97 0.01 155 / 0.15);
+  --ring: oklch(0.62 0.11 158);
 
-  --gold: oklch(0.85 0.16 90);
-  --cyan: oklch(0.82 0.17 220);
-  --deep: oklch(0.12 0.09 268);
+  --bronze: oklch(0.78 0.12 78);
+  --moss: oklch(0.74 0.10 160);
+  --deep: oklch(0.11 0.03 155);
+
+  --color-cyan-100: oklch(0.96 0.02 155);
+  --color-cyan-200: oklch(0.88 0.04 155);
+  --color-cyan-300: oklch(0.76 0.08 158);
+  --color-cyan-400: oklch(0.64 0.10 158);
+  --color-cyan-500: oklch(0.50 0.10 160);
+  --color-cyan-600: oklch(0.40 0.10 162);
+  --color-cyan-700: oklch(0.33 0.09 162);
+  --color-cyan-800: oklch(0.26 0.07 164);
+  --color-cyan-900: oklch(0.20 0.05 166);
+  --color-cyan-950: oklch(0.15 0.03 168);
 
   --gradient-hero:
     radial-gradient(
       ellipse at 70% 40%,
-      oklch(0.35 0.18 240 / 0.6),
+      oklch(0.30 0.10 158 / 0.55),
       transparent 60%
     ),
-    linear-gradient(180deg, oklch(0.12 0.09 268), oklch(0.16 0.1 262));
+    linear-gradient(180deg, oklch(0.11 0.03 155), oklch(0.15 0.05 155));
   --gradient-primary: linear-gradient(
     135deg,
-    oklch(0.82 0.17 220),
-    oklch(0.75 0.19 250)
+    oklch(0.74 0.10 160),
+    oklch(0.58 0.10 162)
   );
   --gradient-gold: linear-gradient(
     135deg,
-    oklch(0.88 0.17 95),
-    oklch(0.72 0.18 60)
+    oklch(0.85 0.14 75),
+    oklch(0.68 0.14 58)
   );
-  --shadow-glow: 0 0 60px oklch(0.75 0.2 235 / 0.35);
-  --shadow-gold: 0 0 40px oklch(0.85 0.18 85 / 0.4);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.19 0.09 265);
-  --sidebar-foreground: oklch(0.98 0.01 250);
-  --sidebar-primary: oklch(0.208 0.042 265.755);
-  --sidebar-primary-foreground: oklch(0.984 0.003 247.858);
-  --sidebar-accent: oklch(0.968 0.007 247.896);
-  --sidebar-accent-foreground: oklch(0.208 0.042 265.755);
-  --sidebar-border: oklch(0.929 0.013 255.508);
-  --sidebar-ring: oklch(0.704 0.04 256.788);
+  --shadow-glow: 0 0 60px oklch(0.62 0.12 158 / 0.35);
+  --shadow-gold: 0 0 40px oklch(0.78 0.12 78 / 0.35);
+  --chart-1: oklch(0.62 0.12 158);
+  --chart-2: oklch(0.78 0.12 78);
+  --chart-3: oklch(0.50 0.10 160);
+  --chart-4: oklch(0.72 0.14 65);
+  --chart-5: oklch(0.55 0.18 35);
+  --sidebar: oklch(0.19 0.04 160);
+  --sidebar-foreground: oklch(0.97 0.01 155);
+  --sidebar-primary: oklch(0.22 0.03 160);
+  --sidebar-primary-foreground: oklch(0.97 0.01 155);
+  --sidebar-accent: oklch(0.24 0.02 160);
+  --sidebar-accent-foreground: oklch(0.97 0.01 155);
+  --sidebar-border: oklch(0.97 0.01 155 / 0.1);
+  --sidebar-ring: oklch(0.62 0.11 158);
 }
 
 .dark {
-  --background: oklch(0.129 0.042 264.695);
-  --foreground: oklch(0.984 0.003 247.858);
-  --card: oklch(0.208 0.042 265.755);
-  --card-foreground: oklch(0.984 0.003 247.858);
-  --popover: oklch(0.208 0.042 265.755);
-  --popover-foreground: oklch(0.984 0.003 247.858);
-  --primary: oklch(0.929 0.013 255.508);
-  --primary-foreground: oklch(0.208 0.042 265.755);
-  --secondary: oklch(0.279 0.041 260.031);
-  --secondary-foreground: oklch(0.984 0.003 247.858);
-  --muted: oklch(0.279 0.041 260.031);
-  --muted-foreground: oklch(0.85 0.02 245);
-  --accent: oklch(0.279 0.041 260.031);
-  --accent-foreground: oklch(0.984 0.003 247.858);
-  --destructive: oklch(0.704 0.191 22.216);
-  --destructive-foreground: oklch(0.984 0.003 247.858);
+  --background: oklch(0.13 0.04 160);
+  --foreground: oklch(0.97 0.01 155);
+  --card: oklch(0.20 0.03 160);
+  --card-foreground: oklch(0.97 0.01 155);
+  --popover: oklch(0.20 0.03 160);
+  --popover-foreground: oklch(0.97 0.01 155);
+  --primary: oklch(0.72 0.08 158);
+  --primary-foreground: oklch(0.13 0.03 160);
+  --secondary: oklch(0.24 0.03 160);
+  --secondary-foreground: oklch(0.97 0.01 155);
+  --muted: oklch(0.24 0.03 160);
+  --muted-foreground: oklch(0.82 0.02 150);
+  --accent: oklch(0.24 0.03 160);
+  --accent-foreground: oklch(0.97 0.01 155);
+  --destructive: oklch(0.65 0.18 22);
+  --destructive-foreground: oklch(0.97 0.01 155);
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.551 0.027 264.364);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.208 0.042 265.755);
-  --sidebar-foreground: oklch(0.984 0.003 247.858);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.984 0.003 247.858);
-  --sidebar-accent: oklch(0.279 0.041 260.031);
-  --sidebar-accent-foreground: oklch(0.984 0.003 247.858);
+  --ring: oklch(0.50 0.10 160);
+  --chart-1: oklch(0.52 0.12 158);
+  --chart-2: oklch(0.70 0.08 160);
+  --chart-3: oklch(0.78 0.12 78);
+  --chart-4: oklch(0.60 0.20 30);
+  --chart-5: oklch(0.55 0.22 20);
+  --sidebar: oklch(0.20 0.03 160);
+  --sidebar-foreground: oklch(0.97 0.01 155);
+  --sidebar-primary: oklch(0.52 0.12 158);
+  --sidebar-primary-foreground: oklch(0.97 0.01 155);
+  --sidebar-accent: oklch(0.24 0.03 160);
+  --sidebar-accent-foreground: oklch(0.97 0.01 155);
   --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.551 0.027 264.364);
+  --sidebar-ring: oklch(0.50 0.10 160);
 }
 
 @layer base {
@@ -202,9 +213,9 @@
   color: transparent;
 }
 @utility glass {
-  background: oklch(0.19 0.09 265 / 0.55);
+  background: oklch(0.19 0.04 160 / 0.55);
   backdrop-filter: blur(14px);
-  border: 1px solid oklch(0.98 0.01 250 / 0.1);
+  border: 1px solid oklch(0.97 0.01 155 / 0.1);
 }
 @utility glow {
   box-shadow: var(--shadow-glow);
@@ -213,27 +224,26 @@
 /* ---------------------------------------------------------------
  * PREMIUM SURFACE SYSTEM
  * Card surfaces, nested bezels, and section background layers.
- * All tints stay inside the cyan / indigo / gold palette defined above.
+ * All tints stay inside the moss / bronze palette defined above.
  * --------------------------------------------------------------- */
 
-/* The shared card fill. Same 141.06deg geometry the cards already used,
- * retuned from the off-palette rose tint to the theme's cyan/indigo. */
+/* The shared card fill. Same 141.06deg geometry, retuned to moss/bronze palette. */
 .card-surface {
   position: relative;
   background-image: linear-gradient(
     141.06deg,
-    oklch(0.82 0.17 220 / 0.1) 4.14%,
-    oklch(0.75 0.19 250 / 0.055) 50.74%,
-    oklch(0.19 0.09 265 / 0.32) 100%
+    oklch(0.74 0.10 160 / 0.1) 4.14%,
+    oklch(0.62 0.11 158 / 0.055) 50.74%,
+    oklch(0.19 0.04 160 / 0.32) 100%
   );
-  background-color: oklch(0.16 0.07 265 / 0.45);
+  background-color: oklch(0.16 0.04 160 / 0.45);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
-  border: 1px solid oklch(0.82 0.17 220 / 0.14);
+  border: 1px solid oklch(0.74 0.10 160 / 0.14);
   box-shadow:
-    inset 0 1px 0 oklch(0.98 0.02 220 / 0.09),
-    0 1px 2px oklch(0.08 0.06 265 / 0.5),
-    0 12px 32px -12px oklch(0.08 0.06 265 / 0.7);
+    inset 0 1px 0 oklch(0.97 0.02 155 / 0.09),
+    0 1px 2px oklch(0.08 0.03 160 / 0.5),
+    0 12px 32px -12px oklch(0.08 0.03 160 / 0.7);
   transition:
     border-color 600ms cubic-bezier(0.32, 0.72, 0, 1),
     box-shadow 600ms cubic-bezier(0.32, 0.72, 0, 1),
@@ -249,55 +259,46 @@
   pointer-events: none;
   background: linear-gradient(
     180deg,
-    oklch(0.98 0.02 220 / 0.06) 0%,
+    oklch(0.97 0.02 155 / 0.06) 0%,
     transparent 22%
   );
 }
 
 .card-surface:hover {
-  border-color: oklch(0.82 0.17 220 / 0.38);
+  border-color: oklch(0.74 0.10 160 / 0.38);
   box-shadow:
-    inset 0 1px 0 oklch(0.98 0.02 220 / 0.14),
-    0 1px 2px oklch(0.08 0.06 265 / 0.5),
-    0 24px 56px -16px oklch(0.75 0.19 235 / 0.28);
+    inset 0 1px 0 oklch(0.97 0.02 155 / 0.14),
+    0 1px 2px oklch(0.08 0.03 160 / 0.5),
+    0 24px 56px -16px oklch(0.62 0.11 158 / 0.28);
   transform: translateY(-4px);
 }
 
 /* ---------------------------------------------------------------
- * PRISM CARD — iridescent tech-foil material.
+ * PRISM CARD — iridescent foil material, moss-toned.
  *
- * Used ONLY for the five strategic-technology pillars, so that section reads
- * as its own material and no longer mirrors the Services grid below it. The
- * base tint is the requested rose -> mint diagonal; the signature is a foil
- * rim that runs rose -> cyan -> mint, tying the off-palette rose back to the
- * site's cyan so it belongs rather than clashes. Same structural DNA as
- * .card-surface (1px edge, inset highlight, 4px hover lift, matched easing).
+ * Used ONLY for the five strategic-technology pillars.
  * --------------------------------------------------------------- */
 .card-prism {
   position: relative;
-  /* Dark base sits UNDER the translucent tint so white/muted text keeps AA
-     contrast and the mobile (no-backdrop-filter) fallback still reads dark. */
-  background-color: oklch(0.16 0.07 265 / 0.55);
+  background-color: oklch(0.16 0.04 160 / 0.55);
   background-image: linear-gradient(
     141.06deg,
-    rgba(236, 177, 178, 0.2) 4.14%,
-    rgba(195, 238, 239, 0.1) 50.74%,
-    oklch(0.19 0.09 265 / 0.34) 100%
+    rgba(210, 180, 140, 0.18) 4.14%,
+    rgba(165, 210, 155, 0.1) 50.74%,
+    oklch(0.19 0.04 160 / 0.34) 100%
   );
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   border: 1px solid transparent;
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.1),
-    0 1px 2px oklch(0.08 0.06 265 / 0.5),
-    0 12px 32px -12px oklch(0.08 0.06 265 / 0.7);
+    0 1px 2px oklch(0.08 0.03 160 / 0.5),
+    0 12px 32px -12px oklch(0.08 0.03 160 / 0.7);
   transition:
     box-shadow 600ms cubic-bezier(0.32, 0.72, 0, 1),
     transform 600ms cubic-bezier(0.32, 0.72, 0, 1);
 }
 
-/* The foil rim. A gradient painted into the 1px border box via mask, so it is
-   a true edge rather than a glow. Quiet at rest, full on hover. */
 .card-prism::before {
   content: "";
   position: absolute;
@@ -306,9 +307,9 @@
   padding: 1px;
   background: linear-gradient(
     110deg,
-    rgba(236, 177, 178, 0.55) 0%,
-    rgba(0, 251, 252, 0.45) 48%,
-    rgba(195, 238, 239, 0.6) 100%
+    rgba(210, 180, 140, 0.55) 0%,
+    rgba(130, 175, 110, 0.45) 48%,
+    rgba(165, 210, 155, 0.6) 100%
   );
   -webkit-mask:
     linear-gradient(#000 0 0) content-box,
@@ -320,7 +321,6 @@
   transition: opacity 600ms cubic-bezier(0.32, 0.72, 0, 1);
 }
 
-/* Top specular, matching .card-surface::after. */
 .card-prism::after {
   content: "";
   position: absolute;
@@ -338,8 +338,8 @@
   transform: translateY(-4px);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.16),
-    0 1px 2px oklch(0.08 0.06 265 / 0.5),
-    0 24px 56px -16px rgba(0, 251, 252, 0.28);
+    0 1px 2px oklch(0.08 0.03 160 / 0.5),
+    0 24px 56px -16px rgba(130, 175, 110, 0.28);
 }
 
 .card-prism:hover::before {
@@ -347,37 +347,31 @@
 }
 
 /* ---------------------------------------------------------------
- * FLOW CARD — horizontal cyan -> blue wash.
+ * FLOW CARD — horizontal moss -> bronze wash.
  *
- * Used ONLY for the four service pillars. Every other card on the page tints
- * on the 141deg diagonal; this one runs near-horizontal (86deg), so the
- * Services grid reads as its own material without leaving the cyan/indigo
- * palette. Deliberately quieter than .card-prism — the direction change and a
- * brighter cyan hairline are the whole signature, no added ornament. Same
- * structural DNA as .card-surface (1px edge, inset highlight, 4px hover lift).
+ * Used ONLY for the four service pillars.
  * --------------------------------------------------------------- */
 .card-flow {
   position: relative;
-  background-color: oklch(0.16 0.07 265 / 0.5);
+  background-color: oklch(0.16 0.04 160 / 0.5);
   background-image: linear-gradient(
     86deg,
-    rgba(66, 231, 232, 0.1) 0%,
-    rgba(0, 89, 238, 0.1) 98.51%
+    rgba(130, 175, 110, 0.1) 0%,
+    rgba(80, 120, 70, 0.1) 98.51%
   );
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
-  border: 1px solid rgba(66, 231, 232, 0.18);
+  border: 1px solid rgba(130, 175, 110, 0.18);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.09),
-    0 1px 2px oklch(0.08 0.06 265 / 0.5),
-    0 12px 32px -12px oklch(0.08 0.06 265 / 0.7);
+    0 1px 2px oklch(0.08 0.03 160 / 0.5),
+    0 12px 32px -12px oklch(0.08 0.03 160 / 0.7);
   transition:
     border-color 600ms cubic-bezier(0.32, 0.72, 0, 1),
     box-shadow 600ms cubic-bezier(0.32, 0.72, 0, 1),
     transform 600ms cubic-bezier(0.32, 0.72, 0, 1);
 }
 
-/* Top specular, matching .card-surface::after. */
 .card-flow::after {
   content: "";
   position: absolute;
@@ -392,49 +386,45 @@
 }
 
 .card-flow:hover {
-  border-color: rgba(66, 231, 232, 0.42);
+  border-color: rgba(130, 175, 110, 0.42);
   transform: translateY(-4px);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.14),
-    0 1px 2px oklch(0.08 0.06 265 / 0.5),
-    0 24px 56px -16px rgba(0, 89, 238, 0.3);
+    0 1px 2px oklch(0.08 0.03 160 / 0.5),
+    0 24px 56px -16px rgba(80, 120, 70, 0.3);
 }
 
-/* Opacity modifier: stack on .card-surface where the card sits on a busy
- * image background and the translucent fill is not enough (e.g. the events
- * column over the news section's diagonal artwork). */
 .card-solid {
-  background-color: oklch(0.17 0.075 265 / 0.92);
+  background-color: oklch(0.17 0.04 160 / 0.92);
 }
 
-/* Gold variant for the featured / accent card. */
+/* Gold variant for the featured / accent card — now bronze-toned. */
 .card-surface-gold {
   background-image: linear-gradient(
     141.06deg,
-    oklch(0.85 0.16 90 / 0.12) 4.14%,
-    oklch(0.72 0.18 60 / 0.06) 50.74%,
-    oklch(0.19 0.09 265 / 0.32) 100%
+    oklch(0.78 0.12 78 / 0.12) 4.14%,
+    oklch(0.68 0.14 58 / 0.06) 50.74%,
+    oklch(0.19 0.04 160 / 0.32) 100%
   );
-  border-color: oklch(0.85 0.16 90 / 0.24);
+  border-color: oklch(0.78 0.12 78 / 0.24);
   box-shadow:
-    inset 0 1px 0 oklch(0.95 0.1 90 / 0.14),
-    0 12px 40px -12px oklch(0.85 0.18 85 / 0.28);
+    inset 0 1px 0 oklch(0.90 0.08 78 / 0.14),
+    0 12px 40px -12px oklch(0.78 0.12 78 / 0.22);
 }
 
 .card-surface-gold:hover {
-  border-color: oklch(0.85 0.16 90 / 0.5);
+  border-color: oklch(0.78 0.12 78 / 0.5);
   box-shadow:
-    inset 0 1px 0 oklch(0.95 0.1 90 / 0.2),
-    0 24px 60px -16px oklch(0.85 0.18 85 / 0.4);
+    inset 0 1px 0 oklch(0.90 0.08 78 / 0.2),
+    0 24px 60px -16px oklch(0.78 0.12 78 / 0.35);
 }
 
-/* Double-bezel: outer tray that a card sits inside, like a machined part.
- * Inner radius is computed from outer radius minus padding for concentricity. */
+/* Double-bezel: outer tray that a card sits inside, like a machined part. */
 .bezel {
   padding: 6px;
   border-radius: 2rem;
-  background: oklch(0.98 0.02 220 / 0.03);
-  border: 1px solid oklch(0.98 0.02 220 / 0.06);
+  background: oklch(0.97 0.02 155 / 0.03);
+  border: 1px solid oklch(0.97 0.02 155 / 0.06);
 }
 
 .bezel > * {
@@ -449,8 +439,8 @@
 /* Blueprint grid, faded out radially so it never reaches the section edge. */
 .bg-grid {
   background-image:
-    linear-gradient(oklch(0.82 0.17 220 / 0.06) 1px, transparent 1px),
-    linear-gradient(90deg, oklch(0.82 0.17 220 / 0.06) 1px, transparent 1px);
+    linear-gradient(oklch(0.74 0.10 160 / 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, oklch(0.74 0.10 160 / 0.06) 1px, transparent 1px);
   background-size: 72px 72px;
   -webkit-mask-image: radial-gradient(
     ellipse 90% 65% at 50% 40%,
@@ -467,7 +457,7 @@
 /* Fine dot matrix — quieter than the grid, for dense sections. */
 .bg-dots {
   background-image: radial-gradient(
-    oklch(0.82 0.17 220 / 0.12) 1px,
+    oklch(0.74 0.10 160 / 0.12) 1px,
     transparent 1px
   );
   background-size: 26px 26px;
@@ -483,22 +473,22 @@
   );
 }
 
-/* Aurora mesh: three offset colour fields in cyan / indigo / gold. */
+/* Aurora mesh: three offset colour fields in moss / bronze. */
 .bg-aurora {
   background-image:
     radial-gradient(
       ellipse 60% 50% at 15% 0%,
-      oklch(0.75 0.19 235 / 0.18),
+      oklch(0.62 0.11 158 / 0.18),
       transparent 60%
     ),
     radial-gradient(
       ellipse 50% 45% at 85% 25%,
-      oklch(0.62 0.2 285 / 0.15),
+      oklch(0.55 0.12 165 / 0.15),
       transparent 62%
     ),
     radial-gradient(
       ellipse 55% 40% at 50% 100%,
-      oklch(0.85 0.16 90 / 0.08),
+      oklch(0.78 0.12 78 / 0.08),
       transparent 65%
     );
 }
@@ -507,7 +497,7 @@
 .bg-spotlight {
   background-image: radial-gradient(
     ellipse 70% 50% at 50% -10%,
-    oklch(0.75 0.19 235 / 0.22),
+    oklch(0.62 0.11 158 / 0.22),
     transparent 70%
   );
 }
@@ -517,13 +507,13 @@
   background-image:
     radial-gradient(
       ellipse 80% 60% at 50% 108%,
-      oklch(0.75 0.19 235 / 0.22),
+      oklch(0.62 0.11 158 / 0.22),
       transparent 62%
     ),
     linear-gradient(
       180deg,
       transparent 55%,
-      oklch(0.85 0.16 90 / 0.05) 100%
+      oklch(0.78 0.12 78 / 0.05) 100%
     );
 }
 
@@ -559,25 +549,21 @@
   .card-surface {
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
-    background-color: oklch(0.17 0.075 265 / 0.82);
+    background-color: oklch(0.17 0.04 160 / 0.82);
   }
 
-  /* Same reasoning as .card-surface: drop the per-card blur on phones and pay
-     for the frosted look with a more opaque base instead. The rose->mint tint
-     rides on top, so the foil identity survives. */
   .card-prism {
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
-    background-color: oklch(0.17 0.075 265 / 0.86);
+    background-color: oklch(0.17 0.04 160 / 0.86);
   }
 
   .card-flow {
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
-    background-color: oklch(0.17 0.075 265 / 0.86);
+    background-color: oklch(0.17 0.04 160 / 0.86);
   }
 
-  /* Coarser grid and dots so the pattern doesn't turn into moiré at 2-3x DPR. */
   .bg-grid {
     background-size: 48px 48px;
   }
@@ -586,23 +572,11 @@
     background-size: 20px 20px;
   }
 
-  /* Full-screen mix-blend layers are the single biggest scroll-jank source on
-     phones: the GPU must re-blend the whole viewport against the moving page on
-     every frame. The grain (fixed, mix-blend-overlay) and the per-section noise
-     (mix-blend-overlay) both sit near 3-4% opacity, so dropping them on mobile
-     costs almost nothing visually and removes those per-frame blends. */
   .grain-overlay,
   .noise-layer {
     display: none;
   }
 
-  /* Trống Đồng disc sits at opacity-40 BEHIND the content, so its two most
-     expensive layers barely read on a phone yet run forever. Drop them:
-       - .drum-sheen: an animated blur() + mix-blend-screen sweep (the most GPU-
-         costly effect on the page);
-       - .gold-mote: 12 continuously-animating box-shadow particles.
-     The slow disc rotation itself is a cheap composited transform, so it stays
-     and keeps the artifact alive. */
   .drum-sheen,
   .gold-mote {
     display: none;
@@ -627,7 +601,7 @@
   .glass {
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
-    background-color: oklch(0.18 0.08 265 / 0.96);
+    background-color: oklch(0.18 0.04 160 / 0.96);
   }
 }
 
@@ -722,8 +696,8 @@
   width: 42%;
   background: radial-gradient(
     ellipse 55% 100% at center,
-    rgba(255, 244, 214, 0.42),
-    rgba(255, 223, 150, 0.16) 45%,
+    rgba(245, 230, 200, 0.36),
+    rgba(225, 200, 140, 0.14) 45%,
     transparent 72%
   );
   filter: blur(8px);
@@ -766,11 +740,11 @@
   border-radius: 9999px;
   background: radial-gradient(
     circle,
-    rgba(255, 236, 176, 0.95),
-    rgba(255, 205, 110, 0.5) 45%,
+    rgba(235, 215, 155, 0.9),
+    rgba(210, 180, 110, 0.45) 45%,
     transparent 70%
   );
-  box-shadow: 0 0 6px rgba(255, 214, 140, 0.55);
+  box-shadow: 0 0 6px rgba(210, 180, 120, 0.5);
   animation: gold-dust var(--dur, 26s) ease-in-out infinite;
   will-change: transform, opacity;
 }
@@ -791,6 +765,6 @@
 /* Belt-and-suspenders for native select dropdowns: some browsers ignore
    color-scheme for the popup list, leaving white-on-white options. */
 select option {
-  background-color: oklch(0.16 0.05 265);
-  color: oklch(0.98 0.01 250);
+  background-color: oklch(0.16 0.03 160);
+  color: oklch(0.97 0.01 155);
 }

@@ -90,7 +90,7 @@ export function Nav({ lang, toggleLang, isLoggedIn }: NavProps) {
               const targetHref = resolveHref(n.href);
 
               const linkClasses =
-                "text-white font-bold hover:text-cyan-300 hover:scale-105 hover:drop-shadow-[0_0_8px_rgba(34,211,238,0.85)] transition-all duration-200 cursor-pointer whitespace-nowrap font-['Be_Vietnam_Pro'] relative py-1 after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[2px] after:bg-cyan-400 after:transition-all after:duration-300 hover:after:w-full";
+                "text-white font-bold hover:text-cyan-300 hover:scale-105 hover:drop-shadow-[0_0_8px_rgba(130,175,110,0.75)] transition-all duration-200 cursor-pointer whitespace-nowrap font-['Be_Vietnam_Pro'] relative py-1 after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[2px] after:bg-cyan-400 after:transition-all after:duration-300 hover:after:w-full";
 
               return isPageRoute ? (
                 <Link

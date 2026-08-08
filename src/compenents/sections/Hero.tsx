@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { MapPin, Plus, Search } from "lucide-react";
-import heroImage from "@/assets/HerosectionBackGroundV3.webp";
+import heroImage from "@/assets/HerosectionBackGroundV4.jpg";
 import { ScrollReveal } from "@/compenents/ScrollReveal";
 import { SectionBackground } from "@/compenents/SectionBackground";
 import { seamTint } from "@/compenents/seamTint";
@@ -40,11 +40,11 @@ export function Hero({ lang }: { lang: Lang }) {
         }}
       />
       {/* Seam handoff, same system as every other boundary on the page: the
-          hero's bottom band paints seamTint.cyan and About's top band paints
+          hero's bottom band paints seamTint.moss and About's top band paints
           the SAME tint, so the colour crosses the boundary as one wave. The
           image itself dissolves to transparent via its own mask, revealing
           the shared fixed colour field underneath. */}
-      <SectionBackground variant="none" tintBottom={seamTint.cyan} />
+      <SectionBackground variant="none" tintBottom={seamTint.moss} />
 
       {/* Centre bloom, mirroring the spotlight About opens with at its
           top-centre (same hue, same intensity, ellipse anchored on the shared
