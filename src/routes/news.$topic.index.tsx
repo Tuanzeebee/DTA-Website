@@ -110,7 +110,7 @@ function TopicPage() {
                 {all.total} {lang === "vn" ? "bài viết" : "articles"}
               </span>
             </div>
-            <div className="space-y-5">
+            <div className="divide-y divide-white/10">
               {all.items.map((a) => (
                 <ArticleCard key={a.id} article={a} />
               ))}

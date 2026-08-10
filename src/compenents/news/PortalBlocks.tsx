@@ -3,6 +3,7 @@ import { Link, useRouter } from "@tanstack/react-router";
 import { toast } from "sonner";
 import {
   Clock,
+  Eye,
   Flame,
   Download,
   ExternalLink,
@@ -15,6 +16,7 @@ import {
   Link as LinkIcon,
   Printer,
   ArrowLeft,
+  ArrowRight,
   Bookmark,
   BookmarkCheck,
 } from "lucide-react";
@@ -28,6 +30,10 @@ import {
   articlesByTopic,
   mainTopics,
   topicName,
+  categoryBySlug,
+  categoryName,
+  timeAgo,
+  isFresh,
   boardMembers,
   articleSorts,
   articleSortLabels,
@@ -48,6 +54,101 @@ export interface ArticleListSearch {
 
 /** Shared building blocks for every portal page. */
 
+/** Pulsing emerald dot + label for stories younger than isFresh()'s window —
+ *  the freshness cue that tells scanners "this is worth your click NOW". */
+export function FreshDot() {
+  const { lang } = useLang();
+  return (
+    <span className="inline-flex items-center gap-1.5 text-[9px] font-black uppercase tracking-wider text-emerald-300">
+      <span className="relative flex w-1.5 h-1.5">
+        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-60" />
+        <span className="relative inline-flex rounded-full w-1.5 h-1.5 bg-emerald-400" />
+      </span>
+      {lang === "vn" ? "Mới" : "New"}
+    </span>
+  );
+}
+
+/** Glass chip naming the article's category — information scent: readers
+ *  click more when they know WHAT KIND of story sits behind the link. */
+function CategoryChip({
+  article,
+  onImage = false,
+}: {
+  article: PortalArticle;
+  onImage?: boolean;
+}) {
+  const { lang } = useLang();
+  const cat = categoryBySlug(article.topic, article.category);
+  if (!cat) return null;
+  return (
+    <span
+      className={
+        onImage
+          ? "px-2 py-0.5 rounded-md bg-black/55 backdrop-blur-sm border border-white/15 text-[9px] font-black uppercase tracking-wider text-cyan-200"
+          : "text-[9px] font-black uppercase tracking-wider text-accent"
+      }
+    >
+      {categoryName(cat, lang)}
+    </span>
+  );
+}
+
+/** Relative time + read count — the two fastest trust signals in a list.
+ *  Absolute date survives in the title tooltip. */
+function CardMeta({
+  article,
+  className = "text-white/45",
+}: {
+  article: PortalArticle;
+  className?: string;
+}) {
+  const { lang } = useLang();
+  return (
+    <span
+      className={`inline-flex items-center gap-2.5 text-[10px] font-mono ${className}`}
+    >
+      <span className="inline-flex items-center gap-1" title={article.date}>
+        <Clock className="w-3 h-3" />
+        {timeAgo(article.date, lang)}
+      </span>
+      <span className="inline-flex items-center gap-1">
+        <Eye className="w-3 h-3" />
+        {article.views.toLocaleString("vi-VN")}
+      </span>
+    </span>
+  );
+}
+
+/** The badge cluster shared by both card faces (fresh / intern / pdf). */
+function CardBadges({ article }: { article: PortalArticle }) {
+  const { lang } = useLang();
+  return (
+    <>
+      {isFresh(article.date) && <FreshDot />}
+      {article.isIntern && (
+        <span className="px-2 py-0.5 rounded-md bg-emerald-500/15 text-emerald-300 text-[9px] font-black uppercase tracking-wider">
+          {lang === "vn" ? "Thực tập sinh" : "Intern"}
+        </span>
+      )}
+      {article.pdfUrl && (
+        <span className="px-2 py-0.5 rounded-md bg-accent/15 text-accent text-[9px] font-black uppercase tracking-wider">
+          {lang === "vn" ? "Có văn bản PDF" : "PDF attached"}
+        </span>
+      )}
+    </>
+  );
+}
+
+/**
+ * Article teaser in two faces:
+ *  - featured: boxed card-surface, 16/9 image with a category chip riding
+ *    the corner, headline + standfirst + an explicit "Đọc bài" call to
+ *    action that slides in on hover (desktop; always visible on touch).
+ *  - row: a flat editorial line (no box) — thumbnail, badges, headline,
+ *    meta — meant to sit inside a `divide-y` parent so a list reads as ONE
+ *    scannable column instead of a stack of identical boxes.
+ */
 export function ArticleCard({
   article,
   featured = false,
@@ -56,63 +157,192 @@ export function ArticleCard({
   featured?: boolean;
 }) {
   const { lang } = useLang();
+
+  if (!featured) {
+    return (
+      <Link
+        to="/news/article/$id"
+        params={{ id: article.id }}
+        className="group flex gap-4 py-4"
+      >
+        <div className="w-28 md:w-36 shrink-0 overflow-hidden rounded-xl border border-white/10">
+          <img
+            src={article.image}
+            alt=""
+            loading="lazy"
+            referrerPolicy="no-referrer"
+            className="w-full h-full object-cover group-hover:scale-110 group-hover:brightness-110 transition-all duration-700"
+          />
+        </div>
+        <div className="flex-1 min-w-0 self-center">
+          <div className="flex items-center gap-2 flex-wrap mb-1.5">
+            <CategoryChip article={article} />
+            <CardBadges article={article} />
+            <CardMeta article={article} className="ml-auto hidden sm:flex" />
+          </div>
+          <h3 className="text-sm font-bold text-white leading-snug line-clamp-2 group-hover:text-cyan-300 transition-colors">
+            {article.title}
+          </h3>
+          <CardMeta article={article} className="mt-1.5 sm:hidden" />
+        </div>
+        <ArrowRight
+          aria-hidden
+          className="hidden md:block w-4 h-4 shrink-0 self-center text-accent opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300"
+        />
+      </Link>
+    );
+  }
+
   return (
     <Link
       to="/news/article/$id"
       params={{ id: article.id }}
       className="group block"
     >
-      <article
-        className={`card-surface rounded-2xl overflow-hidden ${
-          featured ? "" : "flex gap-4"
-        }`}
-      >
-        <div
-          className={
-            featured
-              ? "aspect-[16/9] overflow-hidden"
-              : "w-28 md:w-36 shrink-0 overflow-hidden"
-          }
-        >
+      <article className="card-surface rounded-2xl overflow-hidden">
+        <div className="relative aspect-[16/9] overflow-hidden">
           <img
             src={article.image}
             alt=""
             loading="lazy"
             referrerPolicy="no-referrer"
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            className="w-full h-full object-cover group-hover:scale-110 group-hover:brightness-110 transition-all duration-700"
           />
-        </div>
-        <div className={featured ? "p-5" : "py-3.5 pr-4 flex-1 min-w-0"}>
-          <div className="flex items-center gap-2 flex-wrap mb-2">
-            {article.isIntern && (
-              <span className="px-2 py-0.5 rounded-md bg-emerald-500/15 text-emerald-300 text-[9px] font-black uppercase tracking-wider">
-                {lang === "vn" ? "Thực tập sinh" : "Intern"}
-              </span>
-            )}
-            {article.pdfUrl && (
-              <span className="px-2 py-0.5 rounded-md bg-accent/15 text-accent text-[9px] font-black uppercase tracking-wider">
-                {lang === "vn" ? "Có văn bản PDF" : "PDF attached"}
-              </span>
-            )}
-            <span className="text-[10px] text-white/45 font-mono">
-              {article.date}
-            </span>
+          <div className="absolute top-3 left-3">
+            <CategoryChip article={article} onImage />
           </div>
-          <h3
-            className={`font-bold text-white leading-snug group-hover:text-cyan-300 transition-colors ${
-              featured ? "text-base md:text-lg" : "text-[13.5px] line-clamp-2"
-            }`}
-          >
+        </div>
+        <div className="p-5">
+          <div className="flex items-center gap-2 flex-wrap mb-2">
+            <CardBadges article={article} />
+            <CardMeta article={article} className="ml-auto" />
+          </div>
+          <h3 className="text-lg md:text-xl font-bold text-white leading-snug group-hover:text-cyan-300 transition-colors line-clamp-2">
             {article.title}
           </h3>
-          {featured && (
-            <p className="mt-2.5 text-xs text-white/60 leading-relaxed line-clamp-2">
-              {article.summary}
-            </p>
-          )}
+          <p className="mt-2 text-[13px] text-white/65 leading-relaxed line-clamp-2">
+            {article.summary}
+          </p>
+          <span className="mt-3 inline-flex items-center gap-1.5 text-[11px] font-black uppercase tracking-wider text-accent group-hover:text-cyan-300 transition-all duration-300 lg:opacity-0 lg:translate-y-1 lg:group-hover:opacity-100 lg:group-hover:translate-y-0">
+            {lang === "vn" ? "Đọc bài" : "Read article"}
+            <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform duration-300" />
+          </span>
         </div>
       </article>
     </Link>
+  );
+}
+
+/**
+ * "Tin tiêu điểm" — the front-page's front page. One lead story rendered as
+ * a broadsheet-style splash (full-bleed image, gradient overlay, oversized
+ * headline, gold "Nổi bật" marker, hover-revealed CTA pill) plus up to
+ * three secondary stories as flat rows. This is the single visual anchor
+ * between the banner zone and the topic columns: the eye lands HERE first.
+ */
+export function TopStories({ articles }: { articles: PortalArticle[] }) {
+  const { lang } = useLang();
+  const [lead, ...rest] = articles;
+  if (!lead) return null;
+
+  return (
+    <section aria-label={lang === "vn" ? "Tin tiêu điểm" : "Top stories"}>
+      <div className="flex items-center justify-between border-b-2 border-accent/60 pb-2.5 mb-6">
+        <h2 className="display flex items-center gap-2 text-base md:text-lg font-black uppercase tracking-wide text-white">
+          <Flame className="w-4 h-4 text-accent" />
+          {lang === "vn" ? "Tin tiêu điểm" : "Top stories"}
+        </h2>
+      </div>
+
+      <div className="grid lg:grid-cols-12 gap-x-8 gap-y-8">
+        {/* Lead story */}
+        <Link
+          to="/news/article/$id"
+          params={{ id: lead.id }}
+          className="group block lg:col-span-7"
+        >
+          <article className="card-surface relative rounded-2xl overflow-hidden h-full">
+            <div className="aspect-[16/10] h-full overflow-hidden">
+              <img
+                src={lead.image}
+                alt=""
+                referrerPolicy="no-referrer"
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+              />
+            </div>
+            <div
+              aria-hidden
+              className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/10 pointer-events-none"
+            />
+
+            {/* Top strip: category + the gold "Nổi bật" marker. */}
+            <div className="absolute top-0 left-0 right-0 p-4 md:p-5 flex items-center gap-2">
+              <CategoryChip article={lead} onImage />
+              <span
+                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider text-accent-foreground"
+                style={{ background: "var(--gradient-gold)" }}
+              >
+                <Flame className="w-2.5 h-2.5" />
+                {lang === "vn" ? "Nổi bật" : "Featured"}
+              </span>
+            </div>
+
+            {/* Bottom strip: headline, standfirst, meta, CTA. */}
+            <div className="absolute bottom-0 left-0 right-0 p-4 md:p-6">
+              <h3 className="display text-xl md:text-2xl xl:text-[28px] font-black text-white leading-tight line-clamp-2 group-hover:text-cyan-200 transition-colors">
+                {lead.title}
+              </h3>
+              <p className="hidden md:block mt-2 text-[13px] text-white/75 leading-relaxed line-clamp-2 max-w-2xl">
+                {lead.summary}
+              </p>
+              <div className="mt-3 flex items-center gap-3">
+                <CardMeta article={lead} className="text-white/70" />
+                <span className="ml-auto inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-accent text-accent-foreground text-[10px] font-black uppercase tracking-wider transition-all duration-300 lg:opacity-0 lg:translate-y-1 lg:group-hover:opacity-100 lg:group-hover:translate-y-0">
+                  {lang === "vn" ? "Đọc bài" : "Read"}
+                  <ArrowRight className="w-3 h-3" />
+                </span>
+              </div>
+            </div>
+          </article>
+        </Link>
+
+        {/* Secondary stories */}
+        <div className="lg:col-span-5 flex flex-col justify-between divide-y divide-white/10">
+          {rest.slice(0, 3).map((a) => (
+            <Link
+              key={a.id}
+              to="/news/article/$id"
+              params={{ id: a.id }}
+              className="group flex items-center gap-4 py-4 first:pt-0 last:pb-0"
+            >
+              <div className="w-28 md:w-32 shrink-0 aspect-[4/3] rounded-xl overflow-hidden border border-white/10">
+                <img
+                  src={a.image}
+                  alt=""
+                  loading="lazy"
+                  referrerPolicy="no-referrer"
+                  className="w-full h-full object-cover group-hover:scale-110 group-hover:brightness-110 transition-all duration-700"
+                />
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-2 mb-1">
+                  <CategoryChip article={a} />
+                  {isFresh(a.date) && <FreshDot />}
+                </div>
+                <h3 className="text-sm md:text-[15px] font-bold text-white leading-snug line-clamp-2 group-hover:text-cyan-300 transition-colors">
+                  {a.title}
+                </h3>
+                <CardMeta article={a} className="mt-1.5" />
+              </div>
+              <ArrowRight
+                aria-hidden
+                className="hidden lg:block w-4 h-4 shrink-0 text-accent opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300"
+              />
+            </Link>
+          ))}
+        </div>
+      </div>
+    </section>
   );
 }
 

@@ -281,7 +281,7 @@ function CategoryPage() {
             />
 
             {result.total > 0 ? (
-              <div className="space-y-5">
+              <div className="divide-y divide-white/10">
                 {result.items.map((a) => (
                   <div key={a.id} className="relative">
                     <ArticleCard article={a} />

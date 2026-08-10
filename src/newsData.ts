@@ -905,6 +905,34 @@ const parseDate = (d: string) => {
   return new Date(yyyy, mm - 1, dd).getTime();
 };
 
+/** dd/mm/yyyy -> Date object (midday, to dodge DST edge cases). */
+export function parseNewsDate(d: string): Date {
+  const [dd, mm, yyyy] = d.split("/").map(Number);
+  return new Date(yyyy, mm - 1, dd, 12);
+}
+
+/** Relative freshness label — "3 giờ trước" reads faster than a raw date
+ *  when scanning a list; the absolute date stays available in the title
+ *  attr at the call site. */
+export function timeAgo(dateStr: string, lang: Lang): string {
+  const diffMs = Date.now() - parseNewsDate(dateStr).getTime();
+  const days = Math.floor(diffMs / 86_400_000);
+  if (days <= 0) return lang === "vn" ? "Hôm nay" : "Today";
+  if (days === 1) return lang === "vn" ? "Hôm qua" : "Yesterday";
+  if (days < 7)
+    return lang === "vn" ? `${days} ngày trước` : `${days} days ago`;
+  if (days < 30) {
+    const w = Math.floor(days / 7);
+    return lang === "vn" ? `${w} tuần trước` : `${w}w ago`;
+  }
+  return dateStr; // older than a month: the plain date is clearer.
+}
+
+/** A story is "Mới" while it is younger than `days` (default 3). */
+export function isFresh(dateStr: string, days = 3): boolean {
+  return Date.now() - parseNewsDate(dateStr).getTime() < days * 86_400_000;
+}
+
 /** dd/mm/yyyy -> ms, cached per article so sort comparators don't re-parse
  *  the string on every comparison (O(n log n) comparisons per sort). */
 const dateMsCache = new WeakMap<PortalArticle, number>();
