@@ -118,6 +118,19 @@ const authSnapshot = () => {
   }
 };
 
+/** Non-hook login so code outside the admin tree (the portal sign-in
+ *  shortcut) can open the admin session without rendering AdminShell first. */
+export function adminLogin(password: string): boolean {
+  if (password !== DEMO_PASSWORD) return false;
+  try {
+    sessionStorage.setItem(AUTH_KEY, "1");
+  } catch {
+    /* session-only fallback: still signal success */
+  }
+  window.dispatchEvent(new Event(AUTH_EVENT));
+  return true;
+}
+
 export function useAdminAuth() {
   const isAuthed = useSyncExternalStore(
     authSubscribe,
@@ -125,16 +138,7 @@ export function useAdminAuth() {
     () => false,
   );
 
-  const login = useCallback((password: string) => {
-    if (password !== DEMO_PASSWORD) return false;
-    try {
-      sessionStorage.setItem(AUTH_KEY, "1");
-    } catch {
-      /* session-only fallback: still signal success */
-    }
-    window.dispatchEvent(new Event(AUTH_EVENT));
-    return true;
-  }, []);
+  const login = useCallback((password: string) => adminLogin(password), []);
 
   const logout = useCallback(() => {
     try {

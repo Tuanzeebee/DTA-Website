@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { ArrowLeft, Globe } from "lucide-react";
 import { useLang } from "@/hooks/useLang";
 import { useScrolled } from "@/hooks/useScrolled";
+import logoDta from "@/assets/logoDTA.webp";
 
 /**
  * Shared fixed header for every member-portal page (/portal, /portal/dang-ky).
@@ -34,12 +35,11 @@ export function PortalHeader() {
           aria-label="DTA — Trang chủ"
         >
           <img
-            src="https://dsa.org.vn/wp-content/uploads/2017/11/logoSVG_1411.svg"
+            src={logoDta}
             alt="DTA Logo"
             className={`transition-all duration-300 w-auto object-contain ${
               scrolled ? "h-8 md:h-9" : "h-10 md:h-12"
             }`}
-            referrerPolicy="no-referrer"
           />
           <span className="hidden sm:block leading-tight">
             <span className="block text-[10px] font-black uppercase tracking-[0.18em] text-white/90">

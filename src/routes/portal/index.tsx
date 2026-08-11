@@ -1,5 +1,6 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
+import { toast } from "sonner";
 import { motion, AnimatePresence } from "motion/react";
 import {
   User,
@@ -13,6 +14,7 @@ import {
   Handshake,
 } from "lucide-react";
 import { useLang, useSession } from "@/hooks/useLang";
+import { adminLogin } from "@/compenents/admin/adminStore";
 import { LoginCard } from "@/compenents/member/LoginCard";
 import { MemberCard } from "@/compenents/member/MemberCard";
 import {
@@ -33,6 +35,21 @@ type TabId = "profile" | "finance" | "resources" | "forum";
 function PortalIndex() {
   const { lang } = useLang();
   const { isLoggedIn, handleLogin } = useSession(lang);
+  const navigate = useNavigate();
+
+  /* admin@gmail.com/admin at the member sign-in: open the admin demo session
+     first so AdminShell doesn't ask for the password again, then land on
+     /admin. The member session flag stays untouched — this is a different
+     workspace. */
+  const handleAdminLogin = () => {
+    adminLogin("admin");
+    toast.success(
+      lang === "vn"
+        ? "Đăng nhập quản trị thành công!"
+        : "Signed in as administrator!",
+    );
+    navigate({ to: "/admin" });
+  };
 
   return (
     <main className="flex-grow pt-28 md:pt-32 pb-20 px-4 md:px-6 relative">
@@ -55,7 +72,11 @@ function PortalIndex() {
             exit={{ opacity: 0, y: -12 }}
             transition={{ duration: 0.35, ease: [0.32, 0.72, 0, 1] }}
           >
-            <Lobby lang={lang} onLogin={() => handleLogin(true)} />
+            <Lobby
+              lang={lang}
+              onLogin={() => handleLogin(true)}
+              onAdminLogin={handleAdminLogin}
+            />
           </motion.div>
         )}
       </AnimatePresence>
@@ -67,7 +88,15 @@ function PortalIndex() {
 /* LOGGED-OUT — the "lobby": brand pitch left, sign-in card right.     */
 /* ------------------------------------------------------------------ */
 
-function Lobby({ lang, onLogin }: { lang: "vn" | "en"; onLogin: () => void }) {
+function Lobby({
+  lang,
+  onLogin,
+  onAdminLogin,
+}: {
+  lang: "vn" | "en";
+  onLogin: () => void;
+  onAdminLogin: () => void;
+}) {
   const perks = [
     {
       icon: BadgeCheck,
@@ -200,7 +229,7 @@ function Lobby({ lang, onLogin }: { lang: "vn" | "en"; onLogin: () => void }) {
       </div>
 
       {/* Right: sign-in */}
-      <LoginCard lang={lang} onLogin={onLogin} />
+      <LoginCard lang={lang} onLogin={onLogin} onAdminLogin={onAdminLogin} />
     </div>
   );
 }

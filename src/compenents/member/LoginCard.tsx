@@ -23,9 +23,11 @@ import type { Lang } from "@/types";
 export function LoginCard({
   lang,
   onLogin,
+  onAdminLogin,
 }: {
   lang: Lang;
   onLogin: () => void;
+  onAdminLogin?: () => void;
 }) {
   const [email, setEmail] = useState("hoivien.demo@dta.org.vn");
   const [password, setPassword] = useState("demo2026");
@@ -39,6 +41,23 @@ export function LoginCard({
           ? "Vui lòng nhập email và mật khẩu."
           : "Please enter both email and password.",
       );
+      return;
+    }
+    /* Back-office shortcut for the demo: admin@gmail.com/admin skips the
+       member flow and goes straight to /admin. The bare "admin" alias is kept
+       for safety, but the field is type="email", so the browser's native
+       validation only ever lets the @gmail.com form through. A wrong password
+       gets its own error instead of falling through to the format complaint. */
+    if (["admin", "admin@gmail.com"].includes(email.trim().toLowerCase())) {
+      if (password === "admin") {
+        onAdminLogin?.();
+      } else {
+        toast.error(
+          lang === "vn"
+            ? "Sai mật khẩu quản trị viên."
+            : "Wrong administrator password.",
+        );
+      }
       return;
     }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
@@ -161,6 +180,24 @@ export function LoginCard({
           {lang === "vn"
             ? "bấm đăng nhập để trải nghiệm toàn bộ chức năng."
             : "just sign in to explore every panel."}
+          <br />
+          {lang === "vn" ? (
+            <>
+              Nhập{" "}
+              <span className="font-mono text-white/60">
+                admin@gmail.com / admin
+              </span>{" "}
+              để vào thẳng trang quản trị.
+            </>
+          ) : (
+            <>
+              Enter{" "}
+              <span className="font-mono text-white/60">
+                admin@gmail.com / admin
+              </span>{" "}
+              to jump straight to the admin area.
+            </>
+          )}
         </p>
       </form>
 

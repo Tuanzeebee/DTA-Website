@@ -1,5 +1,6 @@
 import { MapPin, Phone, Mail } from "lucide-react";
 import type { Lang } from "@/types";
+import logoDta from "@/assets/logoDTA.webp";
 
 export function Footer({ lang }: { lang: Lang }) {
   return (
@@ -9,9 +10,8 @@ export function Footer({ lang }: { lang: Lang }) {
           <div className="flex items-center gap-3 font-black tracking-widest mb-4 text-white">
             {/* Same association logo as the header (Nav). */}
             <img
-              src="https://dsa.org.vn/wp-content/uploads/2017/11/logoSVG_1411.svg"
+              src={logoDta}
               alt="DTA Logo"
-              referrerPolicy="no-referrer"
               className="h-10 w-auto object-contain shrink-0"
             />
             <div className="flex flex-col">

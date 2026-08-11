@@ -10,7 +10,6 @@ import {
   CheckCircle2,
   AlertCircle,
   Building,
-  Scale,
   BadgeCheck,
   Clock,
   CreditCard,
@@ -129,319 +128,354 @@ function RegisterPage() {
 
         <div className="grid lg:grid-cols-12 gap-6 items-start">
           {/* Form column */}
-          <div className="lg:col-span-7 card-surface rounded-3xl p-6 md:p-8">
-            {/* Progress rail */}
-            <ol className="flex items-center gap-2 sm:gap-3 mb-8">
-              {stepLabels.map((label, i) => {
-                const n = i + 1;
-                const done = step > n;
-                const current = step === n;
-                return (
-                  <li
-                    key={label}
-                    className="flex items-center gap-2 sm:gap-3 flex-1 last:flex-none"
-                  >
-                    <span
-                      className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-black shrink-0 transition-all duration-300 ${
-                        done
-                          ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/40"
-                          : current
-                            ? "text-accent-foreground"
-                            : "bg-white/5 text-muted-foreground border border-white/10"
-                      }`}
-                      style={
-                        current
-                          ? {
-                              background: "var(--gradient-gold)",
-                              boxShadow: "var(--shadow-gold)",
-                            }
-                          : undefined
-                      }
+          <div className="lg:col-span-7">
+            <div className="card-surface rounded-3xl p-6 md:p-8">
+              {/* Progress rail */}
+              <ol className="flex items-center gap-2 sm:gap-3 mb-8">
+                {stepLabels.map((label, i) => {
+                  const n = i + 1;
+                  const done = step > n;
+                  const current = step === n;
+                  return (
+                    <li
+                      key={label}
+                      className="flex items-center gap-2 sm:gap-3 flex-1 last:flex-none"
                     >
-                      {done ? <Check className="w-4 h-4" /> : n}
-                    </span>
-                    <span
-                      className={`hidden md:block text-[11px] font-bold uppercase tracking-wider whitespace-nowrap ${
-                        current
-                          ? "text-accent"
-                          : done
-                            ? "text-emerald-400"
-                            : "text-muted-foreground"
-                      }`}
-                    >
-                      {label}
-                    </span>
-                    {n < stepLabels.length && (
                       <span
-                        aria-hidden
-                        className={`h-px flex-1 min-w-4 transition-colors duration-500 ${
-                          step > n ? "bg-emerald-500/50" : "bg-white/10"
+                        className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-black shrink-0 transition-all duration-300 ${
+                          done
+                            ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/40"
+                            : current
+                              ? "text-accent-foreground"
+                              : "bg-white/5 text-muted-foreground border border-white/10"
                         }`}
-                      />
-                    )}
-                  </li>
-                );
-              })}
-            </ol>
-
-            <AnimatePresence mode="wait">
-              {/* STEP 1 — organization info */}
-              {step === 1 && (
-                <motion.div
-                  key="step1"
-                  initial={{ opacity: 0, x: 18 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -14 }}
-                  transition={{ duration: 0.25, ease: "easeOut" }}
-                  className="space-y-5"
-                >
-                  <div className="grid sm:grid-cols-2 gap-4">
-                    <div className="sm:col-span-2">
-                      <label className={LABEL}>
-                        {lang === "vn"
-                          ? "Tên Cơ quan / Tổ chức nộp đơn *"
-                          : "Organization Name *"}
-                      </label>
-                      <input
-                        type="text"
-                        placeholder="e.g. Công ty TNHH SoftTech Đà Nẵng"
-                        value={data.orgName}
-                        onChange={(e) =>
-                          setData({ ...data, orgName: e.target.value })
+                        style={
+                          current
+                            ? {
+                                background: "var(--gradient-gold)",
+                                boxShadow: "var(--shadow-gold)",
+                              }
+                            : undefined
                         }
-                        className={FIELD}
-                      />
-                    </div>
-                    <div>
-                      <label className={LABEL}>
-                        {lang === "vn"
-                          ? "Người đại diện pháp luật"
-                          : "Legal Representative"}
-                      </label>
-                      <input
-                        type="text"
-                        placeholder="e.g. Trần Minh Quân"
-                        value={data.representative}
-                        onChange={(e) =>
-                          setData({ ...data, representative: e.target.value })
-                        }
-                        className={FIELD}
-                      />
-                    </div>
-                    <div>
-                      <label className={LABEL}>
-                        {lang === "vn"
-                          ? "Email liên hệ chính *"
-                          : "Primary Email *"}
-                      </label>
-                      <input
-                        type="email"
-                        placeholder="e.g. contact@softtech.com"
-                        value={data.email}
-                        onChange={(e) =>
-                          setData({ ...data, email: e.target.value })
-                        }
-                        className={FIELD}
-                      />
-                    </div>
-                  </div>
-
-                  <div className="pt-3 flex justify-end">
-                    <button
-                      onClick={() => requireStep1() && setStep(2)}
-                      className="px-6 h-11 rounded-xl font-bold text-sm text-accent-foreground hover:opacity-90 active:scale-[0.98] transition-all flex items-center gap-2 cursor-pointer"
-                      style={{
-                        background: "var(--gradient-gold)",
-                        boxShadow: "var(--shadow-gold)",
-                      }}
-                    >
-                      {lang === "vn" ? "Tiếp tục" : "Continue"}
-                      <ChevronRight className="w-4 h-4" />
-                    </button>
-                  </div>
-                </motion.div>
-              )}
-
-              {/* STEP 2 — legal & field */}
-              {step === 2 && (
-                <motion.div
-                  key="step2"
-                  initial={{ opacity: 0, x: 18 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -14 }}
-                  transition={{ duration: 0.25, ease: "easeOut" }}
-                  className="space-y-5"
-                >
-                  <div className="grid sm:grid-cols-2 gap-4">
-                    <div>
-                      <label className={LABEL}>
-                        {lang === "vn"
-                          ? "Lĩnh vực công nghệ cốt lõi"
-                          : "Core Technology Pillar"}
-                      </label>
-                      <select
-                        value={data.techField}
-                        onChange={(e) =>
-                          setData({ ...data, techField: e.target.value })
-                        }
-                        className={`${FIELD} cursor-pointer`}
                       >
-                        <option value="AI">
-                          {lang === "vn" ? "AI & Dữ liệu lớn" : "AI & Big Data"}
-                        </option>
-                        <option value="semi">
-                          {lang === "vn"
-                            ? "Vi mạch & Bán dẫn"
-                            : "Semiconductors & IC Design"}
-                        </option>
-                        <option value="cloud">
-                          {lang === "vn"
-                            ? "Điện toán đám mây"
-                            : "Cloud & Blockchain"}
-                        </option>
-                        <option value="iot">
-                          {lang === "vn"
-                            ? "Robot & Tự động hóa nhúng"
-                            : "Robotics & Automation"}
-                        </option>
-                      </select>
-                    </div>
-                    <div>
-                      <label className={LABEL}>
-                        {lang === "vn"
-                          ? "Tài liệu pháp lý (GPKD) *"
-                          : "Legal Document *"}
-                      </label>
-                      <label
-                        className={`flex items-center gap-3 px-4 py-3 rounded-xl border border-dashed cursor-pointer transition-colors ${
-                          data.hasLegalDoc
-                            ? "border-emerald-500/40 bg-emerald-500/[0.06]"
-                            : "border-white/15 bg-white/[0.03] hover:border-accent/40"
-                        }`}
-                      >
-                        {data.hasLegalDoc ? (
-                          <CheckCircle2 className="w-4.5 h-4.5 text-emerald-400 shrink-0" />
-                        ) : (
-                          <Upload className="w-4.5 h-4.5 text-white/40 shrink-0" />
-                        )}
-                        <span
-                          className={`text-sm ${
-                            data.hasLegalDoc
-                              ? "text-emerald-400 font-bold"
+                        {done ? <Check className="w-4 h-4" /> : n}
+                      </span>
+                      <span
+                        className={`hidden md:block text-[11px] font-bold uppercase tracking-wider whitespace-nowrap ${
+                          current
+                            ? "text-accent"
+                            : done
+                              ? "text-emerald-400"
                               : "text-muted-foreground"
+                        }`}
+                      >
+                        {label}
+                      </span>
+                      {n < stepLabels.length && (
+                        <span
+                          aria-hidden
+                          className={`h-px flex-1 min-w-4 transition-colors duration-500 ${
+                            step > n ? "bg-emerald-500/50" : "bg-white/10"
+                          }`}
+                        />
+                      )}
+                    </li>
+                  );
+                })}
+              </ol>
+
+              <AnimatePresence mode="wait">
+                {/* STEP 1 — organization info */}
+                {step === 1 && (
+                  <motion.div
+                    key="step1"
+                    initial={{ opacity: 0, x: 18 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -14 }}
+                    transition={{ duration: 0.25, ease: "easeOut" }}
+                    className="space-y-5"
+                  >
+                    <div className="grid sm:grid-cols-2 gap-4">
+                      <div className="sm:col-span-2">
+                        <label className={LABEL}>
+                          {lang === "vn"
+                            ? "Tên Cơ quan / Tổ chức nộp đơn *"
+                            : "Organization Name *"}
+                        </label>
+                        <input
+                          type="text"
+                          placeholder="e.g. Công ty TNHH SoftTech Đà Nẵng"
+                          value={data.orgName}
+                          onChange={(e) =>
+                            setData({ ...data, orgName: e.target.value })
+                          }
+                          className={FIELD}
+                        />
+                      </div>
+                      <div>
+                        <label className={LABEL}>
+                          {lang === "vn"
+                            ? "Người đại diện pháp luật"
+                            : "Legal Representative"}
+                        </label>
+                        <input
+                          type="text"
+                          placeholder="e.g. Trần Minh Quân"
+                          value={data.representative}
+                          onChange={(e) =>
+                            setData({ ...data, representative: e.target.value })
+                          }
+                          className={FIELD}
+                        />
+                      </div>
+                      <div>
+                        <label className={LABEL}>
+                          {lang === "vn"
+                            ? "Email liên hệ chính *"
+                            : "Primary Email *"}
+                        </label>
+                        <input
+                          type="email"
+                          placeholder="e.g. contact@softtech.com"
+                          value={data.email}
+                          onChange={(e) =>
+                            setData({ ...data, email: e.target.value })
+                          }
+                          className={FIELD}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="pt-3 flex justify-end">
+                      <button
+                        onClick={() => requireStep1() && setStep(2)}
+                        className="px-6 h-11 rounded-xl font-bold text-sm text-accent-foreground hover:opacity-90 active:scale-[0.98] transition-all flex items-center gap-2 cursor-pointer"
+                        style={{
+                          background: "var(--gradient-gold)",
+                          boxShadow: "var(--shadow-gold)",
+                        }}
+                      >
+                        {lang === "vn" ? "Tiếp tục" : "Continue"}
+                        <ChevronRight className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </motion.div>
+                )}
+
+                {/* STEP 2 — legal & field */}
+                {step === 2 && (
+                  <motion.div
+                    key="step2"
+                    initial={{ opacity: 0, x: 18 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -14 }}
+                    transition={{ duration: 0.25, ease: "easeOut" }}
+                    className="space-y-5"
+                  >
+                    <div className="grid sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className={LABEL}>
+                          {lang === "vn"
+                            ? "Lĩnh vực công nghệ cốt lõi"
+                            : "Core Technology Pillar"}
+                        </label>
+                        <select
+                          value={data.techField}
+                          onChange={(e) =>
+                            setData({ ...data, techField: e.target.value })
+                          }
+                          className={`${FIELD} cursor-pointer`}
+                        >
+                          <option value="AI">
+                            {lang === "vn"
+                              ? "AI & Dữ liệu lớn"
+                              : "AI & Big Data"}
+                          </option>
+                          <option value="semi">
+                            {lang === "vn"
+                              ? "Vi mạch & Bán dẫn"
+                              : "Semiconductors & IC Design"}
+                          </option>
+                          <option value="cloud">
+                            {lang === "vn"
+                              ? "Điện toán đám mây"
+                              : "Cloud & Blockchain"}
+                          </option>
+                          <option value="iot">
+                            {lang === "vn"
+                              ? "Robot & Tự động hóa nhúng"
+                              : "Robotics & Automation"}
+                          </option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className={LABEL}>
+                          {lang === "vn"
+                            ? "Tài liệu pháp lý (GPKD) *"
+                            : "Legal Document *"}
+                        </label>
+                        <label
+                          className={`flex items-center gap-3 px-4 py-3 rounded-xl border border-dashed cursor-pointer transition-colors ${
+                            data.hasLegalDoc
+                              ? "border-emerald-500/40 bg-emerald-500/[0.06]"
+                              : "border-white/15 bg-white/[0.03] hover:border-accent/40"
                           }`}
                         >
-                          {data.hasLegalDoc
-                            ? lang === "vn"
-                              ? "Đã đính kèm tài liệu"
-                              : "Document attached"
-                            : lang === "vn"
-                              ? "Tải lên GPKD / Quyết định thành lập"
-                              : "Upload business certificate"}
-                        </span>
-                        <input
-                          type="file"
-                          className="sr-only"
-                          onChange={() =>
-                            setData({ ...data, hasLegalDoc: true })
-                          }
-                        />
-                      </label>
+                          {data.hasLegalDoc ? (
+                            <CheckCircle2 className="w-4.5 h-4.5 text-emerald-400 shrink-0" />
+                          ) : (
+                            <Upload className="w-4.5 h-4.5 text-white/40 shrink-0" />
+                          )}
+                          <span
+                            className={`text-sm ${
+                              data.hasLegalDoc
+                                ? "text-emerald-400 font-bold"
+                                : "text-muted-foreground"
+                            }`}
+                          >
+                            {data.hasLegalDoc
+                              ? lang === "vn"
+                                ? "Đã đính kèm tài liệu"
+                                : "Document attached"
+                              : lang === "vn"
+                                ? "Tải lên GPKD / Quyết định thành lập"
+                                : "Upload business certificate"}
+                          </span>
+                          <input
+                            type="file"
+                            className="sr-only"
+                            onChange={() =>
+                              setData({ ...data, hasLegalDoc: true })
+                            }
+                          />
+                        </label>
+                      </div>
                     </div>
-                  </div>
 
-                  <div className="flex items-start gap-3 p-4 rounded-xl bg-amber-500/[0.08] border border-amber-500/20 text-amber-300 text-xs leading-relaxed">
-                    <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
-                    <p>
+                    <div className="flex items-start gap-3 p-4 rounded-xl bg-amber-500/[0.08] border border-amber-500/20 text-amber-300 text-xs leading-relaxed">
+                      <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+                      <p>
+                        {lang === "vn"
+                          ? "Cam kết: Hồ sơ nộp tự nguyện, tuân thủ nghĩa vụ hội phí thường niên và các điều khoản trong Dự thảo Điều lệ hoạt động của Hiệp hội."
+                          : "Pledge: this application is voluntary and binds you to the annual fee and the association's public charter."}
+                      </p>
+                    </div>
+
+                    <div className="pt-3 flex justify-between">
+                      <button
+                        onClick={() => setStep(1)}
+                        className="px-5 h-11 rounded-xl font-bold text-sm border border-white/10 hover:bg-white/5 active:scale-[0.98] transition-all text-white cursor-pointer flex items-center gap-2"
+                      >
+                        <ChevronLeft className="w-4 h-4" />
+                        {lang === "vn" ? "Quay lại" : "Back"}
+                      </button>
+                      <button
+                        onClick={handleSubmit}
+                        className="px-6 h-11 rounded-xl font-bold text-sm text-accent-foreground hover:opacity-90 active:scale-[0.98] transition-all flex items-center gap-2 cursor-pointer"
+                        style={{
+                          background: "var(--gradient-gold)",
+                          boxShadow: "var(--shadow-gold)",
+                        }}
+                      >
+                        <Check className="w-4 h-4" />
+                        {lang === "vn" ? "Nộp hồ sơ" : "Submit Application"}
+                      </button>
+                    </div>
+                  </motion.div>
+                )}
+
+                {/* STEP 3 — success */}
+                {step === 3 && (
+                  <motion.div
+                    key="step3"
+                    initial={{ opacity: 0, scale: 0.97 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.3, ease: "easeOut" }}
+                    className="py-6 text-center space-y-5 max-w-md mx-auto"
+                  >
+                    <div className="w-16 h-16 rounded-full bg-emerald-500/15 text-emerald-400 flex items-center justify-center mx-auto">
+                      <CheckCircle2 className="w-9 h-9" />
+                    </div>
+                    <h2 className="display text-xl font-black text-white">
                       {lang === "vn"
-                        ? "Cam kết: Hồ sơ nộp tự nguyện, tuân thủ nghĩa vụ hội phí thường niên và các điều khoản trong Dự thảo Điều lệ hoạt động của Hiệp hội."
-                        : "Pledge: this application is voluntary and binds you to the annual fee and the association's public charter."}
+                        ? "Nộp hồ sơ thành công!"
+                        : "Application Submitted!"}
+                    </h2>
+                    <p className="text-sm text-muted-foreground leading-relaxed">
+                      {lang === "vn"
+                        ? "Ban Thư ký sẽ thẩm định tư cách pháp nhân trực tuyến và phản hồi chính thức trong tối đa 30 ngày làm việc."
+                        : "The Secretariat will verify your legal files online and respond within 30 business days."}
                     </p>
-                  </div>
 
-                  <div className="pt-3 flex justify-between">
-                    <button
-                      onClick={() => setStep(1)}
-                      className="px-5 h-11 rounded-xl font-bold text-sm border border-white/10 hover:bg-white/5 active:scale-[0.98] transition-all text-white cursor-pointer flex items-center gap-2"
-                    >
-                      <ChevronLeft className="w-4 h-4" />
-                      {lang === "vn" ? "Quay lại" : "Back"}
-                    </button>
-                    <button
-                      onClick={handleSubmit}
-                      className="px-6 h-11 rounded-xl font-bold text-sm text-accent-foreground hover:opacity-90 active:scale-[0.98] transition-all flex items-center gap-2 cursor-pointer"
-                      style={{
-                        background: "var(--gradient-gold)",
-                        boxShadow: "var(--shadow-gold)",
-                      }}
-                    >
-                      <Check className="w-4 h-4" />
-                      {lang === "vn" ? "Nộp hồ sơ" : "Submit Application"}
-                    </button>
-                  </div>
-                </motion.div>
-              )}
+                    <div className="p-5 rounded-2xl border border-accent/25 bg-accent/[0.06]">
+                      <span className="text-[11px] text-muted-foreground uppercase tracking-[0.2em] font-bold">
+                        {lang === "vn" ? "Mã số biên nhận" : "Tracking ID"}
+                      </span>
+                      <span className="font-mono text-2xl font-black text-accent mt-1.5 block tracking-[0.12em]">
+                        {trackingCode}
+                      </span>
+                      <span className="text-[11px] text-amber-400 font-bold mt-2.5 flex items-center justify-center gap-1.5">
+                        <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+                        {lang === "vn"
+                          ? "Đang thẩm tra trực tuyến"
+                          : "Under online verification"}
+                      </span>
+                    </div>
 
-              {/* STEP 3 — success */}
-              {step === 3 && (
-                <motion.div
-                  key="step3"
-                  initial={{ opacity: 0, scale: 0.97 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.3, ease: "easeOut" }}
-                  className="py-6 text-center space-y-5 max-w-md mx-auto"
-                >
-                  <div className="w-16 h-16 rounded-full bg-emerald-500/15 text-emerald-400 flex items-center justify-center mx-auto">
-                    <CheckCircle2 className="w-9 h-9" />
-                  </div>
-                  <h2 className="display text-xl font-black text-white">
-                    {lang === "vn"
-                      ? "Nộp hồ sơ thành công!"
-                      : "Application Submitted!"}
-                  </h2>
-                  <p className="text-sm text-muted-foreground leading-relaxed">
-                    {lang === "vn"
-                      ? "Ban Thư ký sẽ thẩm định tư cách pháp nhân trực tuyến và phản hồi chính thức trong tối đa 30 ngày làm việc."
-                      : "The Secretariat will verify your legal files online and respond within 30 business days."}
-                  </p>
+                    <div className="flex flex-wrap justify-center gap-3">
+                      <button
+                        onClick={reset}
+                        className="px-5 h-11 rounded-xl font-bold text-sm border border-white/10 hover:bg-white/5 active:scale-[0.98] transition-all text-white cursor-pointer"
+                      >
+                        {lang === "vn" ? "Nộp đơn khác" : "New Application"}
+                      </button>
+                      <Link
+                        to="/portal"
+                        className="px-5 h-11 rounded-xl font-bold text-sm text-primary-foreground hover:opacity-90 active:scale-[0.98] transition-all flex items-center gap-2 cursor-pointer"
+                        style={{
+                          background: "var(--gradient-primary)",
+                          boxShadow: "var(--shadow-glow)",
+                        }}
+                      >
+                        <LogIn className="w-4 h-4" />
+                        {lang === "vn"
+                          ? "Về trang Đăng nhập"
+                          : "Back to Sign-in"}
+                      </Link>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
 
-                  <div className="p-5 rounded-2xl border border-accent/25 bg-accent/[0.06]">
-                    <span className="text-[11px] text-muted-foreground uppercase tracking-[0.2em] font-bold">
-                      {lang === "vn" ? "Mã số biên nhận" : "Tracking ID"}
-                    </span>
-                    <span className="font-mono text-2xl font-black text-accent mt-1.5 block tracking-[0.12em]">
-                      {trackingCode}
-                    </span>
-                    <span className="text-[11px] text-amber-400 font-bold mt-2.5 flex items-center justify-center gap-1.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
-                      {lang === "vn"
-                        ? "Đang thẩm tra trực tuyến"
-                        : "Under online verification"}
-                    </span>
-                  </div>
-
-                  <div className="flex flex-wrap justify-center gap-3">
-                    <button
-                      onClick={reset}
-                      className="px-5 h-11 rounded-xl font-bold text-sm border border-white/10 hover:bg-white/5 active:scale-[0.98] transition-all text-white cursor-pointer"
-                    >
-                      {lang === "vn" ? "Nộp đơn khác" : "New Application"}
-                    </button>
-                    <Link
-                      to="/portal"
-                      className="px-5 h-11 rounded-xl font-bold text-sm text-primary-foreground hover:opacity-90 active:scale-[0.98] transition-all flex items-center gap-2 cursor-pointer"
-                      style={{
-                        background: "var(--gradient-primary)",
-                        boxShadow: "var(--shadow-glow)",
-                      }}
-                    >
-                      <LogIn className="w-4 h-4" />
-                      {lang === "vn" ? "Về trang Đăng nhập" : "Back to Sign-in"}
-                    </Link>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
+            {/* Sign-in cross-link: the reverse of the LoginCard enrollment
+                footer — a credentialed member landing here by habit should
+                not have to hunt for the way back to their account. */}
+            <div className="card-surface rounded-2xl p-5 md:p-6 mt-6 flex flex-col sm:flex-row sm:items-center gap-4">
+              <div className="flex-1">
+                <h3 className="text-sm font-bold text-white">
+                  {lang === "vn"
+                    ? "Bạn đã có tài khoản?"
+                    : "Already have an account?"}
+                </h3>
+                <p className="text-xs text-muted-foreground leading-relaxed mt-1">
+                  {lang === "vn"
+                    ? "Đăng nhập Văn phòng số để quản lý hồ sơ Hội viên, hội phí và phản biện."
+                    : "Sign in to the Digital Office to manage your member record, dues and feedback."}
+                </p>
+              </div>
+              <Link
+                to="/portal"
+                className="w-full sm:w-auto shrink-0 px-6 h-11 rounded-xl font-bold text-sm text-primary-foreground hover:opacity-90 active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer"
+                style={{
+                  background: "var(--gradient-primary)",
+                  boxShadow: "var(--shadow-glow)",
+                }}
+              >
+                <LogIn className="w-4 h-4" />
+                {lang === "vn" ? "Đăng nhập ngay" : "Sign in now"}
+              </Link>
+            </div>
           </div>
 
           {/* Info rail */}
@@ -496,35 +530,6 @@ function RegisterPage() {
                 </div>
               </div>
             ))}
-
-            <div className="rounded-2xl border border-white/8 bg-white/[0.02] p-5 flex items-center gap-4">
-              <Scale className="w-5 h-5 text-muted-foreground shrink-0" />
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                {lang === "vn" ? (
-                  <>
-                    Đã được cấp tài khoản?{" "}
-                    <Link
-                      to="/portal"
-                      className="text-cyan-300 font-bold hover:underline"
-                    >
-                      Đăng nhập Văn phòng số
-                    </Link>{" "}
-                    để quản lý hồ sơ Hội viên.
-                  </>
-                ) : (
-                  <>
-                    Already credentialed?{" "}
-                    <Link
-                      to="/portal"
-                      className="text-cyan-300 font-bold hover:underline"
-                    >
-                      Sign in to the Digital Office
-                    </Link>{" "}
-                    to manage your member record.
-                  </>
-                )}
-              </p>
-            </div>
           </aside>
         </div>
       </div>

@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Link } from "@tanstack/react-router";
 import { Globe, Building } from "lucide-react";
 import { navItems } from "@/data";
+import logoDta from "@/assets/logoDTA.webp";
 import type { Lang } from "@/types";
 import { useScrolled } from "@/hooks/useScrolled";
 import { resolveHref } from "@/lib/nav";
@@ -75,12 +76,11 @@ export function Nav({ lang, toggleLang, isLoggedIn }: NavProps) {
             className="flex items-center gap-2 shrink-0 cursor-pointer -ml-1 sm:-ml-2"
           >
             <img
-              src="https://dsa.org.vn/wp-content/uploads/2017/11/logoSVG_1411.svg"
+              src={logoDta}
               alt="DTA Logo"
               className={`transition-all duration-300 w-auto object-contain ${
                 scrolled ? "h-8 md:h-9" : "h-10 md:h-12"
               }`}
-              referrerPolicy="no-referrer"
             />
           </a>
 
