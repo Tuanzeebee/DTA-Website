@@ -1,7 +1,7 @@
 import { createCollectionStore, genId } from "./collectionStore";
 
 /**
- * Domain data for the four admin ops pages. All seeds are MOCK rows
+ * Domain data for the admin ops pages. All seeds are MOCK rows
  * (<!-- mock -->) so every screen demos with content; real records replace
  * them the moment the user edits (the whole list then lives in
  * localStorage).
@@ -258,5 +258,96 @@ export const applicationStore = createCollectionStore<MemberApplication>(
     },
   ],
 );
+
+/* ---------------- Quảng cáo & Banner ---------------- */
+
+/**
+ * Vị trí hiển thị trên trang tin:
+ * - `banner`  — banner lớn đầu trang (tuyên truyền / trả phí), dải ngang 2/3.
+ * - `ad`      — ô quảng cáo nhỏ bên phải banner (trên).
+ * - `sponsor` — ô tài trợ nhỏ bên phải banner (dưới).
+ * - `sidebar` — các banner dọc xếp chồng ở cột 3 (trang chuyên mục, bài đọc).
+ */
+export type AdSlot = "banner" | "ad" | "sponsor" | "sidebar";
+
+export interface AdPlacement {
+  id: string;
+  /** Tên chiến dịch / đơn vị quảng cáo — hiển thị trong admin và alt ảnh. */
+  title: string;
+  slot: AdSlot;
+  /** URL hoặc data URL của ảnh quảng cáo. */
+  imageUrl: string;
+  /** Trang đích mở ra khi độc giả bấm vào ảnh. */
+  linkUrl: string;
+  /** Tắt để gỡ khỏi trang tin mà không xóa dữ liệu. */
+  active: boolean;
+  note?: string;
+}
+
+export const AD_SLOTS: { value: AdSlot; label: string }[] = [
+  { value: "banner", label: "Banner lớn đầu trang" },
+  { value: "ad", label: "Ô quảng cáo (phải banner, trên)" },
+  { value: "sponsor", label: "Ô tài trợ (phải banner, dưới)" },
+  { value: "sidebar", label: "Quảng cáo cột phải" },
+];
+
+export const adSlotLabel = (slot: AdSlot) =>
+  AD_SLOTS.find((s) => s.value === slot)?.label ?? slot;
+
+/** Các quảng cáo đang BẬT của một vị trí — trang tin đọc qua hàm này. */
+export const activeAdsForSlot = (ads: AdPlacement[], slot: AdSlot) =>
+  ads.filter((a) => a.active && a.slot === slot);
+
+export const adStore = createCollectionStore<AdPlacement>("dta-admin-ads", [
+  {
+    id: "ad-01",
+    title: "Chiến dịch Chuyển đổi số TP. Đà Nẵng 2026",
+    slot: "banner",
+    imageUrl: "/ads/banner-chuyen-doi-so.svg",
+    linkUrl: "https://danang.gov.vn",
+    active: true,
+    note: "Banner tuyên truyền đầu trang tin",
+  },
+  {
+    id: "ad-02",
+    title: "DTA Summit 2026 — Đăng ký tham dự",
+    slot: "ad",
+    imageUrl: "/ads/ad-dta-summit.svg",
+    linkUrl: "https://dtadanang.org.vn",
+    active: true,
+  },
+  {
+    id: "ad-03",
+    title: "Enouvo — Đối tác đồng hành chuyển đổi số",
+    slot: "sponsor",
+    imageUrl: "/ads/sponsor-enouvo.svg",
+    linkUrl: "https://enouvo.com",
+    active: true,
+  },
+  {
+    id: "ad-04",
+    title: "Gia nhập Hội viên DTA",
+    slot: "sidebar",
+    imageUrl: "/ads/side-gia-nhap-dta.svg",
+    linkUrl: "https://dtadanang.org.vn",
+    active: true,
+  },
+  {
+    id: "ad-05",
+    title: "Đào tạo AI cho doanh nghiệp",
+    slot: "sidebar",
+    imageUrl: "/ads/side-dao-tao-ai.svg",
+    linkUrl: "https://dtadanang.org.vn",
+    active: true,
+  },
+  {
+    id: "ad-06",
+    title: "FPT Software Đà Nẵng — Tuyển dụng",
+    slot: "sidebar",
+    imageUrl: "/ads/side-tuyen-dung-it.svg",
+    linkUrl: "https://career.fpt-software.com",
+    active: true,
+  },
+]);
 
 export { genId };

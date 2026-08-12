@@ -12,6 +12,7 @@ import {
   BookOpen,
   MessagesSquare,
   Inbox,
+  Megaphone,
 } from "lucide-react";
 import { useAdminAuth, DEMO_PASSWORD } from "@/compenents/admin/adminStore";
 import { forumStore, applicationStore } from "@/compenents/admin/opsData";
@@ -51,6 +52,12 @@ export function AdminShell({ children }: { children: ReactNode }) {
 const NAV = [
   { to: "/admin", label: "Tổng quan", icon: LayoutDashboard, exact: true },
   { to: "/admin/bai-viet", label: "Bài viết", icon: FileText, exact: false },
+  {
+    to: "/admin/quang-cao",
+    label: "Thêm quảng cáo",
+    icon: Megaphone,
+    exact: false,
+  },
   { to: "/admin/hoi-vien", label: "Hội viên", icon: Users, exact: false },
   {
     to: "/admin/hoi-phi",

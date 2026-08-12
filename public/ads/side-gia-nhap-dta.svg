@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="300" viewBox="0 0 800 300">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0B1A15"/>
+      <stop offset="1" stop-color="#1B4A38"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#F0C96B"/>
+      <stop offset="1" stop-color="#C99436"/>
+    </linearGradient>
+    <linearGradient id="moss" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#8FC9A8"/>
+      <stop offset="1" stop-color="#5FA98B"/>
+    </linearGradient>
+    <pattern id="grid" width="34" height="34" patternUnits="userSpaceOnUse">
+      <path d="M34 0H0V34" fill="none" stroke="#8FC9A8" stroke-opacity="0.06"/>
+    </pattern>
+  </defs>
+
+  <rect width="800" height="300" fill="url(#bg)"/>
+  <rect width="800" height="300" fill="url(#grid)"/>
+  <circle cx="700" cy="250" r="190" fill="#8FC9A8" opacity="0.10"/>
+  <circle cx="60" cy="20" r="140" fill="#F0C96B" opacity="0.07"/>
+
+  <text x="44" y="66" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="bold" letter-spacing="6" fill="#8FC9A8">HIỆP HỘI CÔNG NGHỆ SỐ ĐÀ NẴNG</text>
+  <text x="42" y="132" font-family="Arial, Helvetica, sans-serif" font-size="56" font-weight="bold" fill="#F4F9F6">GIA NHẬP <tspan fill="url(#gold)">HỘI VIÊN DTA</tspan></text>
+
+  <g font-family="Arial, Helvetica, sans-serif" font-size="21" fill="#C4D8CE">
+    <circle cx="52" cy="172" r="4.5" fill="#F0C96B"/>
+    <text x="68" y="179">Kết nối cộng đồng doanh nghiệp công nghệ</text>
+    <circle cx="52" cy="208" r="4.5" fill="#F0C96B"/>
+    <text x="68" y="215">Đào tạo, sự kiện và hỗ trợ chính sách</text>
+  </g>
+
+  <g transform="translate(44,236)">
+    <rect width="230" height="46" rx="23" fill="url(#moss)"/>
+    <text x="115" y="30" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="bold" letter-spacing="2" fill="#0B1A15">ĐĂNG KÝ NGAY</text>
+  </g>
+
+  <!-- emblem -->
+  <g transform="translate(690,90)" fill="none" stroke="url(#gold)">
+    <circle r="58" stroke-width="2"/>
+    <circle r="46" stroke-width="1" opacity="0.5"/>
+    <path d="M0-11 3-3 12-3 5 2 7 10 0 5-7 10-5 2-12-3-3-3Z" fill="url(#gold)" stroke="none"/>
+  </g>
+</svg>

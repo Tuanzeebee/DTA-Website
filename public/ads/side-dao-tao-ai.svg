@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="300" viewBox="0 0 800 300">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#121B2E"/>
+      <stop offset="1" stop-color="#1E3A5F"/>
+    </linearGradient>
+    <linearGradient id="cyan" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#7FD1C0"/>
+      <stop offset="1" stop-color="#5AA9E6"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#F0C96B"/>
+      <stop offset="1" stop-color="#C99436"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="800" height="300" fill="url(#bg)"/>
+  <!-- circuit lines -->
+  <g stroke="#7FD1C0" stroke-opacity="0.14" fill="none" stroke-width="2">
+    <path d="M520 40h120v60h80M600 40v-40M560 260h100v-70h90"/>
+    <circle cx="520" cy="40" r="5" fill="#7FD1C0" stroke="none"/>
+    <circle cx="720" cy="100" r="5" fill="#7FD1C0" stroke="none"/>
+    <circle cx="750" cy="190" r="5" fill="#7FD1C0" stroke="none"/>
+    <circle cx="560" cy="260" r="5" fill="#7FD1C0" stroke="none"/>
+  </g>
+  <circle cx="120" cy="270" r="170" fill="#5AA9E6" opacity="0.10"/>
+
+  <text x="44" y="66" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="bold" letter-spacing="6" fill="#7FD1C0">CHƯƠNG TRÌNH HỘI VIÊN</text>
+  <text x="42" y="132" font-family="Arial, Helvetica, sans-serif" font-size="54" font-weight="bold" fill="#F4F9F6">ĐÀO TẠO <tspan fill="url(#gold)">AI</tspan> CHO</text>
+  <text x="42" y="192" font-family="Arial, Helvetica, sans-serif" font-size="54" font-weight="bold" fill="#F4F9F6">DOANH NGHIỆP</text>
+
+  <text x="44" y="232" font-family="Arial, Helvetica, sans-serif" font-size="20" fill="#B9CBD8">Khai giảng tháng 9/2026 · Ưu đãi 30% cho hội viên DTA</text>
+
+  <g transform="translate(44,248)">
+    <rect width="210" height="40" rx="20" fill="none" stroke="url(#cyan)" stroke-width="2"/>
+    <text x="105" y="27" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="bold" letter-spacing="2" fill="#7FD1C0">XEM CHI TIẾT</text>
+  </g>
+</svg>

@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="300" viewBox="0 0 800 300">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0E211B"/>
+      <stop offset="1" stop-color="#2E4A1E"/>
+    </linearGradient>
+    <linearGradient id="lime" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#A8D08D"/>
+      <stop offset="1" stop-color="#6FA85F"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#F0C96B"/>
+      <stop offset="1" stop-color="#C99436"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="800" height="300" fill="url(#bg)"/>
+  <g fill="#A8D08D" opacity="0.08">
+    <rect x="560" y="30" width="70" height="70" rx="14"/>
+    <rect x="650" y="70" width="70" height="70" rx="14"/>
+    <rect x="610" y="150" width="70" height="70" rx="14"/>
+    <rect x="700" y="190" width="70" height="70" rx="14"/>
+  </g>
+
+  <text x="44" y="66" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="bold" letter-spacing="6" fill="#A8D08D">CƠ HỘI VIỆC LÀM</text>
+  <text x="42" y="136" font-family="Arial, Helvetica, sans-serif" font-size="58" font-weight="bold" fill="#F4F9F6">TUYỂN DỤNG <tspan fill="url(#gold)">IT 2026</tspan></text>
+
+  <g font-family="Arial, Helvetica, sans-serif" font-size="20" fill="#C9D8C2">
+    <text x="44" y="184"><tspan font-weight="bold" fill="#F0C96B">200+</tspan> vị trí công nghệ tại Đà Nẵng</text>
+    <text x="44" y="216">Dev · Tester · AI Engineer · Data · PM</text>
+  </g>
+
+  <g transform="translate(44,238)">
+    <rect width="224" height="44" rx="22" fill="url(#lime)"/>
+    <text x="112" y="29" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="bold" letter-spacing="2" fill="#0E211B">ỨNG TUYỂN NGAY</text>
+  </g>
+</svg>

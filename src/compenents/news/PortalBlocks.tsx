@@ -23,6 +23,7 @@ import {
 import { useSavedArticles } from "@/hooks/useSavedArticles";
 import { useLang } from "@/hooks/useLang";
 import { allMembers } from "@/data";
+import { adStore, activeAdsForSlot } from "@/compenents/admin/opsData";
 import {
   latestArticles,
   mostReadArticles,
@@ -703,18 +704,41 @@ export function SidebarMostRead() {
 }
 
 /** Ad banners — the brief pins 3 stacked banners atop the rail on
- *  category and article pages. */
+ *  category and article pages. Filled with ACTIVE "sidebar" ads from
+ *  /admin/quang-cao; any slot still unbooked shows the placeholder. */
 export function SidebarAds({ count = 3 }: { count?: number }) {
   const { lang } = useLang();
+  const ads = activeAdsForSlot(adStore.useItems(), "sidebar").slice(0, count);
+  const empty = count - ads.length;
   return (
     <div className="space-y-3">
-      {Array.from({ length: count }, (_, i) => (
+      {ads.map((ad) => (
+        <a
+          key={ad.id}
+          href={ad.linkUrl}
+          target="_blank"
+          rel="noopener sponsored"
+          title={ad.title}
+          className="group relative block rounded-2xl overflow-hidden border border-white/10 h-28"
+        >
+          <img
+            src={ad.imageUrl}
+            alt={ad.title}
+            loading="lazy"
+            className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-500"
+          />
+          <span className="absolute top-1 right-1.5 text-[8px] font-bold uppercase tracking-[0.2em] text-white/55 bg-black/35 rounded px-1 py-px">
+            {lang === "vn" ? "Quảng cáo" : "Ad"}
+          </span>
+        </a>
+      ))}
+      {Array.from({ length: empty }, (_, i) => (
         <div
-          key={i}
+          key={`empty-${i}`}
           className="rounded-2xl border border-dashed border-white/15 bg-white/[0.03] h-28 flex items-center justify-center text-white/40 text-[10px] uppercase tracking-[0.2em]"
         >
           {lang === "vn" ? "Quảng cáo" : "Advertisement"}{" "}
-          {count > 1 ? i + 1 : ""}
+          {count > 1 ? ads.length + i + 1 : ""}
         </div>
       ))}
     </div>

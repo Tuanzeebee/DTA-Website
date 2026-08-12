@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="112" viewBox="0 0 800 112">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#101826"/>
+      <stop offset="1" stop-color="#1B3A4D"/>
+    </linearGradient>
+    <linearGradient id="cyan" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#7FD1C0"/>
+      <stop offset="1" stop-color="#4FA3C4"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="800" height="112" fill="url(#bg)"/>
+  <g stroke="#7FD1C0" stroke-opacity="0.12" fill="none">
+    <path d="M560-20 640 56 560 132M640-20 720 56 640 132M720-20 800 56 720 132"/>
+  </g>
+
+  <!-- logo mark -->
+  <g transform="translate(34,26)">
+    <rect width="60" height="60" rx="14" fill="url(#cyan)"/>
+    <text x="30" y="42" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="34" font-weight="bold" fill="#101826">E</text>
+  </g>
+
+  <text x="116" y="52" font-family="Arial, Helvetica, sans-serif" font-size="34" font-weight="bold" letter-spacing="3" fill="#F4F9F6">ENOUVO</text>
+  <text x="118" y="84" font-family="Arial, Helvetica, sans-serif" font-size="17" letter-spacing="1" fill="#A9C6BC">Đối tác đồng hành chuyển đổi số cùng doanh nghiệp</text>
+
+  <text x="766" y="66" text-anchor="end" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="bold" letter-spacing="2" fill="#7FD1C0">TÀI TRỢ</text>
+</svg>

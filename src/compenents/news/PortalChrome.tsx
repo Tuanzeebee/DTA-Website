@@ -9,6 +9,11 @@ import {
 } from "lucide-react";
 import { mainTopics, topicName, topicShort, categoryName } from "@/newsData";
 import { useLang } from "@/hooks/useLang";
+import {
+  adStore,
+  activeAdsForSlot,
+  type AdPlacement,
+} from "@/compenents/admin/opsData";
 import type { Lang } from "@/types";
 
 /**
@@ -266,29 +271,88 @@ function MenuSearchForm() {
  *  propaganda/campaign banner on the left (carries paid placement when no
  *  campaign runs), and to its right two stacked slots — "quảng cáo" and
  *  "tài trợ" — separated by breathing room ("khoảng cách vừa đủ").
- *  All placeholders until real creative. */
+ *  Each slot shows the first ACTIVE ad of its kind from /admin/quang-cao;
+ *  a dashed placeholder holds the slot when nothing is booked. */
 export function PortalBanner() {
   const { lang } = useLang();
-  const slot =
-    "rounded-2xl border border-dashed border-white/15 bg-white/[0.03] flex items-center justify-center text-white/40 uppercase tracking-[0.2em]";
+  const ads = adStore.useItems();
   return (
     <div className="max-w-7xl mx-auto px-4 md:px-6 mt-6">
       <div className="grid md:grid-cols-3 gap-3 md:gap-4">
-        <div className={`${slot} md:col-span-2 h-20 md:h-28 text-xs`}>
-          {lang === "vn"
-            ? "Banner tuyên truyền / cổ động"
-            : "Campaign / promotional banner"}
-        </div>
+        <BannerSlot
+          ad={activeAdsForSlot(ads, "banner")[0]}
+          lang={lang}
+          className="md:col-span-2 h-20 md:h-28 text-xs"
+          placeholder={
+            lang === "vn"
+              ? "Banner tuyên truyền / cổ động"
+              : "Campaign / promotional banner"
+          }
+        />
         <div className="grid grid-cols-2 md:grid-cols-1 gap-3 md:gap-4">
-          <div className={`${slot} h-14 md:h-12 text-[10px]`}>
-            {lang === "vn" ? "Dành cho quảng cáo" : "Advertising slot"}
-          </div>
-          <div className={`${slot} h-14 md:h-12 text-[10px]`}>
-            {lang === "vn" ? "Dành cho tài trợ" : "Sponsorship slot"}
-          </div>
+          <BannerSlot
+            ad={activeAdsForSlot(ads, "ad")[0]}
+            lang={lang}
+            className="h-14 md:h-12 text-[10px]"
+            placeholder={
+              lang === "vn" ? "Dành cho quảng cáo" : "Advertising slot"
+            }
+          />
+          <BannerSlot
+            ad={activeAdsForSlot(ads, "sponsor")[0]}
+            lang={lang}
+            className="h-14 md:h-12 text-[10px]"
+            placeholder={
+              lang === "vn" ? "Dành cho tài trợ" : "Sponsorship slot"
+            }
+          />
         </div>
       </div>
     </div>
+  );
+}
+
+/** One banner-zone cell: the booked ad as a full-bleed linked image, or the
+ *  dashed "slot available" placeholder. Paid placements are marked with a
+ *  tiny "Quảng cáo" tag, as required of licensed e-information pages. */
+function BannerSlot({
+  ad,
+  lang,
+  className,
+  placeholder,
+}: {
+  ad?: AdPlacement;
+  lang: Lang;
+  className: string;
+  placeholder: string;
+}) {
+  if (!ad) {
+    return (
+      <div
+        className={`rounded-2xl border border-dashed border-white/15 bg-white/[0.03] flex items-center justify-center text-white/40 uppercase tracking-[0.2em] ${className}`}
+      >
+        {placeholder}
+      </div>
+    );
+  }
+  return (
+    <a
+      href={ad.linkUrl}
+      target="_blank"
+      rel="noopener sponsored"
+      title={ad.title}
+      className={`group relative block rounded-2xl overflow-hidden border border-white/10 ${className}`}
+    >
+      <img
+        src={ad.imageUrl}
+        alt={ad.title}
+        loading="lazy"
+        className="w-full h-full object-cover"
+      />
+      <span className="absolute top-1 right-1.5 text-[8px] font-bold uppercase tracking-[0.2em] text-white/55 bg-black/35 rounded px-1 py-px">
+        {lang === "vn" ? "Quảng cáo" : "Ad"}
+      </span>
+    </a>
   );
 }
 

@@ -18,6 +18,7 @@ import { Route as AdminDangKyRouteImport } from './routes/admin.dang-ky'
 import { Route as AdminHoiPhiRouteImport } from './routes/admin.hoi-phi'
 import { Route as AdminHoiVienRouteImport } from './routes/admin.hoi-vien'
 import { Route as AdminPhanBienRouteImport } from './routes/admin.phan-bien'
+import { Route as AdminQuangCaoRouteImport } from './routes/admin.quang-cao'
 import { Route as AdminTaiNguyenRouteImport } from './routes/admin.tai-nguyen'
 import { Route as NewsIndexRouteImport } from './routes/news.index'
 import { Route as NewsDaLuuRouteImport } from './routes/news.da-luu'
@@ -73,6 +74,11 @@ const AdminHoiVienRoute = AdminHoiVienRouteImport.update({
 const AdminPhanBienRoute = AdminPhanBienRouteImport.update({
   id: '/phan-bien',
   path: '/phan-bien',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminQuangCaoRoute = AdminQuangCaoRouteImport.update({
+  id: '/quang-cao',
+  path: '/quang-cao',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminTaiNguyenRoute = AdminTaiNguyenRouteImport.update({
@@ -140,6 +146,7 @@ export interface FileRoutesByFullPath {
   '/admin/hoi-phi': typeof AdminHoiPhiRoute
   '/admin/hoi-vien': typeof AdminHoiVienRoute
   '/admin/phan-bien': typeof AdminPhanBienRoute
+  '/admin/quang-cao': typeof AdminQuangCaoRoute
   '/admin/tai-nguyen': typeof AdminTaiNguyenRoute
   '/news/da-luu': typeof NewsDaLuuRoute
   '/news/tim-kiem': typeof NewsTimKiemRoute
@@ -159,6 +166,7 @@ export interface FileRoutesByTo {
   '/admin/hoi-phi': typeof AdminHoiPhiRoute
   '/admin/hoi-vien': typeof AdminHoiVienRoute
   '/admin/phan-bien': typeof AdminPhanBienRoute
+  '/admin/quang-cao': typeof AdminQuangCaoRoute
   '/admin/tai-nguyen': typeof AdminTaiNguyenRoute
   '/news/da-luu': typeof NewsDaLuuRoute
   '/news/tim-kiem': typeof NewsTimKiemRoute
@@ -182,6 +190,7 @@ export interface FileRoutesById {
   '/admin/hoi-phi': typeof AdminHoiPhiRoute
   '/admin/hoi-vien': typeof AdminHoiVienRoute
   '/admin/phan-bien': typeof AdminPhanBienRoute
+  '/admin/quang-cao': typeof AdminQuangCaoRoute
   '/admin/tai-nguyen': typeof AdminTaiNguyenRoute
   '/news/da-luu': typeof NewsDaLuuRoute
   '/news/tim-kiem': typeof NewsTimKiemRoute
@@ -206,6 +215,7 @@ export interface FileRouteTypes {
     | '/admin/hoi-phi'
     | '/admin/hoi-vien'
     | '/admin/phan-bien'
+    | '/admin/quang-cao'
     | '/admin/tai-nguyen'
     | '/news/da-luu'
     | '/news/tim-kiem'
@@ -225,6 +235,7 @@ export interface FileRouteTypes {
     | '/admin/hoi-phi'
     | '/admin/hoi-vien'
     | '/admin/phan-bien'
+    | '/admin/quang-cao'
     | '/admin/tai-nguyen'
     | '/news/da-luu'
     | '/news/tim-kiem'
@@ -247,6 +258,7 @@ export interface FileRouteTypes {
     | '/admin/hoi-phi'
     | '/admin/hoi-vien'
     | '/admin/phan-bien'
+    | '/admin/quang-cao'
     | '/admin/tai-nguyen'
     | '/news/da-luu'
     | '/news/tim-kiem'
@@ -331,6 +343,13 @@ declare module '@tanstack/react-router' {
       path: '/phan-bien'
       fullPath: '/admin/phan-bien'
       preLoaderRoute: typeof AdminPhanBienRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/quang-cao': {
+      id: '/admin/quang-cao'
+      path: '/quang-cao'
+      fullPath: '/admin/quang-cao'
+      preLoaderRoute: typeof AdminQuangCaoRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/tai-nguyen': {
@@ -418,6 +437,7 @@ interface AdminRouteChildren {
   AdminHoiPhiRoute: typeof AdminHoiPhiRoute
   AdminHoiVienRoute: typeof AdminHoiVienRoute
   AdminPhanBienRoute: typeof AdminPhanBienRoute
+  AdminQuangCaoRoute: typeof AdminQuangCaoRoute
   AdminTaiNguyenRoute: typeof AdminTaiNguyenRoute
   AdminIndexRoute: typeof AdminIndexRoute
   AdminBaiVietIdRoute: typeof AdminBaiVietIdRoute
@@ -429,6 +449,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminHoiPhiRoute: AdminHoiPhiRoute,
   AdminHoiVienRoute: AdminHoiVienRoute,
   AdminPhanBienRoute: AdminPhanBienRoute,
+  AdminQuangCaoRoute: AdminQuangCaoRoute,
   AdminTaiNguyenRoute: AdminTaiNguyenRoute,
   AdminIndexRoute: AdminIndexRoute,
   AdminBaiVietIdRoute: AdminBaiVietIdRoute,
