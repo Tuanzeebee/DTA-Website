@@ -26,6 +26,7 @@ import {
   GHOST_BTN,
   ICON_BTN,
 } from "@/compenents/admin/ui";
+import { RequireSection } from "@/compenents/admin/SectionGate";
 
 /**
  * Diễn đàn phản biện: hàng chờ duyệt bài do hội viên/người trong hội gửi —
@@ -34,7 +35,11 @@ import {
  * nguồn) để Ban Biên tập biên tập lại rồi xuất bản.
  */
 export const Route = createFileRoute("/admin/phan-bien")({
-  component: AdminForum,
+  component: () => (
+    <RequireSection section="forum">
+      <AdminForum />
+    </RequireSection>
+  ),
 });
 
 type Tab = "pending" | "approved" | "rejected" | "all";

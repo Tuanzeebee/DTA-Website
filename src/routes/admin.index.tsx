@@ -16,10 +16,15 @@ import {
   resetToMockData,
 } from "@/compenents/admin/adminStore";
 import { useAdminMembers } from "@/compenents/admin/memberStore";
+import { RequireSection } from "@/compenents/admin/SectionGate";
 
 /** Dashboard overview: headline stats, per-topic counts, recent articles. */
 export const Route = createFileRoute("/admin/")({
-  component: AdminOverview,
+  component: () => (
+    <RequireSection section="overview">
+      <AdminOverview />
+    </RequireSection>
+  ),
 });
 
 function AdminOverview() {

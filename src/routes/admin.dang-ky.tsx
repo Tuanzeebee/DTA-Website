@@ -18,6 +18,7 @@ import {
 } from "@/compenents/admin/opsData";
 import { saveMember, newMemberId } from "@/compenents/admin/memberStore";
 import { StatusChip, PageHeader, ICON_BTN } from "@/compenents/admin/ui";
+import { RequireSection } from "@/compenents/admin/SectionGate";
 
 /**
  * Đăng ký hội viên mới: hộp đơn chờ (nguồn thật sẽ là form Gia nhập trên
@@ -26,7 +27,11 @@ import { StatusChip, PageHeader, ICON_BTN } from "@/compenents/admin/ui";
  * mô phỏng bằng toast cho tới khi có máy chủ gửi mail.
  */
 export const Route = createFileRoute("/admin/dang-ky")({
-  component: AdminApplications,
+  component: () => (
+    <RequireSection section="applications">
+      <AdminApplications />
+    </RequireSection>
+  ),
 });
 
 type Tab = "pending" | "approved" | "rejected" | "all";

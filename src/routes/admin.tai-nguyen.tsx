@@ -27,12 +27,17 @@ import {
   ICON_BTN,
   TH,
 } from "@/compenents/admin/ui";
+import { RequireSection } from "@/compenents/admin/SectionGate";
 
 /** Ấn phẩm & Tài nguyên: kho văn bản (thông tư, nghị định, biểu mẫu, ấn
  *  phẩm DTA) admin tự đăng — nguồn cho chuyên mục "Tài nguyên – Chính sách
  *  mới" và nút PDF trong bài viết. */
 export const Route = createFileRoute("/admin/tai-nguyen")({
-  component: AdminResources,
+  component: () => (
+    <RequireSection section="resources">
+      <AdminResources />
+    </RequireSection>
+  ),
 });
 
 const categoryLabel = (c: ResourceDoc["category"]) =>

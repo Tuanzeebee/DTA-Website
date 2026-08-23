@@ -4,12 +4,17 @@ import { ChevronLeft } from "lucide-react";
 import { allArticles } from "@/newsData";
 import { saveArticle } from "@/compenents/admin/adminStore";
 import { ArticleEditor } from "@/compenents/admin/ArticleEditor";
+import { RequireSection } from "@/compenents/admin/SectionGate";
 
 /** Editor page — $id is an article id, or "moi" for a fresh article. */
 export const Route = createFileRoute("/admin/bai-viet/$id")({
   // Read the article at render time (not a loader cache): edits from this
   // very session must be visible when the editor re-opens.
-  component: AdminArticleEditorPage,
+  component: () => (
+    <RequireSection section="articles">
+      <AdminArticleEditorPage />
+    </RequireSection>
+  ),
 });
 
 function AdminArticleEditorPage() {

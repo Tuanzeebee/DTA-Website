@@ -1,4 +1,4 @@
-import { useCallback, useSyncExternalStore } from "react";
+import { useSyncExternalStore } from "react";
 import {
   allArticles,
   portalArticles,
@@ -97,57 +97,4 @@ const subscribe = (cb: () => void) => {
  *  raw-string-memoised, so the snapshot is referentially stable. */
 export function useAdminArticles() {
   return useSyncExternalStore(subscribe, allArticles, allArticles);
-}
-
-/* ---------------- demo session gate ---------------- */
-
-const AUTH_KEY = "dta-admin-auth";
-const AUTH_EVENT = "dta-admin-auth-changed";
-/** Mock credential until a real backend exists. */
-export const DEMO_PASSWORD = "admin";
-
-const authSubscribe = (cb: () => void) => {
-  window.addEventListener(AUTH_EVENT, cb);
-  return () => window.removeEventListener(AUTH_EVENT, cb);
-};
-const authSnapshot = () => {
-  try {
-    return sessionStorage.getItem(AUTH_KEY) === "1";
-  } catch {
-    return false;
-  }
-};
-
-/** Non-hook login so code outside the admin tree (the portal sign-in
- *  shortcut) can open the admin session without rendering AdminShell first. */
-export function adminLogin(password: string): boolean {
-  if (password !== DEMO_PASSWORD) return false;
-  try {
-    sessionStorage.setItem(AUTH_KEY, "1");
-  } catch {
-    /* session-only fallback: still signal success */
-  }
-  window.dispatchEvent(new Event(AUTH_EVENT));
-  return true;
-}
-
-export function useAdminAuth() {
-  const isAuthed = useSyncExternalStore(
-    authSubscribe,
-    authSnapshot,
-    () => false,
-  );
-
-  const login = useCallback((password: string) => adminLogin(password), []);
-
-  const logout = useCallback(() => {
-    try {
-      sessionStorage.removeItem(AUTH_KEY);
-    } catch {
-      /* nothing to clear */
-    }
-    window.dispatchEvent(new Event(AUTH_EVENT));
-  }, []);
-
-  return { isAuthed, login, logout };
 }

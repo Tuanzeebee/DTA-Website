@@ -28,11 +28,16 @@ import {
   ICON_BTN,
   TH,
 } from "@/compenents/admin/ui";
+import { RequireSection } from "@/compenents/admin/SectionGate";
 
 /** Hội phí & Tài chính: thu/chờ thu/miễn per member-year, mark-paid flow,
  *  reminder mail (simulated until the backend exists). */
 export const Route = createFileRoute("/admin/hoi-phi")({
-  component: AdminFees,
+  component: () => (
+    <RequireSection section="fees">
+      <AdminFees />
+    </RequireSection>
+  ),
 });
 
 const vnd = (n: number) => `${n.toLocaleString("vi-VN")} ₫`;

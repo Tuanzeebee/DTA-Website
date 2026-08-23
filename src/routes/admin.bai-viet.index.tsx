@@ -1,10 +1,15 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { PlusCircle } from "lucide-react";
 import { ArticleTable } from "@/compenents/admin/ArticleTable";
+import { RequireSection } from "@/compenents/admin/SectionGate";
 
 /** Article management list. */
 export const Route = createFileRoute("/admin/bai-viet/")({
-  component: AdminArticles,
+  component: () => (
+    <RequireSection section="articles">
+      <AdminArticles />
+    </RequireSection>
+  ),
 });
 
 function AdminArticles() {

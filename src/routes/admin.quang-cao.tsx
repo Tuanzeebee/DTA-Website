@@ -22,12 +22,17 @@ import {
   ICON_BTN,
   TH,
 } from "@/compenents/admin/ui";
+import { RequireSection } from "@/compenents/admin/SectionGate";
 
 /** Quảng cáo & Banner: quản lý các ô quảng cáo trên trang tin — banner lớn
  *  đầu trang, hai ô quảng cáo/tài trợ cạnh banner và các banner cột phải.
  *  Ảnh đẩy lên từ máy (đã nén) hoặc dán URL; mỗi quảng cáo gắn một link đích. */
 export const Route = createFileRoute("/admin/quang-cao")({
-  component: AdminAds,
+  component: () => (
+    <RequireSection section="ads">
+      <AdminAds />
+    </RequireSection>
+  ),
 });
 
 function AdminAds() {

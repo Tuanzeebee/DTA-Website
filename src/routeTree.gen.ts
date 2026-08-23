@@ -11,12 +11,14 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminRouteImport } from './routes/admin'
+import { Route as DangNhapRouteImport } from './routes/dang-nhap'
 import { Route as NewsRouteImport } from './routes/news'
 import { Route as PortalRouteImport } from './routes/portal'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AdminDangKyRouteImport } from './routes/admin.dang-ky'
 import { Route as AdminHoiPhiRouteImport } from './routes/admin.hoi-phi'
 import { Route as AdminHoiVienRouteImport } from './routes/admin.hoi-vien'
+import { Route as AdminNguoiDungRouteImport } from './routes/admin.nguoi-dung'
 import { Route as AdminPhanBienRouteImport } from './routes/admin.phan-bien'
 import { Route as AdminQuangCaoRouteImport } from './routes/admin.quang-cao'
 import { Route as AdminTaiNguyenRouteImport } from './routes/admin.tai-nguyen'
@@ -39,6 +41,11 @@ const IndexRoute = IndexRouteImport.update({
 const AdminRoute = AdminRouteImport.update({
   id: '/admin',
   path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DangNhapRoute = DangNhapRouteImport.update({
+  id: '/dang-nhap',
+  path: '/dang-nhap',
   getParentRoute: () => rootRouteImport,
 } as any)
 const NewsRoute = NewsRouteImport.update({
@@ -69,6 +76,11 @@ const AdminHoiPhiRoute = AdminHoiPhiRouteImport.update({
 const AdminHoiVienRoute = AdminHoiVienRouteImport.update({
   id: '/hoi-vien',
   path: '/hoi-vien',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminNguoiDungRoute = AdminNguoiDungRouteImport.update({
+  id: '/nguoi-dung',
+  path: '/nguoi-dung',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminPhanBienRoute = AdminPhanBienRouteImport.update({
@@ -140,11 +152,13 @@ const NewsArticleIdRoute = NewsArticleIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
+  '/dang-nhap': typeof DangNhapRoute
   '/news': typeof NewsRouteWithChildren
   '/portal': typeof PortalRouteWithChildren
   '/admin/dang-ky': typeof AdminDangKyRoute
   '/admin/hoi-phi': typeof AdminHoiPhiRoute
   '/admin/hoi-vien': typeof AdminHoiVienRoute
+  '/admin/nguoi-dung': typeof AdminNguoiDungRoute
   '/admin/phan-bien': typeof AdminPhanBienRoute
   '/admin/quang-cao': typeof AdminQuangCaoRoute
   '/admin/tai-nguyen': typeof AdminTaiNguyenRoute
@@ -162,9 +176,11 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/dang-nhap': typeof DangNhapRoute
   '/admin/dang-ky': typeof AdminDangKyRoute
   '/admin/hoi-phi': typeof AdminHoiPhiRoute
   '/admin/hoi-vien': typeof AdminHoiVienRoute
+  '/admin/nguoi-dung': typeof AdminNguoiDungRoute
   '/admin/phan-bien': typeof AdminPhanBienRoute
   '/admin/quang-cao': typeof AdminQuangCaoRoute
   '/admin/tai-nguyen': typeof AdminTaiNguyenRoute
@@ -184,11 +200,13 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
+  '/dang-nhap': typeof DangNhapRoute
   '/news': typeof NewsRouteWithChildren
   '/portal': typeof PortalRouteWithChildren
   '/admin/dang-ky': typeof AdminDangKyRoute
   '/admin/hoi-phi': typeof AdminHoiPhiRoute
   '/admin/hoi-vien': typeof AdminHoiVienRoute
+  '/admin/nguoi-dung': typeof AdminNguoiDungRoute
   '/admin/phan-bien': typeof AdminPhanBienRoute
   '/admin/quang-cao': typeof AdminQuangCaoRoute
   '/admin/tai-nguyen': typeof AdminTaiNguyenRoute
@@ -209,11 +227,13 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/admin'
+    | '/dang-nhap'
     | '/news'
     | '/portal'
     | '/admin/dang-ky'
     | '/admin/hoi-phi'
     | '/admin/hoi-vien'
+    | '/admin/nguoi-dung'
     | '/admin/phan-bien'
     | '/admin/quang-cao'
     | '/admin/tai-nguyen'
@@ -231,9 +251,11 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/dang-nhap'
     | '/admin/dang-ky'
     | '/admin/hoi-phi'
     | '/admin/hoi-vien'
+    | '/admin/nguoi-dung'
     | '/admin/phan-bien'
     | '/admin/quang-cao'
     | '/admin/tai-nguyen'
@@ -252,11 +274,13 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/admin'
+    | '/dang-nhap'
     | '/news'
     | '/portal'
     | '/admin/dang-ky'
     | '/admin/hoi-phi'
     | '/admin/hoi-vien'
+    | '/admin/nguoi-dung'
     | '/admin/phan-bien'
     | '/admin/quang-cao'
     | '/admin/tai-nguyen'
@@ -276,6 +300,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRouteWithChildren
+  DangNhapRoute: typeof DangNhapRoute
   NewsRoute: typeof NewsRouteWithChildren
   PortalRoute: typeof PortalRouteWithChildren
 }
@@ -294,6 +319,13 @@ declare module '@tanstack/react-router' {
       path: '/admin'
       fullPath: '/admin'
       preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dang-nhap': {
+      id: '/dang-nhap'
+      path: '/dang-nhap'
+      fullPath: '/dang-nhap'
+      preLoaderRoute: typeof DangNhapRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/news': {
@@ -336,6 +368,13 @@ declare module '@tanstack/react-router' {
       path: '/hoi-vien'
       fullPath: '/admin/hoi-vien'
       preLoaderRoute: typeof AdminHoiVienRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/nguoi-dung': {
+      id: '/admin/nguoi-dung'
+      path: '/nguoi-dung'
+      fullPath: '/admin/nguoi-dung'
+      preLoaderRoute: typeof AdminNguoiDungRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/phan-bien': {
@@ -436,6 +475,7 @@ interface AdminRouteChildren {
   AdminDangKyRoute: typeof AdminDangKyRoute
   AdminHoiPhiRoute: typeof AdminHoiPhiRoute
   AdminHoiVienRoute: typeof AdminHoiVienRoute
+  AdminNguoiDungRoute: typeof AdminNguoiDungRoute
   AdminPhanBienRoute: typeof AdminPhanBienRoute
   AdminQuangCaoRoute: typeof AdminQuangCaoRoute
   AdminTaiNguyenRoute: typeof AdminTaiNguyenRoute
@@ -448,6 +488,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminDangKyRoute: AdminDangKyRoute,
   AdminHoiPhiRoute: AdminHoiPhiRoute,
   AdminHoiVienRoute: AdminHoiVienRoute,
+  AdminNguoiDungRoute: AdminNguoiDungRoute,
   AdminPhanBienRoute: AdminPhanBienRoute,
   AdminQuangCaoRoute: AdminQuangCaoRoute,
   AdminTaiNguyenRoute: AdminTaiNguyenRoute,
@@ -494,6 +535,7 @@ const PortalRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRouteWithChildren,
+  DangNhapRoute: DangNhapRoute,
   NewsRoute: NewsRouteWithChildren,
   PortalRoute: PortalRouteWithChildren,
 }

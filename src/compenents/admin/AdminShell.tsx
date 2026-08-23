@@ -1,47 +1,75 @@
-import { useState, type ReactNode } from "react";
-import { Link, useRouterState } from "@tanstack/react-router";
+import { useCallback, type ReactNode } from "react";
+import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
+import { toast } from "sonner";
 import {
   LayoutDashboard,
   FileText,
   Users,
   Newspaper,
   LogOut,
-  ShieldCheck,
   ExternalLink,
   Wallet,
   BookOpen,
   MessagesSquare,
   Inbox,
   Megaphone,
+  UserCog,
 } from "lucide-react";
-import { useAdminAuth, DEMO_PASSWORD } from "@/compenents/admin/adminStore";
 import { forumStore, applicationStore } from "@/compenents/admin/opsData";
+import { useAuthSession, useLogout } from "@/lib/auth/useAuth";
+import {
+  ROLE_LABEL,
+  canAccess,
+  type AdminSection,
+} from "@/lib/auth/permissions";
 
 /**
- * Chrome for every /admin page: session gate + sidebar + topbar. Deliberately
- * plainer than the public site — flat dark surface, no aurora — so editors
- * always know which side they're on.
+ * Chrome for every /admin page: sidebar + topbar, shaped by the signed-in
+ * user's role (see lib/auth/permissions). Deliberately plainer than the
+ * public site — flat dark surface, no aurora — so editors always know which
+ * side they're on. Authentication itself is enforced by the route guard;
+ * this shell assumes a session exists.
  */
 export function AdminShell({ children }: { children: ReactNode }) {
-  const { isAuthed, login, logout } = useAdminAuth();
+  const session = useAuthSession();
+  const logout = useLogout();
+  const navigate = useNavigate();
 
-  if (!isAuthed) return <LoginCard onLogin={login} />;
+  /* Signing out must also LEAVE the admin area: the route guard only runs
+     on navigation, so clearing the session alone would leave the current
+     page mounted (rendering its Forbidden gate). Off to /portal instead. */
+  const handleLogout = useCallback(() => {
+    logout();
+    toast.success("Đã đăng xuất khỏi hệ thống.");
+    navigate({ to: "/portal" });
+  }, [logout, navigate]);
 
   return (
     <div className="min-h-dvh bg-[oklch(0.12_0.03_160)] text-white flex">
-      <Sidebar onLogout={logout} />
+      <Sidebar />
       <div className="flex-1 min-w-0 flex flex-col">
-        <header className="h-14 shrink-0 border-b border-white/10 bg-white/[0.02] flex items-center justify-between px-4 md:px-6">
+        <header className="h-14 shrink-0 border-b border-white/10 bg-white/[0.02] flex items-center justify-between gap-3 px-4 md:px-6">
           <span className="text-sm font-bold text-white/80">
             Trang quản trị DTA News
           </span>
-          <Link
-            to="/news"
-            className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wide text-accent hover:text-cyan-300 transition-colors"
-          >
-            <ExternalLink className="w-3.5 h-3.5" />
-            Xem trang tin
-          </Link>
+          <div className="flex items-center gap-2 md:gap-4">
+            <Link
+              to="/news"
+              className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wide text-accent hover:text-cyan-300 transition-colors"
+            >
+              <ExternalLink className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Xem trang tin</span>
+            </Link>
+            {session && <UserChip name={session.name} role={session.role} />}
+            <button
+              onClick={handleLogout}
+              title="Đăng xuất"
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-white/10 text-[11px] font-bold text-white/50 hover:text-red-300 hover:border-red-400/30 transition-colors cursor-pointer"
+            >
+              <LogOut className="w-3.5 h-3.5" />
+              <span className="hidden md:inline">Đăng xuất</span>
+            </button>
+          </div>
         </header>
         <main className="flex-1 overflow-y-auto p-4 md:p-8">{children}</main>
       </div>
@@ -49,44 +77,121 @@ export function AdminShell({ children }: { children: ReactNode }) {
   );
 }
 
-const NAV = [
-  { to: "/admin", label: "Tổng quan", icon: LayoutDashboard, exact: true },
-  { to: "/admin/bai-viet", label: "Bài viết", icon: FileText, exact: false },
+function UserChip({
+  name,
+  role,
+}: {
+  name: string;
+  role: keyof typeof ROLE_LABEL;
+}) {
+  const initials =
+    name
+      .split(/\s+/)
+      .slice(-2)
+      .map((w) => w[0])
+      .join("")
+      .toUpperCase() || "DTA";
+  return (
+    <div
+      className="flex items-center gap-2.5"
+      title={`${name} — ${ROLE_LABEL[role]}`}
+    >
+      <div className="hidden md:flex flex-col items-end leading-tight">
+        <span className="text-xs font-bold text-white/85 max-w-[160px] truncate">
+          {name}
+        </span>
+        <span className="text-[9px] font-black uppercase tracking-wider text-accent">
+          {ROLE_LABEL[role]}
+        </span>
+      </div>
+      <span className="w-8 h-8 rounded-full bg-white/10 border border-white/15 flex items-center justify-center text-[10px] font-black text-white/80 shrink-0">
+        {initials}
+      </span>
+    </div>
+  );
+}
+
+type NavItem = {
+  to: string;
+  section: AdminSection;
+  label: string;
+  icon: typeof LayoutDashboard;
+  exact: boolean;
+};
+
+const NAV: NavItem[] = [
+  {
+    to: "/admin",
+    section: "overview",
+    label: "Tổng quan",
+    icon: LayoutDashboard,
+    exact: true,
+  },
+  {
+    to: "/admin/bai-viet",
+    section: "articles",
+    label: "Bài viết",
+    icon: FileText,
+    exact: false,
+  },
   {
     to: "/admin/quang-cao",
+    section: "ads",
     label: "Thêm quảng cáo",
     icon: Megaphone,
     exact: false,
   },
-  { to: "/admin/hoi-vien", label: "Hội viên", icon: Users, exact: false },
+  {
+    to: "/admin/hoi-vien",
+    section: "members",
+    label: "Hội viên",
+    icon: Users,
+    exact: false,
+  },
   {
     to: "/admin/hoi-phi",
+    section: "fees",
     label: "Hội phí & Tài chính",
     icon: Wallet,
     exact: false,
   },
   {
     to: "/admin/tai-nguyen",
+    section: "resources",
     label: "Ấn phẩm & Tài nguyên",
     icon: BookOpen,
     exact: false,
   },
   {
     to: "/admin/phan-bien",
+    section: "forum",
     label: "Diễn đàn phản biện",
     icon: MessagesSquare,
     exact: false,
   },
   {
     to: "/admin/dang-ky",
+    section: "applications",
     label: "Đăng ký hội viên",
     icon: Inbox,
     exact: false,
   },
-] as const;
+  {
+    to: "/admin/nguoi-dung",
+    section: "users",
+    label: "Người dùng & Quyền",
+    icon: UserCog,
+    exact: false,
+  },
+];
 
-function Sidebar({ onLogout }: { onLogout: () => void }) {
+function Sidebar() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const session = useAuthSession();
+  const role = session?.role ?? "editor";
+
+  /* Only the sections this role may open appear in the nav at all. */
+  const items = NAV.filter((item) => canAccess(role, item.section));
 
   /* Notification badges: pending counts surface in the nav so the editor
      sees new submissions/applications without opening each page. */
@@ -111,7 +216,7 @@ function Sidebar({ onLogout }: { onLogout: () => void }) {
       </div>
 
       <nav className="flex-1 py-3 space-y-1 px-2">
-        {NAV.map((item) => {
+        {items.map((item) => {
           const active = item.exact
             ? pathname === item.to
             : pathname.startsWith(item.to);
@@ -145,74 +250,12 @@ function Sidebar({ onLogout }: { onLogout: () => void }) {
         })}
       </nav>
 
-      <button
-        onClick={onLogout}
-        className="m-2 flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] font-bold text-white/50 hover:text-red-300 hover:bg-white/5 transition-colors cursor-pointer"
-      >
-        <LogOut className="w-4 h-4 shrink-0" />
-        <span className="hidden lg:block">Đăng xuất</span>
-      </button>
+      {session && (
+        <p className="hidden lg:block px-4 pb-2 text-[9px] uppercase tracking-wider text-white/30 font-bold">
+          Đăng nhập với vai trò{" "}
+          <span className="text-accent">{ROLE_LABEL[session.role]}</span>
+        </p>
+      )}
     </aside>
-  );
-}
-
-function LoginCard({ onLogin }: { onLogin: (password: string) => boolean }) {
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState(false);
-
-  return (
-    <div className="min-h-dvh bg-[oklch(0.12_0.03_160)] text-white flex items-center justify-center p-6">
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          if (!onLogin(password)) setError(true);
-        }}
-        className="w-full max-w-sm rounded-2xl border border-white/10 bg-white/[0.03] p-8"
-      >
-        <div className="flex items-center gap-2.5 mb-1">
-          <ShieldCheck className="w-6 h-6 text-accent" />
-          <h1 className="text-lg font-black uppercase tracking-wide">
-            DTA Admin
-          </h1>
-        </div>
-        <p className="text-xs text-white/50 mb-6">
-          Khu vực dành cho Ban Biên tập. Phiên đăng nhập demo — tài khoản thật
-          sẽ nối vào backend sau.
-        </p>
-
-        <label className="block text-[10px] uppercase tracking-wider text-white/60 font-bold mb-1.5">
-          Mật khẩu
-        </label>
-        <input
-          type="password"
-          value={password}
-          onChange={(e) => {
-            setPassword(e.target.value);
-            setError(false);
-          }}
-          autoFocus
-          className="w-full px-3 py-2.5 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-cyan-400/60"
-        />
-        {error && (
-          <p className="mt-2 text-[11px] text-red-300">
-            Mật khẩu chưa đúng — bản demo dùng “{DEMO_PASSWORD}”.
-          </p>
-        )}
-
-        <button
-          type="submit"
-          className="mt-5 w-full py-2.5 rounded-xl text-sm font-bold text-primary-foreground hover:opacity-90 active:scale-98 transition-all cursor-pointer"
-          style={{
-            background: "var(--gradient-primary)",
-            boxShadow: "var(--shadow-glow)",
-          }}
-        >
-          Đăng nhập
-        </button>
-        <p className="mt-3 text-center text-[10px] text-white/35">
-          Demo: mật khẩu “{DEMO_PASSWORD}”
-        </p>
-      </form>
-    </div>
   );
 }

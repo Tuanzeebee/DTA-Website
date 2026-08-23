@@ -17,6 +17,7 @@ import {
   resetMembersToMockData,
 } from "@/compenents/admin/memberStore";
 import { MemberEditor } from "@/compenents/admin/MemberEditor";
+import { RequireSection } from "@/compenents/admin/SectionGate";
 
 /**
  * Member management: full CRUD over the localStorage overlay — changes are
@@ -25,7 +26,11 @@ import { MemberEditor } from "@/compenents/admin/MemberEditor";
  * (member accounts + editorial approval) still needs the real backend.
  */
 export const Route = createFileRoute("/admin/hoi-vien")({
-  component: AdminMembers,
+  component: () => (
+    <RequireSection section="members">
+      <AdminMembers />
+    </RequireSection>
+  ),
 });
 
 const TYPE_LABEL: Record<DtaMember["type"], string> = {

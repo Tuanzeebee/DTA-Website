@@ -14,8 +14,9 @@ import {
   Handshake,
 } from "lucide-react";
 import { useLang, useSession } from "@/hooks/useLang";
-import { adminLogin } from "@/compenents/admin/adminStore";
 import { LoginCard } from "@/compenents/member/LoginCard";
+import type { AdminUser } from "@/lib/auth/types";
+import { ROLE_LABEL } from "@/lib/auth/permissions";
 import { MemberCard } from "@/compenents/member/MemberCard";
 import {
   ProfilePanel,
@@ -37,16 +38,15 @@ function PortalIndex() {
   const { isLoggedIn, handleLogin } = useSession(lang);
   const navigate = useNavigate();
 
-  /* admin@gmail.com/admin at the member sign-in: open the admin demo session
-     first so AdminShell doesn't ask for the password again, then land on
-     /admin. The member session flag stays untouched — this is a different
-     workspace. */
-  const handleAdminLogin = () => {
-    adminLogin("admin");
+  /* Directory credentials on the member sign-in: the service has already
+     opened the admin session by the time this fires (see LoginCard) — here
+     we only announce the role and land in /admin. The member session flag
+     stays untouched — this is a different workspace. */
+  const handleAdminLogin = (user: AdminUser) => {
     toast.success(
       lang === "vn"
-        ? "Đăng nhập quản trị thành công!"
-        : "Signed in as administrator!",
+        ? `Đăng nhập quản trị thành công — ${ROLE_LABEL[user.role]}.`
+        : `Signed in as ${ROLE_LABEL[user.role]}!`,
     );
     navigate({ to: "/admin" });
   };
@@ -156,12 +156,17 @@ function Lobby({
     <div className="max-w-6xl mx-auto grid lg:grid-cols-[1.15fr_1fr] gap-10 lg:gap-14 items-center relative">
       {/* Ambient bronze drum behind the pitch — the association's emblem,
           kept faint so the form stays the loudest thing on the right.
+          Anchored so the WHOLE disc stays inside main's box: the bottom edge
+          rides main's pb-20 zone and the left edge hides in the viewport
+          gutter, so the full circle shows with zero page-height growth (and
+          therefore a single scrollbar — PageShell's overflow-x-clip quietly
+          absorbs whatever still pokes out on narrower lg screens).
           NB: the disc root carries `relative`, so the absolute positioning
           must live on this wrapper — passing it down would clash in the
           cascade and the disc would join the grid as a static item. */}
       <div
         aria-hidden
-        className="hidden lg:block absolute -left-44 -bottom-56 w-[440px] h-[440px] opacity-30 pointer-events-none select-none"
+        className="hidden lg:block absolute -left-32 -bottom-20 w-[440px] h-[440px] opacity-30 pointer-events-none select-none"
       >
         <TrongDongDisc className="w-full h-full" />
       </div>
