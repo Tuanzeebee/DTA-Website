@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="224" viewBox="0 0 1600 224">
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="400" viewBox="0 0 1600 400">
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="0.4">
       <stop offset="0" stop-color="#0B1A15"/>
@@ -22,13 +22,13 @@
     </pattern>
   </defs>
 
-  <rect width="1600" height="224" fill="url(#bg)"/>
-  <rect width="1600" height="224" fill="url(#grid)"/>
+  <rect width="1600" height="400" fill="url(#bg)"/>
+  <rect width="1600" height="400" fill="url(#grid)"/>
   <ellipse cx="1330" cy="40" rx="420" ry="220" fill="url(#glow)"/>
   <ellipse cx="180" cy="230" rx="380" ry="180" fill="url(#glow)" opacity="0.6"/>
 
   <!-- Trống-đồng style emblem -->
-  <g transform="translate(112,112)" fill="none" stroke="url(#gold)">
+  <g transform="translate(112,200)" fill="none" stroke="url(#gold)">
     <circle r="74" stroke-width="2.5"/>
     <circle r="60" stroke-width="1" opacity="0.55"/>
     <circle r="26" stroke-width="1.5" opacity="0.8"/>
@@ -40,12 +40,12 @@
   </g>
 
   <!-- Headline -->
-  <text x="230" y="86" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="bold" letter-spacing="6" fill="#F0C96B">HIỆP HỘI CÔNG NGHỆ SỐ ĐÀ NẴNG</text>
-  <text x="228" y="152" font-family="Arial, Helvetica, sans-serif" font-size="62" font-weight="bold" letter-spacing="2" fill="#F4F9F6">CHUYỂN ĐỔI SỐ <tspan fill="url(#gold)">ĐÀ NẴNG 2026</tspan></text>
-  <text x="230" y="192" font-family="Arial, Helvetica, sans-serif" font-size="22" letter-spacing="1" fill="#B9CDC2">Đồng hành cùng doanh nghiệp trên hành trình số hóa toàn diện</text>
+  <text x="230" y="130" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="bold" letter-spacing="6" fill="#F0C96B">HIỆP HỘI CÔNG NGHỆ SỐ ĐÀ NẴNG</text>
+  <text x="228" y="220" font-family="Arial, Helvetica, sans-serif" font-size="62" font-weight="bold" letter-spacing="2" fill="#F4F9F6">CHUYỂN ĐỔI SỐ <tspan fill="url(#gold)">ĐÀ NẴNG 2026</tspan></text>
+  <text x="230" y="280" font-family="Arial, Helvetica, sans-serif" font-size="22" letter-spacing="1" fill="#B9CDC2">Đồng hành cùng doanh nghiệp trên hành trình số hóa toàn diện</text>
 
   <!-- CTA pill -->
-  <g transform="translate(1270,88)">
+  <g transform="translate(1270,130)">
     <rect width="250" height="52" rx="26" fill="url(#moss)"/>
     <text x="125" y="34" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="20" font-weight="bold" letter-spacing="2" fill="#0B1A15">TÌM HIỂU THÊM</text>
   </g>

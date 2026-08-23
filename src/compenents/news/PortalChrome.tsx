@@ -1,12 +1,17 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import {
   ChevronDown,
+  ChevronLeft,
+  ChevronRight,
   Newspaper,
   Search,
   Bookmark,
   LayoutGrid,
 } from "lucide-react";
+import useEmblaCarousel, {
+  type UseEmblaCarouselType,
+} from "embla-carousel-react";
 import { mainTopics, topicName, topicShort, categoryName } from "@/newsData";
 import { useLang } from "@/hooks/useLang";
 import {
@@ -15,6 +20,8 @@ import {
   type AdPlacement,
 } from "@/compenents/admin/opsData";
 import type { Lang } from "@/types";
+
+type EmblaApi = NonNullable<UseEmblaCarouselType[1]>;
 
 /**
  * Portal chrome that lives UNDER the shared site header (layout/Nav):
@@ -271,37 +278,44 @@ function MenuSearchForm() {
  *  propaganda/campaign banner on the left (carries paid placement when no
  *  campaign runs), and to its right two stacked slots — "quảng cáo" and
  *  "tài trợ" — separated by breathing room ("khoảng cách vừa đủ").
- *  Each slot shows the first ACTIVE ad of its kind from /admin/quang-cao;
- *  a dashed placeholder holds the slot when nothing is booked. */
+ *  The main banner becomes a carousel when multiple active ads exist.
+ *  Each slot shows ACTIVE ads from /admin/quang-cao; a dashed placeholder
+ *  holds the slot when nothing is booked. */
 export function PortalBanner() {
   const { lang } = useLang();
   const ads = adStore.useItems();
+  const bannerAds = activeAdsForSlot(ads, "banner");
+  const adAds = activeAdsForSlot(ads, "ad");
+  const sponsorAds = activeAdsForSlot(ads, "sponsor");
+
   return (
     <div className="max-w-7xl mx-auto px-4 md:px-6 mt-6">
       <div className="grid md:grid-cols-3 gap-3 md:gap-4">
-        <BannerSlot
-          ad={activeAdsForSlot(ads, "banner")[0]}
+        {/* Main banner — carousel if multiple, otherwise single image */}
+        <BannerCarousel
+          ads={bannerAds}
           lang={lang}
-          className="md:col-span-2 h-20 md:h-28 text-xs"
+          className="md:col-span-2 h-44 sm:h-56 md:h-72"
           placeholder={
             lang === "vn"
               ? "Banner tuyên truyền / cổ động"
               : "Campaign / promotional banner"
           }
         />
-        <div className="grid grid-cols-2 md:grid-cols-1 gap-3 md:gap-4">
+        {/* Right column: ad + sponsor slots — full width on mobile, stacked on md+ */}
+        <div className="grid gap-3 md:gap-4">
           <BannerSlot
-            ad={activeAdsForSlot(ads, "ad")[0]}
+            ads={adAds}
             lang={lang}
-            className="h-14 md:h-12 text-[10px]"
+            className="h-28 md:h-[8.5rem]"
             placeholder={
               lang === "vn" ? "Dành cho quảng cáo" : "Advertising slot"
             }
           />
           <BannerSlot
-            ad={activeAdsForSlot(ads, "sponsor")[0]}
+            ads={sponsorAds}
             lang={lang}
-            className="h-14 md:h-12 text-[10px]"
+            className="h-28 md:h-[8.5rem]"
             placeholder={
               lang === "vn" ? "Dành cho tài trợ" : "Sponsorship slot"
             }
@@ -312,21 +326,68 @@ export function PortalBanner() {
   );
 }
 
-/** One banner-zone cell: the booked ad as a full-bleed linked image, or the
- *  dashed "slot available" placeholder. Paid placements are marked with a
- *  tiny "Quảng cáo" tag, as required of licensed e-information pages. */
-function BannerSlot({
-  ad,
+/** Carousel for the main banner slot — cycles through all active "banner" ads.
+ *  Auto-plays every 5s, pauses on hover, supports swipe on mobile.
+ *  Falls back to single image (or placeholder) when 0/1 ad. */
+function BannerCarousel({
+  ads,
   lang,
   className,
   placeholder,
 }: {
-  ad?: AdPlacement;
+  ads: AdPlacement[];
   lang: Lang;
   className: string;
   placeholder: string;
 }) {
-  if (!ad) {
+  const [index, setIndex] = useState(0);
+  const [api, setApi] = useState<EmblaApi | null>(null);
+  const hovering = useRef(false);
+
+  // Initialize Embla carousel at top level (Rules of Hooks)
+  const [emblaCarouselRef, emblaCarouselApi] = useEmblaCarousel(
+    { loop: true, align: "center", slidesToScroll: 1 },
+    undefined,
+  );
+
+  // Store API in state for use in effects
+  useEffect(() => {
+    if (!emblaCarouselApi) return;
+    setApi(emblaCarouselApi);
+    return () => {
+      emblaCarouselApi.destroy();
+      setApi(null);
+    };
+  }, [emblaCarouselApi]);
+
+  // Auto-play
+  useEffect(() => {
+    if (!api || ads.length < 2) return;
+    const id = setInterval(() => {
+      if (!hovering.current) {
+        const next = (index + 1) % ads.length;
+        api.scrollTo(next);
+      }
+    }, 5000);
+    return () => clearInterval(id);
+  }, [api, ads.length, index]);
+
+  // Sync index from Embla
+  const onSelect = useCallback((embla: EmblaApi) => {
+    if (embla) setIndex(embla.selectedScrollSnap());
+  }, []);
+
+  useEffect(() => {
+    if (!api) return;
+    api.on("select", onSelect);
+    onSelect(api);
+    return () => {
+      api.off("select", onSelect);
+    };
+  }, [api, onSelect]);
+
+  // Placeholder when no ads
+  if (ads.length === 0) {
     return (
       <div
         className={`rounded-2xl border border-dashed border-white/15 bg-white/[0.03] flex items-center justify-center text-white/40 uppercase tracking-[0.2em] ${className}`}
@@ -335,6 +396,136 @@ function BannerSlot({
       </div>
     );
   }
+
+  // Single ad — no carousel needed
+  if (ads.length === 1) {
+    const ad = ads[0];
+    return (
+      <a
+        href={ad.linkUrl}
+        target="_blank"
+        rel="noopener sponsored"
+        title={ad.title}
+        className={`group relative block rounded-2xl overflow-hidden border border-white/10 ${className}`}
+      >
+        <img
+          src={ad.imageUrl}
+          alt={ad.title}
+          loading="lazy"
+          className="w-full h-full object-cover"
+        />
+        <span className="absolute top-1.5 right-2 text-[8px] font-bold uppercase tracking-[0.2em] text-white/55 bg-black/35 rounded px-1 py-px">
+          {lang === "vn" ? "Quảng cáo" : "Ad"}
+        </span>
+      </a>
+    );
+  }
+
+  // Multiple ads — render carousel
+  return (
+    <div
+      className={`group relative rounded-2xl overflow-hidden border border-white/10 ${className}`}
+      onMouseEnter={() => {
+        hovering.current = true;
+      }}
+      onMouseLeave={() => {
+        hovering.current = false;
+      }}
+    >
+      <div ref={emblaCarouselRef} className="h-full overflow-hidden">
+        <div className="flex h-full">
+          {ads.map((ad) => (
+            <div key={ad.id} className="min-w-0 flex-[0_0_100%] h-full">
+              <a
+                href={ad.linkUrl}
+                target="_blank"
+                rel="noopener sponsored"
+                title={ad.title}
+                className="block h-full"
+              >
+                <img
+                  src={ad.imageUrl}
+                  alt={ad.title}
+                  loading="lazy"
+                  className="w-full h-full object-cover"
+                />
+              </a>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* "Quảng cáo" badge */}
+      <span className="absolute top-1.5 right-2 text-[8px] font-bold uppercase tracking-[0.2em] text-white/55 bg-black/35 rounded px-1 py-px z-10">
+        {lang === "vn" ? "Quảng cáo" : "Ad"}
+      </span>
+
+      {/* Previous/Next arrows — show on hover (desktop) */}
+      {ads.length > 1 && api && (
+        <>
+          <button
+            onClick={() => api.scrollPrev()}
+            disabled={!api.canScrollPrev()}
+            className="absolute left-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity h-10 w-10 rounded-full bg-black/40 text-white flex items-center justify-center hover:bg-black/60 z-10"
+            aria-label="Banner trước"
+          >
+            <ChevronLeft className="w-5 h-5" />
+          </button>
+          <button
+            onClick={() => api.scrollNext()}
+            disabled={!api.canScrollNext()}
+            className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity h-10 w-10 rounded-full bg-black/40 text-white flex items-center justify-center hover:bg-black/60 z-10"
+            aria-label="Banner sau"
+          >
+            <ChevronRight className="w-5 h-5" />
+          </button>
+        </>
+      )}
+
+      {/* Dots indicator */}
+      {ads.length > 1 && (
+        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1.5 z-10">
+          {ads.map((_, i) => (
+            <button
+              key={i}
+              onClick={() => api?.scrollTo(i)}
+              className={`w-2 h-2 rounded-full transition-colors ${
+                i === index ? "bg-white w-6" : "bg-white/40 hover:bg-white/60"
+              }`}
+              aria-label={`Chuyển đến banner ${i + 1}`}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/** Single-slot banner (ad/sponsor) — shows first active ad or placeholder.
+ *  If multiple ads exist for this slot, shows the first one (can be extended
+ *  to carousel later if needed). */
+function BannerSlot({
+  ads,
+  lang,
+  className,
+  placeholder,
+}: {
+  ads: AdPlacement[];
+  lang: Lang;
+  className: string;
+  placeholder: string;
+}) {
+  if (ads.length === 0) {
+    return (
+      <div
+        className={`rounded-2xl border border-dashed border-white/15 bg-white/[0.03] flex items-center justify-center text-white/40 uppercase tracking-[0.2em] ${className}`}
+      >
+        {placeholder}
+      </div>
+    );
+  }
+
+  const ad = ads[0];
   return (
     <a
       href={ad.linkUrl}
@@ -349,7 +540,7 @@ function BannerSlot({
         loading="lazy"
         className="w-full h-full object-cover"
       />
-      <span className="absolute top-1 right-1.5 text-[8px] font-bold uppercase tracking-[0.2em] text-white/55 bg-black/35 rounded px-1 py-px">
+      <span className="absolute top-1.5 right-2 text-[8px] font-bold uppercase tracking-[0.2em] text-white/55 bg-black/35 rounded px-1 py-px">
         {lang === "vn" ? "Quảng cáo" : "Ad"}
       </span>
     </a>

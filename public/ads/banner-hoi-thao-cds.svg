@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="400" viewBox="0 0 1600 400">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="0.4">
+      <stop offset="0" stop-color="#1A1A2E"/>
+      <stop offset="0.55" stop-color="#2D1B4E"/>
+      <stop offset="1" stop-color="#4A1B6E"/>
+    </linearGradient>
+    <linearGradient id="violet" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#D4A5FF"/>
+      <stop offset="1" stop-color="#A855F7"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#F0C96B"/>
+      <stop offset="1" stop-color="#C99436"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#A855F7" stop-opacity="0.35"/>
+      <stop offset="1" stop-color="#A855F7" stop-opacity="0"/>
+    </radialGradient>
+    <pattern id="dots" width="24" height="24" patternUnits="userSpaceOnUse">
+      <circle cx="12" cy="12" r="1.5" fill="#A855F7" opacity="0.15"/>
+    </pattern>
+  </defs>
+
+  <rect width="1600" height="400" fill="url(#bg)"/>
+  <rect width="1600" height="400" fill="url(#dots)"/>
+  <ellipse cx="1350" cy="80" rx="400" ry="200" fill="url(#glow)"/>
+  <ellipse cx="250" cy="320" rx="350" ry="180" fill="url(#glow)" opacity="0.5"/>
+
+  <!-- Icon -->
+  <g transform="translate(120,200)">
+    <circle r="64" fill="none" stroke="url(#violet)" stroke-width="3"/>
+    <circle r="48" fill="none" stroke="url(#violet)" stroke-width="1.5" opacity="0.6"/>
+    <g stroke="url(#violet)" stroke-width="2.5" stroke-linecap="round">
+      <path d="M-28 0 0-28 28 0M0-28V28M-28 0H28"/>
+      <path d="M0 0L18 0M0 0L-18 0M0 0L0-18M0 0L0 18" stroke-width="2" opacity="0.7"/>
+    </g>
+    <circle r="10" fill="url(#violet)"/>
+  </g>
+
+  <!-- Headline -->
+  <text x="240" y="140" font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="bold" letter-spacing="6" fill="#D4A5FF">HỘI THẢO CHUYỂN ĐỔI SỐ</text>
+  <text x="238" y="230" font-family="Arial, Helvetica, sans-serif" font-size="58" font-weight="bold" letter-spacing="1" fill="#F4F9F6">CHO DOANH NGHIỆP <tspan fill="url(#gold)">VIỆT NAM</tspan></text>
+  <text x="240" y="285" font-family="Arial, Helvetica, sans-serif" font-size="22" letter-spacing="1" fill="#C4B5D6">Chia sẻ thực tiễn · Hành trình số hóa · Cơ hội hợp tác</text>
+
+  <!-- Date badge -->
+  <g transform="translate(240,320)">
+    <rect width="320" height="42" rx="21" fill="url(#violet)" opacity="0.25" stroke="url(#violet)" stroke-width="1.5"/>
+    <text x="160" y="28" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="bold" fill="#D4A5FF">Thứ 5, 20/08/2026  ·  08:30 - 12:00  ·  Trực tuyến & Tại chỗ</text>
+  </g>
+
+  <!-- CTA pill -->
+  <g transform="translate(1270,140)">
+    <rect width="270" height="56" rx="28" fill="url(#violet)"/>
+    <text x="135" y="36" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="bold" letter-spacing="2" fill="#1A1A2E">ĐĂNG KÝ MIỄN PHÍ</text>
+  </g>
+</svg>
