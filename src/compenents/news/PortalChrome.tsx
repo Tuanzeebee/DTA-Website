@@ -49,6 +49,7 @@ function useClock(lang: Lang) {
 export function PortalMenuBar() {
   const { lang } = useLang();
   const clock = useClock(lang);
+  const navRef = useRef<HTMLElement>(null);
 
   /* State-driven dropdown instead of pure CSS hover/focus-within: navigation
      here is client-side (no page reload), so a clicked link KEEPS focus and a
@@ -60,10 +61,40 @@ export function PortalMenuBar() {
      into one "Chuyên mục" button that drops a grouped panel instead. */
   const [mobileOpen, setMobileOpen] = useState(false);
 
+  /* The shared header (layout/Nav) shrinks from h-16 to lg:h-12 while
+     scrolling. Duplicating that state here with a second useScrolled() and a
+     matching top-16/top-12 swap left a visible gap whenever the two animated
+     values drifted (different flip timing, breakpoint edges, stale builds).
+     Instead, measure the header's REAL height with a ResizeObserver: the
+     sticky offset is set to offsetHeight every frame the header changes size,
+     so the bar stays glued to its bottom edge through the whole shrink
+     animation — no state to desync. The top-16 class below is only the
+     pre-hydration fallback. */
+  useEffect(() => {
+    const bar = navRef.current;
+    const header = document.querySelector<HTMLElement>("header.fixed");
+    if (!bar || !header) return;
+
+    const dock = () => {
+      bar.style.top = `${header.offsetHeight}px`;
+    };
+    dock();
+    const ro = new ResizeObserver(dock);
+    ro.observe(header);
+    window.addEventListener("resize", dock);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("resize", dock);
+    };
+  }, []);
+
   return (
     /* top-16 = height of the fixed shared header, so the bar docks right
-       under it while scrolling. */
-    <nav className="sticky top-16 z-40 border-y border-white/10 bg-[oklch(0.14_0.03_160_/_0.88)] backdrop-blur-md">
+       under it while scrolling; the effect above keeps it exact. */
+    <nav
+      ref={navRef}
+      className="sticky top-16 z-40 border-y border-white/10 bg-[oklch(0.14_0.03_160_/_0.88)] backdrop-blur-md"
+    >
       <div className="max-w-7xl mx-auto px-4 md:px-6 flex items-center gap-1">
         <Link
           to="/news"
