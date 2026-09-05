@@ -11,14 +11,13 @@ import {
   KeyRound,
 } from "lucide-react";
 import type { Lang } from "@/types";
-import { authService, findUserByEmail } from "@/lib/auth/service";
+import { authService } from "@/lib/auth/service";
 import type { AdminUser } from "@/lib/auth/types";
 
 /**
  * Shared sign-in card: member portal by default, admin area when the
- * credentials match a directory account (see lib/auth). The admin branch
- * goes through AuthService so RBAC roles apply; anything else keeps the
- * legacy one-click member demo.
+ * credentials match a backend account. The admin branch goes through
+ * AuthService which calls POST /api/auth/login for real JWT tokens.
  */
 export function LoginCard({
   lang,
@@ -32,8 +31,9 @@ export function LoginCard({
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email.trim() || !password.trim()) {
       toast.error(
@@ -43,19 +43,13 @@ export function LoginCard({
       );
       return;
     }
-    /* Directory accounts authenticate through the RBAC service. Admin-area
-       roles open a session and land in /admin; "member" accounts belong to
-       the portal workspace and follow the normal member flow instead. A
-       known email with a wrong password gets its own error rather than
-       silently degrading to the legacy member demo. */
-    const knownUser = findUserByEmail(email);
-    if (knownUser) {
-      const result = authService.verify(email, password);
+    setLoading(true);
+    try {
+      const result = await authService.login(email.trim(), password.trim());
       if (result.ok) {
         if (result.user.role === "member") {
           onLogin();
         } else {
-          authService.openSessionFor(result.user);
           onAdminLogin?.(result.user);
         }
       } else if (result.reason === "disabled") {
@@ -64,22 +58,26 @@ export function LoginCard({
             ? "Tài khoản đã bị khóa — liên hệ Quản trị viên."
             : "This account is locked — contact an administrator.",
         );
-      } else {
+      } else if (result.reason === "wrong_password") {
         toast.error(
           lang === "vn" ? "Mật khẩu chưa đúng." : "That password isn't right.",
         );
+      } else if (result.reason === "network") {
+        toast.error(
+          lang === "vn"
+            ? "Không kết nối được server."
+            : "Cannot connect to server.",
+        );
+      } else {
+        toast.error(
+          lang === "vn"
+            ? "Đăng nhập thất bại."
+            : "Sign in failed.",
+        );
       }
-      return;
+    } finally {
+      setLoading(false);
     }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
-      toast.error(
-        lang === "vn"
-          ? "Địa chỉ email chưa đúng định dạng."
-          : "That email address doesn't look right.",
-      );
-      return;
-    }
-    onLogin();
   };
 
   const inputShell =
@@ -171,7 +169,8 @@ export function LoginCard({
 
         <button
           type="submit"
-          className="w-full h-11 rounded-xl font-bold text-sm text-primary-foreground hover:opacity-90 active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer"
+          disabled={loading}
+          className="w-full h-11 rounded-xl font-bold text-sm text-primary-foreground hover:opacity-90 active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
           style={{
             background: "var(--gradient-primary)",
             boxShadow: "var(--shadow-glow)",
@@ -179,7 +178,13 @@ export function LoginCard({
         >
           <LogIn className="w-4 h-4" />
           <span>
-            {lang === "vn" ? "Đăng nhập Văn phòng số" : "Sign in to Portal"}
+            {loading
+              ? lang === "vn"
+                ? "Đang đăng nhập…"
+                : "Signing in…"
+              : lang === "vn"
+                ? "Đăng nhập Văn phòng số"
+                : "Sign in to Portal"}
           </span>
         </button>
 

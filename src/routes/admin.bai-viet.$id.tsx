@@ -1,15 +1,12 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { ChevronLeft } from "lucide-react";
-import { allArticles } from "@/newsData";
-import { saveArticle } from "@/compenents/admin/adminStore";
+import { useAdminArticles, saveArticle } from "@/compenents/admin/adminStore";
 import { ArticleEditor } from "@/compenents/admin/ArticleEditor";
 import { RequireSection } from "@/compenents/admin/SectionGate";
 
 /** Editor page — $id is an article id, or "moi" for a fresh article. */
 export const Route = createFileRoute("/admin/bai-viet/$id")({
-  // Read the article at render time (not a loader cache): edits from this
-  // very session must be visible when the editor re-opens.
   component: () => (
     <RequireSection section="articles">
       <AdminArticleEditorPage />
@@ -20,14 +17,15 @@ export const Route = createFileRoute("/admin/bai-viet/$id")({
 function AdminArticleEditorPage() {
   const { id } = Route.useParams();
   const navigate = useNavigate();
+  const articles = useAdminArticles();
 
   const isNew = id === "moi";
-  const article = isNew ? undefined : allArticles().find((a) => a.id === id);
+  const article = isNew ? undefined : articles.find((a) => a.id === id);
 
   if (!isNew && !article) {
     return (
       <div className="max-w-3xl">
-        <p className="text-sm text-white/60">Không tìm thấy bài viết “{id}”.</p>
+        <p className="text-sm text-white/60">Không tìm thấy bài viết "{id}".</p>
         <Link
           to="/admin/bai-viet"
           className="inline-flex items-center gap-1.5 mt-4 text-[11px] font-bold uppercase text-accent hover:text-cyan-300 transition-colors"
@@ -58,14 +56,18 @@ function AdminArticleEditorPage() {
         // Remount when switching between articles so state resets cleanly.
         key={id}
         initial={article}
-        onSave={(next, publish) => {
-          saveArticle(next);
-          toast.success(
-            publish
-              ? "Đã xuất bản — bài viết đang hiển thị trên trang tin."
-              : "Đã lưu nháp.",
-          );
-          navigate({ to: "/admin/bai-viet" });
+        onSave={async (next, publish) => {
+          try {
+            await saveArticle(next);
+            toast.success(
+              publish
+                ? "Đã xuất bản — bài viết đang hiển thị trên trang tin."
+                : "Đã lưu nháp.",
+            );
+            navigate({ to: "/admin/bai-viet" });
+          } catch {
+            toast.error("Không thể lưu bài viết. Vui lòng thử lại.");
+          }
         }}
       />
     </div>

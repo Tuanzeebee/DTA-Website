@@ -9,18 +9,14 @@ import {
   StaggerItem,
 } from "@/compenents/ScrollReveal";
 import { SectionHeader } from "@/compenents/SectionHeader";
-import { dtaNews, dtaEvents } from "@/data";
+import { useTimelineData } from "@/hooks/useTimelineData";
 import type { Lang } from "@/types";
 import tinTucCutout from "@/assets/image-1566.webp";
 import leftGradientBg from "@/assets/left-gradient-start-background.webp";
 
-/** Landing-page teaser -> portal article mapping, by card position. */
-const teaserArticleIds: string[] = [];
-
-/** Same idea for the events column. */
-const eventArticleIds: string[] = [];
-
 export function TimelineSection({ lang }: { lang: Lang }) {
+  const { news, events, newsSlugs, eventSlugs, newsLoading, eventLoading } =
+    useTimelineData();
   return (
     <section
       id="news"
@@ -117,24 +113,27 @@ export function TimelineSection({ lang }: { lang: Lang }) {
             </ScrollReveal>
 
             <StaggerContainer className="space-y-4">
-              {dtaNews.slice(0, 3).map((news, idx) => (
-                <StaggerItem key={news.title.vn}>
+              {newsLoading ? (
+                <div className="space-y-4">
+                  {[1, 2, 3].map((i) => (
+                    <div key={i} className="card-surface rounded-3xl h-28 animate-pulse" />
+                  ))}
+                </div>
+              ) : (
+                news.slice(0, 3).map((item, idx) => (
+                <StaggerItem key={item.title.vn}>
                   <div className="card-surface card-solid rounded-3xl flex overflow-hidden group relative transition-all duration-300 hover:border-accent/40 hover:-translate-y-0.5">
-                    {/* Card-wide click target -> the portal article page.
-                        An overlay Link (not a wrapping <a>) because the card
-                        also contains the PDF button — nesting interactive
-                        elements is invalid; the button sits above on z-[2]. */}
                     <Link
                       to="/news/article/$slug"
-                      params={{ slug: teaserArticleIds[idx] }}
-                      aria-label={news.title[lang]}
+                      params={{ slug: newsSlugs[idx] }}
+                      aria-label={item.title[lang]}
                       className="absolute inset-0 z-[1] rounded-3xl"
                     />
                     {/* News Image Metadata */}
                     <div className="w-28 h-auto shrink-0 relative overflow-hidden hidden sm:block">
                       <img
-                        src={news.image}
-                        alt={news.title[lang]}
+                        src={item.image}
+                        alt={item.title[lang]}
                         referrerPolicy="no-referrer"
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       />
@@ -144,22 +143,20 @@ export function TimelineSection({ lang }: { lang: Lang }) {
                       <div>
                         <div className="flex items-center justify-between gap-2 mb-3">
                           <span className="px-2.5 py-1 rounded-md text-[9px] font-bold bg-accent/10 text-accent uppercase tracking-wider">
-                            {news.category[lang]}
+                            {item.category[lang]}
                           </span>
                           <span className="text-[10px] text-muted-foreground font-mono">
-                            {news.date}
+                            {item.date}
                           </span>
                         </div>
                         <h4 className="text-base font-bold text-white mb-2 leading-snug group-hover:text-accent transition-colors duration-200 line-clamp-2">
-                          {news.title[lang]}
+                          {item.title[lang]}
                         </h4>
                         <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2">
-                          {news.summary[lang]}
+                          {item.summary[lang]}
                         </p>
                       </div>
                       <div className="mt-4 pt-3 border-t border-white/5 flex items-center justify-between gap-3">
-                        {/* Visual affordance only — the overlay Link handles
-                            the actual click, so this stays non-interactive. */}
                         <span className="text-[10px] uppercase font-bold text-white/40 group-hover:text-accent transition-colors duration-300 flex items-center gap-1 pointer-events-none">
                           <span>
                             {lang === "vn" ? "Đọc bài viết" : "Read article"}
@@ -194,7 +191,8 @@ export function TimelineSection({ lang }: { lang: Lang }) {
                     </div>
                   </div>
                 </StaggerItem>
-              ))}
+                ))
+              )}
             </StaggerContainer>
           </div>
 
@@ -212,22 +210,26 @@ export function TimelineSection({ lang }: { lang: Lang }) {
             </ScrollReveal>
 
             <StaggerContainer className="space-y-6">
-              {dtaEvents.map((event, idx) => (
+              {eventLoading ? (
+                <div className="space-y-6">
+                  {[1, 2, 3].map((i) => (
+                    <div key={i} className="card-surface rounded-3xl h-40 animate-pulse" />
+                  ))}
+                </div>
+              ) : (
+                events.map((event, idx) => (
                 <StaggerItem key={event.title.vn}>
                   <div className="card-surface card-solid rounded-3xl relative overflow-hidden flex flex-col md:flex-row group transition-all duration-300 hover:border-accent/40 hover:-translate-y-0.5">
-                    {/* Card-wide click target -> the portal article page,
-                        same overlay-Link pattern as the news column: the
-                        register button keeps its own click on z-[2]. */}
                     <Link
                       to="/news/article/$slug"
-                      params={{ slug: eventArticleIds[idx] }}
+                      params={{ slug: eventSlugs[idx] }}
                       aria-label={event.title[lang]}
                       className="absolute inset-0 z-[1] rounded-3xl"
                     />
                     {/* Event Image */}
                     <div className="w-full md:w-44 h-36 md:h-auto shrink-0 relative overflow-hidden">
                       <img
-                        src=""
+                        src={event.image}
                         alt={event.title[lang]}
                         referrerPolicy="no-referrer"
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
@@ -249,7 +251,7 @@ export function TimelineSection({ lang }: { lang: Lang }) {
                         {/* Calendar Date Block */}
                         <div className="p-3 rounded-xl bg-white/5 border border-white/10 flex flex-col items-center justify-center text-center shrink-0 min-w-[70px]">
                           <span className="text-[10px] font-bold text-accent font-mono">
-                            2026
+                            {event.date.split("/")[2]}
                           </span>
                           <span className="text-base font-black text-white font-mono mt-0.5">
                             {event.date.split("/")[0]}/
@@ -261,12 +263,14 @@ export function TimelineSection({ lang }: { lang: Lang }) {
                             {event.title[lang]}
                           </h4>
                           <div className="mt-2.5 space-y-1 text-xs text-muted-foreground">
-                            <p className="flex items-center gap-1.5">
-                              <span className="font-semibold text-white">
-                                {lang === "vn" ? "Thời gian:" : "Time:"}
-                              </span>{" "}
-                              {event.time}
-                            </p>
+                            {event.time && (
+                              <p className="flex items-center gap-1.5">
+                                <span className="font-semibold text-white">
+                                  {lang === "vn" ? "Thời gian:" : "Time:"}
+                                </span>{" "}
+                                {event.time}
+                              </p>
+                            )}
                             <p className="flex items-center gap-1.5 leading-tight">
                               <span className="font-semibold text-white">
                                 {lang === "vn" ? "Địa điểm:" : "Venue:"}
@@ -289,8 +293,6 @@ export function TimelineSection({ lang }: { lang: Lang }) {
                                 ? "Đăng ký Tham gia"
                                 : "Register Now"}
                             </button>
-                            {/* Visual affordance only — the overlay Link
-                                handles the actual click. */}
                             <span className="text-[10px] uppercase font-bold text-white/40 group-hover:text-accent transition-colors duration-300 flex items-center gap-1 pointer-events-none">
                               <span>
                                 {lang === "vn" ? "Xem chi tiết" : "Details"}
@@ -303,7 +305,8 @@ export function TimelineSection({ lang }: { lang: Lang }) {
                     </div>
                   </div>
                 </StaggerItem>
-              ))}
+                ))
+              )}
             </StaggerContainer>
           </div>
         </div>

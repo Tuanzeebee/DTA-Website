@@ -891,43 +891,12 @@ function ImageBlockEditor({
 
 /* ---------------- image source: URL or local file ---------------- */
 
-/**
- * Read a local image, downscale it on a canvas and return a JPEG data URL.
- * Storage is localStorage until the real backend exists, so images must be
- * kept small — 1400px on the long edge at q0.85 keeps a photo well under
- * the quota while staying sharp at column width.
- */
-function fileToDataUrl(file: File, maxDim = 1400): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    const objectUrl = URL.createObjectURL(file);
-    img.onload = () => {
-      URL.revokeObjectURL(objectUrl);
-      const scale = Math.min(1, maxDim / Math.max(img.width, img.height));
-      const canvas = document.createElement("canvas");
-      canvas.width = Math.max(1, Math.round(img.width * scale));
-      canvas.height = Math.max(1, Math.round(img.height * scale));
-      const ctx = canvas.getContext("2d");
-      if (!ctx) {
-        reject(new Error("canvas unavailable"));
-        return;
-      }
-      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-      resolve(canvas.toDataURL("image/jpeg", 0.85));
-    };
-    img.onerror = () => {
-      URL.revokeObjectURL(objectUrl);
-      reject(new Error("not an image"));
-    };
-    img.src = objectUrl;
-  });
-}
+import { uploadImage } from "@/lib/api";
 
 /**
  * One image source field, two ways to fill it: paste a URL, or pick a file
- * from the machine (converted to an embedded data URL). An uploaded image
- * replaces the text input with a compact chip + remove button — a megabyte
- * of base64 in a text box is uneditable noise.
+ * from the machine (uploaded to the backend server). An uploaded image
+ * replaces the text input with a compact chip + remove button.
  */
 export function ImageInput({
   value,
@@ -939,7 +908,7 @@ export function ImageInput({
   placeholder?: string;
 }) {
   const fileRef = useRef<HTMLInputElement>(null);
-  const isDataUrl = value.startsWith("data:");
+  const isUploaded = value.startsWith("/uploads/") || value.startsWith("/news-images/");
 
   const pick = async (file: File) => {
     if (!file.type.startsWith("image/")) {
@@ -947,24 +916,20 @@ export function ImageInput({
       return;
     }
     try {
-      const dataUrl = await fileToDataUrl(file);
-      if (dataUrl.length > 1_500_000) {
-        toast.warning(
-          "Ảnh khá nặng sau khi nén — bản demo lưu trên trình duyệt nên hạn chế dùng nhiều ảnh cỡ này.",
-        );
-      }
-      onChange(dataUrl);
-    } catch {
-      toast.error("Không đọc được file ảnh.");
+      const url = await uploadImage(file);
+      onChange(url);
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : "Upload thất bại.";
+      toast.error(msg);
     }
   };
 
   return (
     <div className="flex gap-2 items-center">
-      {isDataUrl ? (
+      {isUploaded ? (
         <div className="flex-1 flex items-center gap-2 px-3 py-2 bg-white/5 border border-white/10 rounded-xl text-xs text-white/70">
           <ImageIcon className="w-3.5 h-3.5 text-accent shrink-0" />
-          <span className="truncate">Ảnh tải từ máy (đã nén)</span>
+          <span className="truncate">Ảnh đã tải lên server</span>
           <button
             onClick={() => onChange("")}
             title="Gỡ ảnh"

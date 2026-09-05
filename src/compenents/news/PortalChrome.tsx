@@ -307,54 +307,28 @@ function MenuSearchForm() {
   );
 }
 
-/** Banner zone, laid out per the brief's illustration: one large
- *  propaganda/campaign banner on the left (carries paid placement when no
- *  campaign runs), and to its right two stacked slots — "quảng cáo" and
- *  "tài trợ" — separated by breathing room ("khoảng cách vừa đủ").
- *  The main banner becomes a carousel when multiple active ads exist.
- *  Each slot shows ACTIVE ads from /admin/quang-cao; a dashed placeholder
- *  holds the slot when nothing is booked. */
+/**
+ * Banner zone — full-width propaganda/campaign banner.
+ * The main banner becomes a carousel when multiple active ads exist.
+ * Shows ACTIVE ads from /admin/quang-cao; a dashed placeholder
+ * holds the slot when nothing is booked. */
 export function PortalBanner() {
   const { lang } = useLang();
   const ads = adStore.useItems();
   const bannerAds = activeAdsForSlot(ads, "banner");
-  const adAds = activeAdsForSlot(ads, "ad");
-  const sponsorAds = activeAdsForSlot(ads, "sponsor");
 
   return (
     <div className="max-w-7xl mx-auto px-4 md:px-6 mt-6">
-      <div className="grid md:grid-cols-3 gap-3 md:gap-4">
-        {/* Main banner — carousel if multiple, otherwise single image */}
-        <BannerCarousel
-          ads={bannerAds}
-          lang={lang}
-          className="md:col-span-2 h-44 sm:h-56 md:h-72"
-          placeholder={
-            lang === "vn"
-              ? "Banner tuyên truyền / cổ động"
-              : "Campaign / promotional banner"
-          }
-        />
-        {/* Right column: ad + sponsor slots — full width on mobile, stacked on md+ */}
-        <div className="grid gap-3 md:gap-4">
-          <BannerSlot
-            ads={adAds}
-            lang={lang}
-            className="h-28 md:h-[8.5rem]"
-            placeholder={
-              lang === "vn" ? "Dành cho quảng cáo" : "Advertising slot"
-            }
-          />
-          <BannerSlot
-            ads={sponsorAds}
-            lang={lang}
-            className="h-28 md:h-[8.5rem]"
-            placeholder={
-              lang === "vn" ? "Dành cho tài trợ" : "Sponsorship slot"
-            }
-          />
-        </div>
-      </div>
+      <BannerCarousel
+        ads={bannerAds}
+        lang={lang}
+        className="h-44 sm:h-56 md:h-72"
+        placeholder={
+          lang === "vn"
+            ? "Banner tuyên truyền / cổ động"
+            : "Campaign / promotional banner"
+        }
+      />
     </div>
   );
 }
@@ -531,52 +505,6 @@ function BannerCarousel({
         </div>
       )}
     </div>
-  );
-}
-
-/** Single-slot banner (ad/sponsor) — shows first active ad or placeholder.
- *  If multiple ads exist for this slot, shows the first one (can be extended
- *  to carousel later if needed). */
-function BannerSlot({
-  ads,
-  lang,
-  className,
-  placeholder,
-}: {
-  ads: AdPlacement[];
-  lang: Lang;
-  className: string;
-  placeholder: string;
-}) {
-  if (ads.length === 0) {
-    return (
-      <div
-        className={`rounded-2xl border border-dashed border-white/15 bg-white/[0.03] flex items-center justify-center text-white/40 uppercase tracking-[0.2em] ${className}`}
-      >
-        {placeholder}
-      </div>
-    );
-  }
-
-  const ad = ads[0];
-  return (
-    <a
-      href={ad.linkUrl}
-      target="_blank"
-      rel="noopener sponsored"
-      title={ad.title}
-      className={`group relative block rounded-2xl overflow-hidden border border-white/10 ${className}`}
-    >
-      <img
-        src={ad.imageUrl}
-        alt={ad.title}
-        loading="lazy"
-        className="w-full h-full object-cover"
-      />
-      <span className="absolute top-1.5 right-2 text-[8px] font-bold uppercase tracking-[0.2em] text-white/55 bg-black/35 rounded px-1 py-px">
-        {lang === "vn" ? "Quảng cáo" : "Ad"}
-      </span>
-    </a>
   );
 }
 

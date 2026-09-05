@@ -22,13 +22,37 @@ export interface AdminUser {
   disabled?: boolean;
 }
 
-/** What an open session carries — identity + role, never the password. */
+/** What an open session carries — identity + role + JWT tokens. */
 export interface AdminSession {
   userId: string;
   name: string;
   email: string;
   role: AdminRole;
+  accessToken: string;
+  refreshToken: string;
 }
 
 export type LoginResult =
-  { ok: true; user: AdminUser } | { ok: false; reason?: "disabled" };
+  | { ok: true; user: AdminUser }
+  | { ok: false; reason?: "disabled" }
+  | { ok: false; reason?: "not_found" }
+  | { ok: false; reason?: "wrong_password" };
+
+/** Backend login response shape. */
+export interface BackendAuthResponse {
+  accessToken: string;
+  refreshToken: string;
+  user: {
+    id: string;
+    email: string;
+    fullName: string;
+    roles: string[];
+  };
+}
+
+/** Map backend RoleName[] to frontend AdminRole. */
+export function mapBackendRole(roles: string[]): AdminRole {
+  if (roles.some((r) => r === "SUPER_ADMIN" || r === "ADMIN")) return "admin";
+  if (roles.some((r) => r === "EDITOR" || r === "AUTHOR")) return "editor";
+  return "member";
+}

@@ -3,7 +3,7 @@ import { toast } from "sonner";
 import { Save, X } from "lucide-react";
 import type { AdminRole, AdminUser } from "@/lib/auth/types";
 import { ROLE_LABEL } from "@/lib/auth/permissions";
-import { findUserByEmail, newUserId } from "@/lib/auth/service";
+import { adminCreateUser, adminSetUserRoles, adminSetUserStatus } from "@/lib/api";
 
 const INPUT =
   "w-full px-3 py-2 bg-white/5 border border-white/10 rounded-xl text-xs text-white placeholder:text-white/30 focus:outline-none focus:border-cyan-400/60";
@@ -19,10 +19,15 @@ function Field({ label, children }: { label: string; children: ReactNode }) {
   );
 }
 
+function roleToBackend(r: AdminRole): string {
+  if (r === "admin") return "ADMIN";
+  if (r === "editor") return "EDITOR";
+  return "MEMBER";
+}
+
 /**
- * Add/edit form for one directory account. The role picker is the RBAC
- * heart of the page; everything else is identity + demo credentials.
- * On edit an empty password keeps the current one.
+ * Add/edit form for one directory account. Calls the real backend API.
+ * On edit, empty password keeps the current one.
  */
 export function UserEditor({
   initial,
@@ -38,8 +43,9 @@ export function UserEditor({
   const [role, setRole] = useState<AdminRole>(initial?.role ?? "editor");
   const [password, setPassword] = useState("");
   const [disabled, setDisabled] = useState(initial?.disabled ?? false);
+  const [saving, setSaving] = useState(false);
 
-  const submit = () => {
+  const submit = async () => {
     if (!name.trim()) {
       toast.error("Cần nhập họ tên người dùng.");
       return;
@@ -49,23 +55,55 @@ export function UserEditor({
       toast.error("Địa chỉ email chưa đúng định dạng.");
       return;
     }
-    const clash = findUserByEmail(normalizedEmail);
-    if (clash && clash.id !== initial?.id) {
-      toast.error("Email này đã có người dùng khác sử dụng.");
-      return;
-    }
     if (!initial && !password.trim()) {
       toast.error("Cần đặt mật khẩu cho tài khoản mới.");
       return;
     }
-    onSave({
-      id: initial?.id ?? newUserId(),
-      name: name.trim(),
-      email: normalizedEmail,
-      role,
-      password: password.trim() || initial?.password || "",
-      disabled,
-    });
+
+    setSaving(true);
+    try {
+      if (initial) {
+        // Edit: update roles + status
+        const backendRole = roleToBackend(role);
+        await adminSetUserRoles(initial.id, [backendRole]);
+        await adminSetUserStatus(initial.id, disabled ? "INACTIVE" : "ACTIVE");
+        onSave({
+          ...initial,
+          name: name.trim(),
+          email: normalizedEmail,
+          role,
+          disabled,
+        });
+        toast.success("Đã lưu thay đổi tài khoản.");
+      } else {
+        // Create new user
+        const backendRole = roleToBackend(role);
+        const created = await adminCreateUser({
+          email: normalizedEmail,
+          fullName: name.trim(),
+          password: password.trim(),
+          roles: [backendRole],
+        });
+        onSave({
+          id: created.id,
+          name: created.fullName,
+          email: created.email,
+          role,
+          password: "",
+          disabled: false,
+        });
+        toast.success(`Đã thêm ${ROLE_LABEL[role]} — có thể đăng nhập ngay.`);
+      }
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Lỗi không xác định";
+      if (msg.includes("Email đã được sử dụng")) {
+        toast.error("Email này đã có người dùng khác sử dụng.");
+      } else {
+        toast.error(`Lỗi: ${msg}`);
+      }
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -150,14 +188,15 @@ export function UserEditor({
         </button>
         <button
           onClick={submit}
-          className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold text-primary-foreground hover:opacity-90 transition-all cursor-pointer"
+          disabled={saving}
+          className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold text-primary-foreground hover:opacity-90 transition-all cursor-pointer disabled:opacity-50"
           style={{
             background: "var(--gradient-primary)",
             boxShadow: "var(--shadow-glow)",
           }}
         >
           <Save className="w-3.5 h-3.5" />
-          {initial ? "Lưu thay đổi" : "Thêm tài khoản"}
+          {saving ? "Đang lưu..." : initial ? "Lưu thay đổi" : "Thêm tài khoản"}
         </button>
       </div>
     </div>

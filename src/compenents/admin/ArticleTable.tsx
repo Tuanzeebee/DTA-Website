@@ -55,18 +55,26 @@ export function ArticleTable() {
   const current = Math.min(page, pageCount);
   const paged = rows.slice((current - 1) * PAGE_SIZE, current * PAGE_SIZE);
 
-  const togglePublish = (a: PortalArticle) => {
-    const publish = a.status === "draft";
-    saveArticle({ ...a, status: publish ? "published" : "draft" });
-    toast.success(
-      publish ? "Đã xuất bản bài viết." : "Đã gỡ bài về trạng thái nháp.",
-    );
+  const togglePublish = async (a: PortalArticle) => {
+    try {
+      const publish = a.status === "draft";
+      await saveArticle({ ...a, status: publish ? "published" : "draft" });
+      toast.success(
+        publish ? "Đã xuất bản bài viết." : "Đã gỡ bài về trạng thái nháp.",
+      );
+    } catch {
+      toast.error("Không thể cập nhật trạng thái.");
+    }
   };
 
-  const remove = (a: PortalArticle) => {
-    if (!window.confirm(`Xóa bài “${a.title}”?`)) return;
-    deleteArticle(a.id);
-    toast.success("Đã xóa bài viết.");
+  const remove = async (a: PortalArticle) => {
+    if (!window.confirm(`Xóa bài "${a.title}"?`)) return;
+    try {
+      await deleteArticle(a.id);
+      toast.success("Đã xóa bài viết.");
+    } catch {
+      toast.error("Không thể xóa bài viết.");
+    }
   };
 
   return (

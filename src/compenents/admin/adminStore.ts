@@ -1,100 +1,242 @@
-import { useSyncExternalStore } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
-  allArticles,
-  portalArticles,
-  ADMIN_ARTICLES_KEY,
-  ADMIN_HIDDEN_KEY,
-  type PortalArticle,
-} from "@/newsData";
+  adminFetchArticles,
+  adminCreateArticle,
+  adminUpdateArticle,
+  adminDeleteArticle,
+  adminPublishArticle,
+  adminUnpublishArticle,
+  adminFetchCategories,
+  type AdminArticleItem,
+} from "@/lib/api";
+import { authService } from "@/lib/auth/service";
+import { categoryBySlug, type PortalArticle } from "@/newsData";
 
 /**
- * Admin-side mutations over the article overlay in localStorage (see the
- * store block in newsData.ts for the merge semantics). Every write fires
- * CHANGE_EVENT so admin views re-render; portal pages pick changes up on
- * their next render since the helpers read through the same merge.
- * Swapping this for a real API later only touches this file.
+ * Admin article store backed by the real NestJS API.
+ * Replaces the previous localStorage overlay system.
  */
 
 const CHANGE_EVENT = "dta-admin-articles-changed";
 
-const readJson = <T>(key: string, fallback: T): T => {
-  try {
-    const raw = localStorage.getItem(key);
-    if (!raw) return fallback;
-    const parsed: unknown = JSON.parse(raw);
-    return (parsed ?? fallback) as T;
-  } catch {
-    return fallback;
-  }
-};
+/* ---------------- state ---------------- */
 
-const writeJson = (key: string, value: unknown) => {
-  try {
-    localStorage.setItem(key, JSON.stringify(value));
-  } catch {
-    /* storage full/blocked — the change simply doesn't persist */
-  }
-  window.dispatchEvent(new Event(CHANGE_EVENT));
-};
+let cachedArticles: PortalArticle[] = [];
+let cacheRaw: string = "";
+let loading = false;
 
-const isBaseId = (id: string) => portalArticles.some((a) => a.id === id);
+const notify = () => window.dispatchEvent(new Event(CHANGE_EVENT));
 
-/** Create or update. Same id = override (mock rows included). */
-export function saveArticle(article: PortalArticle) {
-  const overrides = readJson<PortalArticle[]>(ADMIN_ARTICLES_KEY, []);
-  const next = overrides.filter((o) => o.id !== article.id);
-  next.push(article);
-  writeJson(ADMIN_ARTICLES_KEY, next);
+/** Map backend status to frontend status. */
+function mapStatus(s: string): "published" | "draft" {
+  return s === "PUBLISHED" ? "published" : "draft";
 }
 
-/** Delete: admin-created rows are removed outright; mock rows can't be
- *  removed from the bundle, so they go on the hidden list instead. */
-export function deleteArticle(id: string) {
-  const overrides = readJson<PortalArticle[]>(ADMIN_ARTICLES_KEY, []);
-  writeJson(
-    ADMIN_ARTICLES_KEY,
-    overrides.filter((o) => o.id !== id),
-  );
-  if (isBaseId(id)) {
-    const hidden = readJson<string[]>(ADMIN_HIDDEN_KEY, []);
-    if (!hidden.includes(id)) writeJson(ADMIN_HIDDEN_KEY, [...hidden, id]);
-  }
+/** Format ISO date to dd/mm/yyyy. */
+function fmtDate(iso: string | null): string {
+  if (!iso) return "";
+  const d = new Date(iso);
+  const dd = String(d.getDate()).padStart(2, "0");
+  const mm = String(d.getMonth() + 1).padStart(2, "0");
+  const yyyy = d.getFullYear();
+  return `${dd}/${mm}/${yyyy}`;
 }
 
-/** Drop every local change and return to the bundled mock data. */
-export function resetToMockData() {
+/** Map backend article item to frontend PortalArticle. */
+function mapArticle(item: AdminArticleItem): PortalArticle {
+  return {
+    id: item.id,
+    title: item.title,
+    summary: item.summary ?? "",
+    topic: item.topic,
+    category: item.category,
+    date: fmtDate(item.date),
+    image: item.image ?? "",
+    tags: item.tags ?? [],
+    views: item.views ?? 0,
+    isIntern: item.isIntern || undefined,
+    author: item.author ?? undefined,
+    status: mapStatus(item.status),
+    body: [],
+  };
+}
+
+/* ---------------- data fetching ---------------- */
+
+export async function loadArticles(): Promise<PortalArticle[]> {
+  if (loading) return cachedArticles;
+  loading = true;
   try {
-    localStorage.removeItem(ADMIN_ARTICLES_KEY);
-    localStorage.removeItem(ADMIN_HIDDEN_KEY);
+    const token = authService.getAccessToken();
+    if (!token) {
+      cachedArticles = [];
+      return cachedArticles;
+    }
+    const res = await adminFetchArticles({ pageSize: 200 });
+    cachedArticles = res.items.map(mapArticle);
+    cacheRaw = JSON.stringify(cachedArticles);
+    notify();
   } catch {
-    /* nothing to clear */
+    // keep stale data on error
+  } finally {
+    loading = false;
   }
-  window.dispatchEvent(new Event(CHANGE_EVENT));
+  return cachedArticles;
 }
 
-export const newArticleId = () =>
-  `adm-${Date.now().toString(36)}${Math.random().toString(36).slice(2, 5)}`;
-
-/** Where a row lives — the table shows this so editors know what a delete
- *  actually does. */
-export const articleOrigin = (id: string): "mock" | "admin" =>
-  isBaseId(id) ? "mock" : "admin";
+/* ---------------- reactive hook ---------------- */
 
 const subscribe = (cb: () => void) => {
   window.addEventListener(CHANGE_EVENT, cb);
-  // Cross-tab: storage events fire in OTHER tabs.
-  const onStorage = (e: StorageEvent) => {
-    if (e.key === ADMIN_ARTICLES_KEY || e.key === ADMIN_HIDDEN_KEY) cb();
-  };
-  window.addEventListener("storage", onStorage);
-  return () => {
-    window.removeEventListener(CHANGE_EVENT, cb);
-    window.removeEventListener("storage", onStorage);
-  };
+  return () => window.removeEventListener(CHANGE_EVENT, cb);
 };
 
-/** Reactive full list (drafts included) for admin views. allArticles() is
- *  raw-string-memoised, so the snapshot is referentially stable. */
-export function useAdminArticles() {
-  return useSyncExternalStore(subscribe, allArticles, allArticles);
+/** Reactive full list (drafts included) for admin views. */
+export function useAdminArticles(): PortalArticle[] {
+  const [articles, setArticles] = useState<PortalArticle[]>(cachedArticles);
+  const mounted = useRef(true);
+
+  useEffect(() => {
+    mounted.current = true;
+    // Initial fetch
+    loadArticles().then((a) => {
+      if (mounted.current) setArticles(a);
+    });
+    return () => {
+      mounted.current = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    const unsub = subscribe(() => {
+      setArticles([...cachedArticles]);
+    });
+    return unsub;
+  }, []);
+
+  return articles;
 }
+
+/* ---------------- mutations ---------------- */
+
+/**
+ * Resolve a category slug to its numeric ID for the backend API.
+ * Fetches categories from the API if needed.
+ */
+let categoryCache: Map<string, number> | null = null;
+
+async function resolveCategoryId(
+  topicSlug: string,
+  categorySlug: string,
+): Promise<number> {
+  // Try the local data first
+  const local = categoryBySlug(topicSlug, categorySlug);
+  if (local) return local.id;
+
+  // Fetch from API
+  if (!categoryCache) {
+    try {
+      const cats = await adminFetchCategories();
+      categoryCache = new Map(cats.map((c) => [c.slug, c.id]));
+    } catch {
+      return 1; // fallback
+    }
+  }
+  return categoryCache.get(categorySlug) ?? 1;
+}
+
+/** Create or update article via the API. */
+export async function saveArticle(
+  article: PortalArticle,
+): Promise<void> {
+  const token = authService.getAccessToken();
+  if (!token) throw new Error("Chưa đăng nhập");
+
+  const categoryId = await resolveCategoryId(
+    article.topic,
+    article.category,
+  );
+
+  // Build blocks from body
+  const blocks = (article.body ?? [])
+    .filter((b) => {
+      if (typeof b === "string") return b.trim() !== "";
+      return true;
+    })
+    .map((b, i) => {
+      if (typeof b === "string") {
+        return { type: "TEXT", text: b, position: i };
+      }
+      // Image block
+      return {
+        type: "IMAGE",
+        imageUrl: b.src?.startsWith("/uploads/") ? undefined : b.src,
+        imageLocalPath: b.src?.startsWith("/uploads/") ? b.src : undefined,
+        caption: b.caption,
+        align: (b.align ?? "center").toUpperCase(),
+        wrap: (b.wrap ?? "none").toUpperCase(),
+        width: b.width,
+        position: i,
+      };
+    });
+
+  const isExistingBackend = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+    article.id,
+  );
+
+  const payload = {
+    title: article.title,
+    summary: article.summary || undefined,
+    categoryId,
+    thumbnailUrl: article.image || undefined,
+    tags: article.tags.length > 0 ? article.tags : undefined,
+    isIntern: article.isIntern || undefined,
+    status: article.status === "published" ? "PUBLISHED" : "DRAFT",
+    blocks: blocks.length > 0 ? blocks : undefined,
+  };
+
+  if (isExistingBackend) {
+    await adminUpdateArticle(article.id, payload);
+  } else {
+    await adminCreateArticle(payload);
+  }
+  await loadArticles();
+}
+
+/** Toggle publish/draft status. */
+export async function togglePublish(article: PortalArticle): Promise<void> {
+  const token = authService.getAccessToken();
+  if (!token) throw new Error("Chưa đăng nhập");
+
+  if (article.status === "published") {
+    await adminUnpublishArticle(article.id);
+  } else {
+    await adminPublishArticle(article.id);
+  }
+  await loadArticles();
+}
+
+/** Delete article via the API. */
+export async function deleteArticle(id: string): Promise<void> {
+  const token = authService.getAccessToken();
+  if (!token) throw new Error("Chưa đăng nhập");
+  await adminDeleteArticle(id);
+  await loadArticles();
+}
+
+/** Drop every local change and re-fetch from API. */
+export async function resetToMockData(): Promise<void> {
+  await loadArticles();
+}
+
+/** Check if an article was created locally (not yet in backend). */
+export function articleOrigin(id: string): "mock" | "admin" {
+  const isBackend = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+    id,
+  );
+  return isBackend ? "admin" : "mock";
+}
+
+/** Generate a temporary client-side ID. */
+export const newArticleId = () =>
+  `adm-${Date.now().toString(36)}${Math.random().toString(36).slice(2, 5)}`;
