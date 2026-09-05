@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { useLang, useSession } from "@/hooks/useLang";
 import { LoginCard } from "@/compenents/member/LoginCard";
+import { authService } from "@/lib/auth/service";
 import type { AdminUser } from "@/lib/auth/types";
 import { ROLE_LABEL } from "@/lib/auth/permissions";
 import { MemberCard } from "@/compenents/member/MemberCard";
@@ -38,10 +39,7 @@ function PortalIndex() {
   const { isLoggedIn, handleLogin } = useSession(lang);
   const navigate = useNavigate();
 
-  /* Directory credentials on the member sign-in: the service has already
-     opened the admin session by the time this fires (see LoginCard) — here
-     we only announce the role and land in /admin. The member session flag
-     stays untouched — this is a different workspace. */
+  /* Admin/Editor credentials: redirect to /admin */
   const handleAdminLogin = (user: AdminUser) => {
     toast.success(
       lang === "vn"
@@ -74,7 +72,6 @@ function PortalIndex() {
           >
             <Lobby
               lang={lang}
-              onLogin={() => handleLogin(true)}
               onAdminLogin={handleAdminLogin}
             />
           </motion.div>
@@ -90,12 +87,10 @@ function PortalIndex() {
 
 function Lobby({
   lang,
-  onLogin,
   onAdminLogin,
 }: {
   lang: "vn" | "en";
-  onLogin: () => void;
-  onAdminLogin: () => void;
+  onAdminLogin: (user: AdminUser) => void;
 }) {
   const perks = [
     {
@@ -234,7 +229,7 @@ function Lobby({
       </div>
 
       {/* Right: sign-in */}
-      <LoginCard lang={lang} onLogin={onLogin} onAdminLogin={onAdminLogin} />
+      <LoginCard lang={lang} onAdminLogin={onAdminLogin} onMemberLogin={() => {}} />
     </div>
   );
 }

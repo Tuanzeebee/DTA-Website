@@ -1,9 +1,9 @@
 import { useState, useCallback, useSyncExternalStore } from "react";
 import { toast } from "sonner";
 import type { Lang } from "@/types";
+import { authService, subscribeSession } from "@/lib/auth/service";
 
 const LANG_KEY = "dta_lang";
-const LOGIN_KEY = "dta_is_logged_in";
 
 function isLang(value: string | null): value is Lang {
   return value === "vn" || value === "en";
@@ -75,39 +75,28 @@ export function useLang() {
 }
 
 /**
- * Demo session flag persisted to localStorage.
- *
- * This is a front-end-only mock, not authentication — it gates which portal
- * view renders and nothing more.
+ * Real auth session backed by JWT via authService.
+ * Checks the actual JWT session stored in localStorage — no mock flags.
  */
 export function useSession(lang: Lang) {
-  /* Lazy initializer reads storage synchronously: this is a client-only SPA
-     (no SSR), so window/localStorage always exist at first render — and the
-     logged-in dashboard never flashes the signed-out lobby on reload. */
-  const [isLoggedIn, setIsLoggedIn] = useState(
-    () =>
-      typeof window !== "undefined" &&
-      localStorage.getItem(LOGIN_KEY) === "true",
+  const isLoggedIn = useSyncExternalStore(
+    subscribeSession,
+    () => authService.isLoggedIn(),
+    () => false,
   );
 
   const handleLogin = useCallback(
     (status: boolean) => {
-      setIsLoggedIn(status);
-      if (status) {
-        localStorage.setItem(LOGIN_KEY, "true");
-        toast.success(
-          lang === "vn"
-            ? "Đăng nhập Cổng Hội viên DTA thành công!"
-            : "Successfully logged into DTA Member Portal!",
-        );
-      } else {
-        localStorage.removeItem(LOGIN_KEY);
+      if (!status) {
+        authService.logout();
         toast.success(
           lang === "vn"
             ? "Đã đăng xuất khỏi hệ thống."
             : "Successfully logged out.",
         );
       }
+      // When status=true, login is handled by authService.login() via LoginCard
+      // This callback is only used for logout from the portal
     },
     [lang],
   );

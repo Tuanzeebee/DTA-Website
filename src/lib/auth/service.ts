@@ -8,7 +8,8 @@ import { mapBackendRole } from "./types";
 /**
  * Auth service backed by the real NestJS backend.
  * - Login: POST /api/auth/login → JWT access + refresh tokens
- * - Session stored in sessionStorage with tokens
+ * - Session stored in localStorage (persists across tabs and browser restarts)
+ * - Auto-refreshes access token every 12 min (token TTL = 15 min)
  * - All admin API calls use the access token
  */
 
@@ -17,10 +18,10 @@ import { mapBackendRole } from "./types";
 const SESSION_KEY = "dta-admin-session";
 const SESSION_EVENT = "dta-admin-session-changed";
 
-/** Single mutable source of truth, hydrated once from sessionStorage. */
+/** Single mutable source of truth, hydrated once from localStorage. */
 let current: AdminSession | null = (() => {
   try {
-    const raw = sessionStorage.getItem(SESSION_KEY);
+    const raw = localStorage.getItem(SESSION_KEY);
     return raw ? (JSON.parse(raw) as AdminSession) : null;
   } catch {
     return null;
@@ -29,8 +30,8 @@ let current: AdminSession | null = (() => {
 
 const persist = () => {
   try {
-    if (current) sessionStorage.setItem(SESSION_KEY, JSON.stringify(current));
-    else sessionStorage.removeItem(SESSION_KEY);
+    if (current) localStorage.setItem(SESSION_KEY, JSON.stringify(current));
+    else localStorage.removeItem(SESSION_KEY);
   } catch {
     /* storage unavailable */
   }
@@ -41,6 +42,47 @@ const notify = () => window.dispatchEvent(new Event(SESSION_EVENT));
 export function subscribeSession(cb: () => void) {
   window.addEventListener(SESSION_EVENT, cb);
   return () => window.removeEventListener(SESSION_EVENT, cb);
+}
+
+/* ---------------- auto token refresh ---------------- */
+
+const REFRESH_INTERVAL_MS = 12 * 60 * 1000; // 12 minutes (access token TTL = 15 min)
+let refreshTimer: ReturnType<typeof setInterval> | null = null;
+
+function startAutoRefresh() {
+  stopAutoRefresh();
+  refreshTimer = setInterval(async () => {
+    if (!current?.refreshToken) return;
+    try {
+      const res = await fetch("/api/auth/refresh", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ refreshToken: current.refreshToken }),
+      });
+      if (!res.ok) return; // will be caught on next API call → 401 → logout
+      const data = (await res.json()) as BackendAuthResponse;
+      current = {
+        ...current,
+        accessToken: data.accessToken,
+        refreshToken: data.refreshToken,
+      };
+      persist();
+    } catch {
+      // network error — don't logout, retry next interval
+    }
+  }, REFRESH_INTERVAL_MS);
+}
+
+function stopAutoRefresh() {
+  if (refreshTimer !== null) {
+    clearInterval(refreshTimer);
+    refreshTimer = null;
+  }
+}
+
+// Start auto-refresh if we already have a session on module load
+if (current?.refreshToken) {
+  startAutoRefresh();
 }
 
 /* ---------------- the real implementation ---------------- */
@@ -92,6 +134,7 @@ export const authService = {
       };
       persist();
       notify();
+      startAutoRefresh();
       return { ok: true, user };
     } catch {
       return { ok: false, reason: "network" };
@@ -136,6 +179,7 @@ export const authService = {
     current = null;
     persist();
     notify();
+    stopAutoRefresh();
   },
 
   currentSession(): AdminSession | null {
@@ -145,6 +189,16 @@ export const authService = {
   /** Get the current access token for API calls. */
   getAccessToken(): string | null {
     return current?.accessToken ?? null;
+  },
+
+  /** Check if the user is logged in (has a valid session). */
+  isLoggedIn(): boolean {
+    return current !== null;
+  },
+
+  /** Get the current user's mapped role. */
+  getRole(): string | null {
+    return current?.role ?? null;
   },
 };
 
@@ -161,5 +215,3 @@ export function syncSessionWith(user: AdminUser) {
   persist();
   notify();
 }
-
-

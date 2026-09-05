@@ -1,7 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect } from "react";
 import { PlusCircle } from "lucide-react";
 import { ArticleTable } from "@/compenents/admin/ArticleTable";
 import { RequireSection } from "@/compenents/admin/SectionGate";
+import { loadMainTopics } from "@/newsData";
 
 /** Article management list. */
 export const Route = createFileRoute("/admin/bai-viet/")({
@@ -13,6 +15,10 @@ export const Route = createFileRoute("/admin/bai-viet/")({
 });
 
 function AdminArticles() {
+  useEffect(() => {
+    loadMainTopics();
+  }, []);
+
   return (
     <div className="space-y-6 max-w-6xl">
       <div className="flex items-center gap-3">

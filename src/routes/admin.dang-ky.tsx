@@ -16,7 +16,7 @@ import {
   APPLICATION_STATUS_LABEL,
   type MemberApplication,
 } from "@/compenents/admin/opsData";
-import { saveMember, newMemberId } from "@/compenents/admin/memberStore";
+import { saveMember } from "@/compenents/admin/memberStore";
 import { StatusChip, PageHeader, ICON_BTN } from "@/compenents/admin/ui";
 import { RequireSection } from "@/compenents/admin/SectionGate";
 
@@ -53,35 +53,24 @@ function AdminApplications() {
   );
   const pendingCount = apps.filter((a) => a.status === "pending").length;
 
-  const approve = (a: MemberApplication) => {
+  const approve = async (a: MemberApplication) => {
     applicationStore.save({ ...a, status: "approved" });
-    // Straight into the member directory — logos/marquee update site-wide.
-    saveMember({
-      id: newMemberId(),
-      name: { vn: a.orgName, en: a.orgName },
-      role: {
-        vn:
+    try {
+      await saveMember({
+        name: a.orgName,
+        role:
           a.type === "organization"
             ? "Hội viên Tổ chức · Kết nạp mới"
             : "Hội viên Cá nhân · Kết nạp mới",
-        en:
-          a.type === "organization"
-            ? "Corporate Member · Newly admitted"
-            : "Individual Member · Newly admitted",
-      },
-      type: a.type,
-      domain: { vn: a.domain ?? "", en: a.domain ?? "" },
-      logoInitials:
-        a.orgName
-          .split(/\s+/)
-          .slice(-3)
-          .map((w) => w[0])
-          .join("")
-          .toUpperCase() || "DTA",
-    });
-    toast.success(
-      `Đã kết nạp “${a.orgName}” và gửi email chúc mừng tới ${a.email} (mô phỏng).`,
-    );
+        type: a.type,
+        domain: a.domain ?? "",
+      });
+      toast.success(
+        `Đã kết nạp "${a.orgName}" và gửi email chúc mừng tới ${a.email} (mô phỏng).`,
+      );
+    } catch {
+      toast.error("Lỗi thêm hội viên vào danh bạ.");
+    }
   };
 
   const reject = (a: MemberApplication) => {

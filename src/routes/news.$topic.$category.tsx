@@ -15,6 +15,7 @@ import {
 } from "@/newsData";
 import { useTopics, useArticles } from "@/hooks/useNewsApi";
 import { useLang } from "@/hooks/useLang";
+import { authService } from "@/lib/auth/service";
 import {
   ArticleCard,
   ArticleListControls,
@@ -134,22 +135,22 @@ function CommunityGrid() {
               {m.logoUrl ? (
                 <img
                   src={m.logoUrl}
-                  alt={m.name.vn}
+                  alt={m.name}
                   referrerPolicy="no-referrer"
                   className="max-h-full max-w-full object-contain p-1"
                 />
               ) : (
                 <span className="text-xs font-black text-slate-700">
-                  {m.logoInitials}
+                  {m.name.split(/\s+/).slice(0, 2).map((w) => w[0]).join("").toUpperCase()}
                 </span>
               )}
             </a>
             <div className="min-w-0">
               <div className="text-sm font-bold text-white leading-tight">
-                {m.name.vn}
+                {m.name}
               </div>
               <p className="text-[11px] text-white/55 mt-1 line-clamp-2">
-                {m.domain.vn}
+                {m.domain}
               </p>
               <a
                 href={m.website ?? "#"}
@@ -168,6 +169,8 @@ function CommunityGrid() {
 }
 
 function JoinPortalCta() {
+  const role = authService.getRole();
+  const portalPath = role === "admin" || role === "editor" ? "/admin" : "/portal";
   return (
     <div className="card-surface card-surface-gold rounded-2xl p-6 mb-8 flex flex-col sm:flex-row sm:items-center gap-4 justify-between">
       <div>
@@ -180,7 +183,7 @@ function JoinPortalCta() {
         </p>
       </div>
       <Link
-        to="/portal"
+        to={portalPath}
         className="shrink-0 px-6 py-3 rounded-full text-xs font-bold text-primary-foreground flex items-center gap-2 hover:opacity-90 active:scale-95 transition-all"
         style={{
           background: "var(--gradient-gold)",

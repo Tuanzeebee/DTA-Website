@@ -12,9 +12,10 @@ export interface NavProps {
   lang: Lang;
   toggleLang: () => void;
   isLoggedIn: boolean;
+  role?: string | null;
 }
 
-export function Nav({ lang, toggleLang, isLoggedIn }: NavProps) {
+export function Nav({ lang, toggleLang, isLoggedIn, role }: NavProps) {
   const scrolled = useScrolled();
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -129,7 +130,7 @@ export function Nav({ lang, toggleLang, isLoggedIn }: NavProps) {
               and the menu trigger; the sheet carries it full-width instead. */}
             {isLoggedIn ? (
               <Link
-                to="/portal"
+                to={role === "admin" || role === "editor" ? "/admin" : "/portal"}
                 className="hidden lg:flex px-4 py-1.5 rounded-full text-xs font-bold text-primary-foreground items-center gap-1.5 transition-all duration-300 cursor-pointer whitespace-nowrap shrink-0"
                 style={{
                   background: "var(--gradient-primary)",
@@ -198,6 +199,7 @@ export function Nav({ lang, toggleLang, isLoggedIn }: NavProps) {
         onClose={() => setMenuOpen(false)}
         lang={lang}
         isLoggedIn={isLoggedIn}
+        role={role}
       />
     </>
   );

@@ -16,17 +16,17 @@ import type { AdminUser } from "@/lib/auth/types";
 
 /**
  * Shared sign-in card: member portal by default, admin area when the
- * credentials match a backend account. The admin branch goes through
- * AuthService which calls POST /api/auth/login for real JWT tokens.
+ * credentials match a backend account. Uses real JWT auth via authService.
+ * After login, the session is stored and useSession() detects the change.
  */
 export function LoginCard({
   lang,
-  onLogin,
   onAdminLogin,
+  onMemberLogin,
 }: {
   lang: Lang;
-  onLogin: () => void;
   onAdminLogin?: (user: AdminUser) => void;
+  onMemberLogin?: () => void;
 }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -48,7 +48,7 @@ export function LoginCard({
       const result = await authService.login(email.trim(), password.trim());
       if (result.ok) {
         if (result.user.role === "member") {
-          onLogin();
+          onMemberLogin?.();
         } else {
           onAdminLogin?.(result.user);
         }

@@ -8,6 +8,7 @@ import {
   PortalBottomMenu,
 } from "@/compenents/news/PortalChrome";
 import { Footer } from "@/compenents/layout/Footer";
+import { authService } from "@/lib/auth/service";
 
 /**
  * Layout for the news portal (/news/*), a "Trang thông tin điện tử tổng hợp"
@@ -27,10 +28,11 @@ export const Route = createFileRoute("/news")({
 function NewsPortalLayout() {
   const { lang, toggleLang } = useLang();
   const { isLoggedIn } = useSession(lang);
+  const role = authService.getRole();
 
   return (
     <PageShell>
-      <Nav lang={lang} toggleLang={toggleLang} isLoggedIn={isLoggedIn} />
+      <Nav lang={lang} toggleLang={toggleLang} isLoggedIn={isLoggedIn} role={role} />
 
       {/* pt-16 clears the fixed shared header; the menu bar then sticks to
           top-16 so both bars stack while scrolling. */}

@@ -14,6 +14,7 @@ import { TimelineSection } from "@/compenents/sections/TimelineSection";
 import { MembersDirectorySection } from "@/compenents/sections/MembersDirectorySection";
 import { MapAddressSection } from "@/compenents/sections/MapAddressSection";
 import { FAQSection } from "@/compenents/sections/FAQSection";
+import { authService } from "@/lib/auth/service";
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -22,11 +23,12 @@ export const Route = createFileRoute("/")({
 function Index() {
   const { lang, toggleLang } = useLang();
   const { isLoggedIn } = useSession(lang);
+  const role = authService.getRole();
   const [showCharter, setShowCharter] = useState(false);
 
   return (
     <PageShell>
-      <Nav lang={lang} toggleLang={toggleLang} isLoggedIn={isLoggedIn} />
+      <Nav lang={lang} toggleLang={toggleLang} isLoggedIn={isLoggedIn} role={role} />
       <Hero lang={lang} />
       <AboutSection lang={lang} setShowCharter={setShowCharter} />
 

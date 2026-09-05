@@ -1,9 +1,15 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { ChevronLeft } from "lucide-react";
-import { useAdminArticles, saveArticle } from "@/compenents/admin/adminStore";
+import { ChevronLeft, Loader2 } from "lucide-react";
+import {
+  useAdminArticles,
+  saveArticle,
+  loadArticleDetail,
+} from "@/compenents/admin/adminStore";
 import { ArticleEditor } from "@/compenents/admin/ArticleEditor";
 import { RequireSection } from "@/compenents/admin/SectionGate";
+import type { PortalArticle } from "@/newsData";
 
 /** Editor page — $id is an article id, or "moi" for a fresh article. */
 export const Route = createFileRoute("/admin/bai-viet/$id")({
@@ -18,14 +24,62 @@ function AdminArticleEditorPage() {
   const { id } = Route.useParams();
   const navigate = useNavigate();
   const articles = useAdminArticles();
-
   const isNew = id === "moi";
-  const article = isNew ? undefined : articles.find((a) => a.id === id);
 
-  if (!isNew && !article) {
+  const [fetchedArticle, setFetchedArticle] = useState<PortalArticle | null>(
+    null,
+  );
+  const [fetching, setFetching] = useState(false);
+  const [fetchDone, setFetchDone] = useState(false);
+
+  // Try cache first, then fetch from API
+  const cachedArticle = isNew
+    ? undefined
+    : articles.find((a) => a.id === id);
+
+  useEffect(() => {
+    if (isNew || cachedArticle) {
+      setFetchDone(true);
+      return;
+    }
+    // Not in cache — fetch from API
+    setFetching(true);
+    loadArticleDetail(id).then((detail) => {
+      setFetchedArticle(detail);
+      setFetching(false);
+      setFetchDone(true);
+    });
+  }, [id, isNew, cachedArticle]);
+
+  const article = cachedArticle ?? fetchedArticle;
+
+  if (!isNew && fetching) {
     return (
       <div className="max-w-3xl">
-        <p className="text-sm text-white/60">Không tìm thấy bài viết "{id}".</p>
+        <div className="flex items-center gap-3 mb-6">
+          <Link
+            to="/admin/bai-viet"
+            className="flex items-center gap-1 text-[11px] font-bold uppercase text-white/50 hover:text-white transition-colors"
+          >
+            <ChevronLeft className="w-3.5 h-3.5" />
+            Bài viết
+          </Link>
+          <h1 className="text-xl font-black text-white">Sửa bài viết</h1>
+        </div>
+        <div className="flex items-center justify-center py-16 text-white/40 gap-2">
+          <Loader2 className="w-5 h-5 animate-spin" />
+          <span className="text-sm">Đang tải bài viết...</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isNew && fetchDone && !article) {
+    return (
+      <div className="max-w-3xl">
+        <p className="text-sm text-white/60">
+          Không tìm thấy bài viết "{id}".
+        </p>
         <Link
           to="/admin/bai-viet"
           className="inline-flex items-center gap-1.5 mt-4 text-[11px] font-bold uppercase text-accent hover:text-cyan-300 transition-colors"
@@ -53,9 +107,8 @@ function AdminArticleEditorPage() {
       </div>
 
       <ArticleEditor
-        // Remount when switching between articles so state resets cleanly.
         key={id}
-        initial={article}
+        initial={article ?? undefined}
         onSave={async (next, publish) => {
           try {
             await saveArticle(next);

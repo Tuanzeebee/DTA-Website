@@ -5,9 +5,12 @@ import { ScrollReveal } from "@/compenents/ScrollReveal";
 import { SectionBackground } from "@/compenents/SectionBackground";
 import { seamTint } from "@/compenents/seamTint";
 import { translationStrings } from "@/data";
+import { authService } from "@/lib/auth/service";
 import type { Lang } from "@/types";
 
 export function Hero({ lang }: { lang: Lang }) {
+  const role = authService.getRole();
+  const portalPath = role === "admin" || role === "editor" ? "/admin" : "/portal";
   return (
     <section
       id="top"
@@ -102,7 +105,7 @@ export function Hero({ lang }: { lang: Lang }) {
               labels at 375px, and a wrapped CTA label reads as broken. */}
             <div className="mt-7 md:mt-8 flex flex-col sm:flex-row sm:flex-wrap gap-3 sm:gap-4">
               <Link
-                to="/portal"
+                to={portalPath}
                 className="w-full sm:w-auto min-h-13 px-7 rounded-full font-bold text-sm text-primary-foreground hover:scale-[1.02] active:scale-95 transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer"
                 style={{
                   background: "var(--gradient-primary)",

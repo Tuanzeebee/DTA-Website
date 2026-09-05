@@ -316,3 +316,181 @@ export function adminDeleteUser(
 ): Promise<{ id: string; deleted: boolean }> {
   return authFetch(`/admin/users/${id}`, { method: "DELETE" });
 }
+
+/* ---------------- member endpoints ---------------- */
+
+export interface MemberItem {
+  id: string;
+  name: string;
+  role: string;
+  type: string;
+  domain: string;
+  logoUrl: string | null;
+  website: string | null;
+  sortOrder: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/** Public: fetch all members for homepage. */
+export function fetchMembers(): Promise<MemberItem[]> {
+  return fetchJson("/news/members");
+}
+
+/** Admin: fetch all members. */
+export function adminFetchMembers(): Promise<MemberItem[]> {
+  return authFetch("/admin/members");
+}
+
+/** Admin: create a new member. */
+export function adminCreateMember(data: {
+  name: string;
+  role?: string;
+  type?: string;
+  domain?: string;
+  logoUrl?: string;
+  website?: string;
+  sortOrder?: number;
+}): Promise<MemberItem> {
+  return authFetch("/admin/members", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+}
+
+/** Admin: update an existing member. */
+export function adminUpdateMember(
+  id: string,
+  data: {
+    name?: string;
+    role?: string;
+    type?: string;
+    domain?: string;
+    logoUrl?: string;
+    website?: string;
+    sortOrder?: number;
+  },
+): Promise<MemberItem> {
+  return authFetch(`/admin/members/${id}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+}
+
+/** Admin: delete a member. */
+export function adminDeleteMember(
+  id: string,
+): Promise<{ id: string; deleted: boolean }> {
+  return authFetch(`/admin/members/${id}`, { method: "DELETE" });
+}
+
+/* ---------------- ad placement endpoints ---------------- */
+
+export interface AdPlacementItem {
+  id: string;
+  title: string;
+  slot: string;
+  imageUrl: string;
+  linkUrl: string;
+  active: boolean;
+  note: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/** Public: fetch active ads for a slot. */
+export function fetchAdsBySlot(slot: string): Promise<AdPlacementItem[]> {
+  return fetchJson(`/news/ads?slot=${encodeURIComponent(slot)}`);
+}
+
+/** Admin: fetch all ads. */
+export function adminFetchAds(): Promise<AdPlacementItem[]> {
+  return authFetch("/admin/ads");
+}
+
+/** Admin: create a new ad. */
+export function adminCreateAd(data: {
+  title: string;
+  slot?: string;
+  imageUrl: string;
+  linkUrl: string;
+  active?: boolean;
+  note?: string;
+}): Promise<AdPlacementItem> {
+  return authFetch("/admin/ads", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+}
+
+/** Admin: update an existing ad. */
+export function adminUpdateAd(
+  id: string,
+  data: {
+    title?: string;
+    slot?: string;
+    imageUrl?: string;
+    linkUrl?: string;
+    active?: boolean;
+    note?: string;
+  },
+): Promise<AdPlacementItem> {
+  return authFetch(`/admin/ads/${id}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+}
+
+/** Admin: toggle ad active status. */
+export function adminToggleAd(
+  id: string,
+): Promise<AdPlacementItem> {
+  return authFetch(`/admin/ads/${id}/toggle`, { method: "PATCH" });
+}
+
+/** Admin: delete an ad. */
+export function adminDeleteAd(
+  id: string,
+): Promise<{ id: string; deleted: boolean }> {
+  return authFetch(`/admin/ads/${id}`, { method: "DELETE" });
+}
+
+/** Upload an ad image file to the backend. Returns the serveable URL. */
+export async function uploadAdImage(file: File): Promise<string> {
+  const doUpload = async (token: string | null) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    const headers: Record<string, string> = {};
+    if (token) headers["Authorization"] = `Bearer ${token}`;
+    return fetch(`${API_BASE}/admin/ads/upload`, {
+      method: "POST",
+      headers,
+      body: formData,
+    });
+  };
+
+  const token = authService.getAccessToken();
+  let res = await doUpload(token);
+
+  if (res.status === 401) {
+    const refreshed = await authService.refreshAccessToken();
+    if (refreshed) {
+      res = await doUpload(authService.getAccessToken());
+    }
+  }
+
+  if (!res.ok) {
+    const body = await res.text().catch(() => "");
+    if (res.status === 401) {
+      authService.logout();
+      window.location.href = "/dang-nhap";
+    }
+    throw new Error(body || `Upload failed (${res.status})`);
+  }
+  const data = (await res.json()) as { url: string };
+  return data.url;
+}

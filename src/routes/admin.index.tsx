@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import {
   FileText,
@@ -15,8 +15,8 @@ import {
   useAdminArticles,
   resetToMockData,
 } from "@/compenents/admin/adminStore";
-import { useAdminMembers } from "@/compenents/admin/memberStore";
 import { RequireSection } from "@/compenents/admin/SectionGate";
+import { adminFetchMembers } from "@/lib/api";
 
 /** Dashboard overview: headline stats, per-topic counts, recent articles. */
 export const Route = createFileRoute("/admin/")({
@@ -29,7 +29,13 @@ export const Route = createFileRoute("/admin/")({
 
 function AdminOverview() {
   const articles = useAdminArticles();
-  const members = useAdminMembers();
+  const [memberCount, setMemberCount] = useState(0);
+
+  useEffect(() => {
+    adminFetchMembers()
+      .then((m) => setMemberCount(m.length))
+      .catch(() => {});
+  }, []);
 
   const stats = useMemo(() => {
     const published = articles.filter((a) => a.status !== "draft");
@@ -37,14 +43,14 @@ function AdminOverview() {
       total: articles.length,
       drafts: articles.length - published.length,
       views: published.reduce((s, a) => s + a.views, 0),
-      members: members.length,
+      members: memberCount,
       byTopic: mainTopics.map((t) => ({
         topic: t,
         count: articles.filter((a) => a.topic === t.slug).length,
       })),
       recent: [...articles].slice(-5).reverse(),
     };
-  }, [articles, members]);
+  }, [articles, memberCount]);
 
   return (
     <div className="space-y-8 max-w-6xl">

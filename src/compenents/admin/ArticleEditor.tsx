@@ -31,6 +31,7 @@ import {
 } from "@/compenents/admin/bodyFormats";
 import {
   mainTopics,
+  loadMainTopics,
   type PortalArticle,
   type ArticleBlock,
   type ArticleImage,
@@ -52,13 +53,19 @@ export function ArticleEditor({
   initial?: PortalArticle;
   onSave: (article: PortalArticle, publish: boolean) => void;
 }) {
+  const [topicsReady, setTopicsReady] = useState(mainTopics.length > 0);
+
+  useEffect(() => {
+    loadMainTopics().then(() => setTopicsReady(true));
+  }, []);
+
   const [title, setTitle] = useState(initial?.title ?? "");
   const [summary, setSummary] = useState(initial?.summary ?? "");
   const [topicSlug, setTopicSlug] = useState(
-    initial?.topic ?? mainTopics[0].slug,
+    initial?.topic ?? mainTopics[0]?.slug ?? "",
   );
   const [categorySlug, setCategorySlug] = useState(
-    initial?.category ?? mainTopics[0].categories[0].slug,
+    initial?.category ?? mainTopics[0]?.categories?.[0]?.slug ?? "",
   );
   const [date, setDate] = useState(initial?.date ?? todayVn());
   const [author, setAuthor] = useState(initial?.author ?? "");
@@ -76,7 +83,7 @@ export function ArticleEditor({
 
   const topic = useMemo(
     () => mainTopics.find((t) => t.slug === topicSlug) ?? mainTopics[0],
-    [topicSlug],
+    [topicSlug, topicsReady],
   );
 
   const buildArticle = (publish: boolean): PortalArticle | null => {
@@ -88,10 +95,10 @@ export function ArticleEditor({
       id: initial?.id ?? newArticleId(),
       title: title.trim(),
       summary: summary.trim(),
-      topic: topic.slug,
+      topic: topic?.slug ?? "",
       category:
-        topic.categories.find((c) => c.slug === categorySlug)?.slug ??
-        topic.categories[0].slug,
+        topic?.categories?.find((c) => c.slug === categorySlug)?.slug ??
+        topic?.categories?.[0]?.slug ?? "",
       date: date.trim() || todayVn(),
       image: image.trim() || "",
       tags: tags
@@ -120,7 +127,7 @@ export function ArticleEditor({
       id: "preview",
       title: title || "(Chưa có tiêu đề)",
       summary,
-      topic: topic.slug,
+      topic: topic?.slug ?? "",
       category: categorySlug,
       date,
       image,
@@ -236,7 +243,7 @@ export function ArticleEditor({
                 onChange={(e) => setCategorySlug(e.target.value)}
                 className={INPUT}
               >
-                {topic.categories.map((c) => (
+                {topic?.categories?.map((c) => (
                   <option key={c.slug} value={c.slug}>
                     {c.name}
                   </option>

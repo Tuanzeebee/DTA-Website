@@ -126,13 +126,11 @@ export const programsAndServices: ProgramService[] = [
 
 export interface DtaMember {
   id: string;
-  name: { vn: string; en: string };
-  role: { vn: string; en: string };
+  name: string;
+  role: string;
   type: "organization" | "individual" | "advisory";
-  domain: { vn: string; en: string };
-  logoInitials: string;
+  domain: string;
   logoUrl?: string;
-  /** Member site URL — logos on the news portal must link out (per brief). */
   website?: string;
 }
 
@@ -140,58 +138,48 @@ export interface DtaMember {
 export const membersData: DtaMember[] = [];
 
 /* ------------------------------------------------------------------ *
- * Member store: the admin dashboard writes created/edited members to
- * localStorage as an OVERLAY on membersData above — an override with a
- * base id replaces that row, new ids append, hidden ids remove base rows.
- * Every consumer (landing marquee, portal logo grids, admin) reads
- * through allMembers(), so admin edits are live site-wide. Swapping this
- * for a real API later only touches this block + the admin memberStore.
+ * allMembers() now fetches from the real backend API.
  * ------------------------------------------------------------------ */
 
-export const ADMIN_MEMBERS_KEY = "dta-admin-members";
-export const ADMIN_MEMBERS_HIDDEN_KEY = "dta-admin-members-hidden";
-
-interface MemberCache {
-  key: string;
-  all: DtaMember[];
-}
-let memberCache: MemberCache | null = null;
+let cachedMembers: DtaMember[] | null = null;
+let cacheKey = "";
 
 export function allMembers(): DtaMember[] {
-  let rawA = "";
-  let rawH = "";
-  try {
-    rawA = localStorage.getItem(ADMIN_MEMBERS_KEY) ?? "";
-    rawH = localStorage.getItem(ADMIN_MEMBERS_HIDDEN_KEY) ?? "";
-  } catch {
-    return membersData;
-  }
-  const key = `${rawA} ${rawH}`;
-  // Raw-string memo keeps the returned array referentially stable for
-  // hooks/useSyncExternalStore.
-  if (memberCache?.key === key) return memberCache.all;
+  return cachedMembers ?? membersData;
+}
 
-  let overrides: DtaMember[] = [];
-  let hidden: string[] = [];
+/** Fetch members from the backend and update the cache. Called by components. */
+export async function loadMembersFromApi(): Promise<DtaMember[]> {
   try {
-    const a: unknown = rawA ? JSON.parse(rawA) : [];
-    if (Array.isArray(a)) overrides = a as DtaMember[];
-    const h: unknown = rawH ? JSON.parse(rawH) : [];
-    if (Array.isArray(h)) hidden = h.filter((x) => typeof x === "string");
+    const res = await fetch("/api/news/members");
+    if (!res.ok) return cachedMembers ?? membersData;
+    const data = (await res.json()) as Array<{
+      id: string;
+      name: string;
+      role: string;
+      type: string;
+      domain: string;
+      logoUrl: string | null;
+      website: string | null;
+    }>;
+    const members: DtaMember[] = data.map((m) => ({
+      id: m.id,
+      name: m.name,
+      role: m.role,
+      type: m.type as DtaMember["type"],
+      domain: m.domain,
+      logoUrl: m.logoUrl ?? undefined,
+      website: m.website ?? undefined,
+    }));
+    const key = JSON.stringify(members);
+    if (key !== cacheKey) {
+      cacheKey = key;
+      cachedMembers = members;
+    }
+    return members;
   } catch {
-    return membersData;
+    return cachedMembers ?? membersData;
   }
-
-  const byId = new Map(overrides.map((o) => [o.id, o]));
-  const baseIds = new Set(membersData.map((m) => m.id));
-  const all = [
-    ...membersData
-      .filter((m) => !hidden.includes(m.id))
-      .map((m) => byId.get(m.id) ?? m),
-    ...overrides.filter((o) => !baseIds.has(o.id)),
-  ];
-  memberCache = { key, all };
-  return all;
 }
 
 export interface DtaNews {

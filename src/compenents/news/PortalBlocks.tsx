@@ -23,7 +23,8 @@ import {
 import { useSavedArticles } from "@/hooks/useSavedArticles";
 import { useLang } from "@/hooks/useLang";
 import { allMembers } from "@/data";
-import { adStore, activeAdsForSlot } from "@/compenents/admin/opsData";
+import { fetchAdsBySlot } from "@/lib/api";
+import type { AdPlacement } from "@/compenents/admin/opsData";
 import {
   topicName,
   categoryName,
@@ -669,7 +670,26 @@ export function SidebarMostRead() {
 
 export function SidebarAds({ count = 3 }: { count?: number }) {
   const { lang } = useLang();
-  const ads = activeAdsForSlot(adStore.useItems(), "sidebar").slice(0, count);
+  const [ads, setAds] = useState<AdPlacement[]>([]);
+
+  useEffect(() => {
+    fetchAdsBySlot("sidebar")
+      .then((data) =>
+        setAds(
+          data.slice(0, count).map((a) => ({
+            id: a.id,
+            title: a.title,
+            slot: a.slot as AdPlacement["slot"],
+            imageUrl: a.imageUrl,
+            linkUrl: a.linkUrl,
+            active: a.active,
+            note: a.note ?? undefined,
+          })),
+        ),
+      )
+      .catch(() => {});
+  }, [count]);
+
   const empty = count - ads.length;
   return (
     <div className="space-y-3">
@@ -992,7 +1012,7 @@ export function MemberLogoGrid({ compact = false }: { compact?: boolean }) {
           href={m.website ?? "#"}
           target="_blank"
           rel="noreferrer noopener"
-          title={m.name.vn}
+          title={m.name}
           className={`${
             compact ? "h-12" : "h-14 md:h-16 w-28 md:w-32"
           } rounded-xl bg-white/90 border border-white/10 flex items-center justify-center overflow-hidden hover:scale-105 hover:border-cyan-400/50 transition-all`}
@@ -1000,13 +1020,13 @@ export function MemberLogoGrid({ compact = false }: { compact?: boolean }) {
           {m.logoUrl ? (
             <img
               src={m.logoUrl}
-              alt={m.name.vn}
+              alt={m.name}
               referrerPolicy="no-referrer"
               className="max-h-full max-w-full object-contain p-1.5"
             />
           ) : (
             <span className="text-[11px] font-black text-slate-700">
-              {m.logoInitials}
+              {m.name.split(/\s+/).slice(0, 2).map((w) => w[0]).join("").toUpperCase()}
             </span>
           )}
         </a>

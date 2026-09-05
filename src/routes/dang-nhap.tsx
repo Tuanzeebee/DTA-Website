@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { ArrowLeft, Newspaper } from "lucide-react";
-import { useLang, useSession } from "@/hooks/useLang";
+import { useLang } from "@/hooks/useLang";
 import { LoginCard } from "@/compenents/member/LoginCard";
 import { ROLE_LABEL } from "@/lib/auth/permissions";
 import type { AdminUser } from "@/lib/auth/types";
@@ -20,7 +20,6 @@ export const Route = createFileRoute("/dang-nhap")({
 
 function DangNhapPage() {
   const { lang } = useLang();
-  const { handleLogin } = useSession(lang);
   const navigate = useNavigate();
   const { redirect } = Route.useSearch();
 
@@ -37,11 +36,6 @@ function DangNhapPage() {
         : `Signed in as ${ROLE_LABEL[user.role]} (${user.name}).`,
     );
     navigate({ href: safeRedirect });
-  };
-
-  const handleMemberLogin = () => {
-    handleLogin(true);
-    navigate({ to: "/portal" });
   };
 
   return (
@@ -72,8 +66,8 @@ function DangNhapPage() {
 
         <LoginCard
           lang={lang}
-          onLogin={handleMemberLogin}
           onAdminLogin={handleAdminLogin}
+          onMemberLogin={() => navigate({ to: "/portal" })}
         />
       </div>
     </div>

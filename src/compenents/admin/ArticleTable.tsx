@@ -178,7 +178,7 @@ export function ArticleTable() {
                       {!draft && (
                         <Link
 to="/news/article/$slug"
-                            params={{ slug: a.id }}
+                            params={{ slug: a.slug ?? a.id }}
                           title="Xem trên trang tin"
                           className="p-1.5 rounded-lg border border-white/10 text-white/50 hover:text-cyan-300 transition-colors"
                         >

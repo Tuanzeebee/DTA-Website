@@ -1,10 +1,9 @@
 import { createCollectionStore, genId } from "./collectionStore";
 
 /**
- * Domain data for the admin ops pages. All seeds are MOCK rows
- * (<!-- mock -->) so every screen demos with content; real records replace
- * them the moment the user edits (the whole list then lives in
- * localStorage).
+ * Domain data for the admin ops pages. Seeds are empty — real data comes
+ * from the backend API. The ad placement store has been migrated to the
+ * backend (Prisma AdPlacement model).
  */
 
 /* ---------------- Hội phí & Tài chính ---------------- */
@@ -36,7 +35,12 @@ export interface ResourceDoc {
   /** Số hiệu văn bản, ví dụ "47/2026/TT-BKHCN". */
   code?: string;
   category:
-    "thong-tu" | "nghi-dinh" | "quyet-dinh" | "bieu-mau" | "an-pham" | "khac";
+    | "thong-tu"
+    | "nghi-dinh"
+    | "quyet-dinh"
+    | "bieu-mau"
+    | "an-pham"
+    | "khac";
   date: string;
   /** URL hoặc data URL của file PDF. */
   fileUrl: string;
@@ -129,14 +133,10 @@ export type AdSlot = "banner" | "ad" | "sponsor" | "sidebar";
 
 export interface AdPlacement {
   id: string;
-  /** Tên chiến dịch / đơn vị quảng cáo — hiển thị trong admin và alt ảnh. */
   title: string;
   slot: AdSlot;
-  /** URL hoặc data URL của ảnh quảng cáo. */
   imageUrl: string;
-  /** Trang đích mở ra khi độc giả bấm vào ảnh. */
   linkUrl: string;
-  /** Tắt để gỡ khỏi trang tin mà không xóa dữ liệu. */
   active: boolean;
   note?: string;
 }
@@ -151,10 +151,8 @@ export const AD_SLOTS: { value: AdSlot; label: string }[] = [
 export const adSlotLabel = (slot: AdSlot) =>
   AD_SLOTS.find((s) => s.value === slot)?.label ?? slot;
 
-/** Các quảng cáo đang BẬT của một vị trí — trang tin đọc qua hàm này. */
+/** Các quảng cáo đang BẬT của một vị trí. */
 export const activeAdsForSlot = (ads: AdPlacement[], slot: AdSlot) =>
   ads.filter((a) => a.active && a.slot === slot);
-
-export const adStore = createCollectionStore<AdPlacement>("dta-admin-ads", []);
 
 export { genId };

@@ -2,13 +2,24 @@ import { useState, type ReactNode } from "react";
 import { toast } from "sonner";
 import { Save, X } from "lucide-react";
 import type { DtaMember } from "@/data";
-import { newMemberId } from "@/compenents/admin/memberStore";
-import { ImageInput } from "@/compenents/admin/ArticleEditor";
+import { uploadImage } from "@/lib/api";
+
+const INPUT =
+  "w-full px-3 py-2 bg-white/5 border border-white/10 rounded-xl text-xs text-white placeholder:text-white/30 focus:outline-none focus:border-cyan-400/60";
+
+function Field({ label, children }: { label: string; children: ReactNode }) {
+  return (
+    <div>
+      <label className="block text-[10px] uppercase tracking-wider text-white/60 font-bold mb-1.5">
+        {label}
+      </label>
+      {children}
+    </div>
+  );
+}
 
 /**
- * Add/edit form for one member. Bilingual fields keep VN as the source of
- * truth — an empty EN falls back to the VN value on save, so editors are
- * never blocked on translations.
+ * Add/edit form for one member. Calls API via parent onSave callback.
  */
 export function MemberEditor({
   initial,
@@ -19,48 +30,45 @@ export function MemberEditor({
   onSave: (member: DtaMember) => void;
   onCancel: () => void;
 }) {
-  const [nameVn, setNameVn] = useState(initial?.name.vn ?? "");
-  const [nameEn, setNameEn] = useState(initial?.name.en ?? "");
-  const [roleVn, setRoleVn] = useState(initial?.role.vn ?? "");
-  const [roleEn, setRoleEn] = useState(initial?.role.en ?? "");
+  const [name, setName] = useState(initial?.name ?? "");
+  const [role, setRole] = useState(initial?.role ?? "Hội viên");
   const [type, setType] = useState<DtaMember["type"]>(
     initial?.type ?? "organization",
   );
-  const [domainVn, setDomainVn] = useState(initial?.domain.vn ?? "");
-  const [domainEn, setDomainEn] = useState(initial?.domain.en ?? "");
-  const [initials, setInitials] = useState(initial?.logoInitials ?? "");
+  const [domain, setDomain] = useState(initial?.domain ?? "");
   const [logoUrl, setLogoUrl] = useState(initial?.logoUrl ?? "");
   const [website, setWebsite] = useState(initial?.website ?? "");
+  const [saving, setSaving] = useState(false);
 
-  const submit = () => {
-    if (!nameVn.trim()) {
-      toast.error("Cần nhập tên hội viên (tiếng Việt).");
+  const submit = async () => {
+    if (!name.trim()) {
+      toast.error("Cần nhập tên hội viên.");
       return;
     }
-    const fallbackInitials =
-      nameVn
-        .trim()
-        .split(/\s+/)
-        .slice(-3)
-        .map((w) => w[0])
-        .join("")
-        .toUpperCase() || "DTA";
-    onSave({
-      id: initial?.id ?? newMemberId(),
-      name: { vn: nameVn.trim(), en: nameEn.trim() || nameVn.trim() },
-      role: {
-        vn: roleVn.trim() || "Hội viên",
-        en: roleEn.trim() || roleVn.trim() || "Member",
-      },
-      type,
-      domain: {
-        vn: domainVn.trim(),
-        en: domainEn.trim() || domainVn.trim(),
-      },
-      logoInitials: initials.trim().toUpperCase() || fallbackInitials,
-      logoUrl: logoUrl.trim() || undefined,
-      website: website.trim() || undefined,
-    });
+    setSaving(true);
+    try {
+      onSave({
+        id: initial?.id ?? "",
+        name: name.trim(),
+        role: role.trim() || "Hội viên",
+        type,
+        domain: domain.trim(),
+        logoUrl: logoUrl.trim() || undefined,
+        website: website.trim() || undefined,
+      });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleLogoUpload = async (file: File) => {
+    try {
+      const url = await uploadImage(file);
+      setLogoUrl(url);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Lỗi upload";
+      toast.error(msg);
+    }
   };
 
   return (
@@ -79,54 +87,31 @@ export function MemberEditor({
       </div>
 
       <div className="grid sm:grid-cols-2 gap-4">
-        <Field label="Tên hội viên (VN) *">
+        <Field label="Tên hội viên *">
           <input
-            value={nameVn}
-            onChange={(e) => setNameVn(e.target.value)}
+            value={name}
+            onChange={(e) => setName(e.target.value)}
             placeholder="Công ty Cổ phần…"
             className={INPUT}
           />
         </Field>
-        <Field label="Tên hội viên (EN — trống = dùng VN)">
+        <Field label="Vai trò">
           <input
-            value={nameEn}
-            onChange={(e) => setNameEn(e.target.value)}
+            value={role}
+            onChange={(e) => setRole(e.target.value)}
+            placeholder="Hội viên Tổ chức"
             className={INPUT}
           />
         </Field>
 
-        <Field label="Vai trò (VN)">
+        <Field label="Lĩnh vực hoạt động">
           <input
-            value={roleVn}
-            onChange={(e) => setRoleVn(e.target.value)}
-            placeholder="Hội viên Tổ chức · Doanh nghiệp phần mềm"
-            className={INPUT}
-          />
-        </Field>
-        <Field label="Vai trò (EN — trống = dùng VN)">
-          <input
-            value={roleEn}
-            onChange={(e) => setRoleEn(e.target.value)}
-            className={INPUT}
-          />
-        </Field>
-
-        <Field label="Lĩnh vực hoạt động (VN)">
-          <input
-            value={domainVn}
-            onChange={(e) => setDomainVn(e.target.value)}
+            value={domain}
+            onChange={(e) => setDomain(e.target.value)}
             placeholder="Phát triển phần mềm, AI…"
             className={INPUT}
           />
         </Field>
-        <Field label="Lĩnh vực (EN — trống = dùng VN)">
-          <input
-            value={domainEn}
-            onChange={(e) => setDomainEn(e.target.value)}
-            className={INPUT}
-          />
-        </Field>
-
         <Field label="Loại hội viên">
           <select
             value={type}
@@ -138,22 +123,29 @@ export function MemberEditor({
             <option value="advisory">Cố vấn</option>
           </select>
         </Field>
-        <Field label="Chữ viết tắt trên logo (trống = tự sinh)">
-          <input
-            value={initials}
-            onChange={(e) => setInitials(e.target.value)}
-            maxLength={4}
-            placeholder="FPT"
-            className={INPUT}
-          />
-        </Field>
       </div>
 
       <div className="mt-4 space-y-4">
-        <Field label="Logo — dán URL hoặc chọn file từ máy">
-          <ImageInput value={logoUrl} onChange={setLogoUrl} />
+        <Field label="Logo URL">
+          <input
+            value={logoUrl}
+            onChange={(e) => setLogoUrl(e.target.value)}
+            placeholder="https://… hoặc upload file bên dưới"
+            className={INPUT}
+          />
         </Field>
-        <Field label="Website hội viên (logo sẽ nhúng link này)">
+        <Field label="Hoặc upload logo từ máy">
+          <input
+            type="file"
+            accept="image/*"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) handleLogoUpload(file);
+            }}
+            className="w-full text-xs text-white/60 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-[11px] file:font-bold file:bg-white/10 file:text-white hover:file:bg-white/20 cursor-pointer"
+          />
+        </Field>
+        <Field label="Website hội viên">
           <input
             value={website}
             onChange={(e) => setWebsite(e.target.value)}
@@ -172,30 +164,17 @@ export function MemberEditor({
         </button>
         <button
           onClick={submit}
-          className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold text-primary-foreground hover:opacity-90 transition-all cursor-pointer"
+          disabled={saving}
+          className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold text-primary-foreground hover:opacity-90 transition-all cursor-pointer disabled:opacity-50"
           style={{
             background: "var(--gradient-primary)",
             boxShadow: "var(--shadow-glow)",
           }}
         >
           <Save className="w-3.5 h-3.5" />
-          {initial ? "Lưu thay đổi" : "Thêm hội viên"}
+          {saving ? "Đang lưu..." : initial ? "Lưu thay đổi" : "Thêm hội viên"}
         </button>
       </div>
-    </div>
-  );
-}
-
-const INPUT =
-  "w-full px-3 py-2 bg-white/5 border border-white/10 rounded-xl text-xs text-white placeholder:text-white/30 focus:outline-none focus:border-cyan-400/60";
-
-function Field({ label, children }: { label: string; children: ReactNode }) {
-  return (
-    <div>
-      <label className="block text-[10px] uppercase tracking-wider text-white/60 font-bold mb-1.5">
-        {label}
-      </label>
-      {children}
     </div>
   );
 }

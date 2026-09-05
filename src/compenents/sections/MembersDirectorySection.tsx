@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Globe,
   Building,
@@ -12,17 +12,16 @@ import {
 import { SectionBackground } from "@/compenents/SectionBackground";
 import { seamTint } from "@/compenents/seamTint";
 import { SectionHeader } from "@/compenents/SectionHeader";
-import { allMembers } from "@/data";
+import { allMembers, loadMembersFromApi, type DtaMember } from "@/data";
 import type { Lang } from "@/types";
 import type { LucideIcon } from "lucide-react";
 import doiTacBg from "@/assets/DoiTac.webp";
 
 interface SliderOrg {
   id: string;
-  name: { vn: string; en: string };
-  domain: { vn: string; en: string };
+  name: string;
+  domain: string;
   type: "organization" | "individual" | "advisory";
-  logoInitials: string;
   logoUrl?: string;
   website?: string;
   icon: LucideIcon;
@@ -31,9 +30,7 @@ interface SliderOrg {
   textColor: string;
 }
 
-/** One marquee card. Members with a website become external links (open in a
- *  new tab — the marquee pauses on hover, so the card is clickable at rest);
- *  members without one (individuals, advisors) stay plain divs. */
+/** One marquee card. Members with a website become external links. */
 function MemberCard({ org, lang }: { org: SliderOrg; lang: Lang }) {
   const IconComp = org.icon;
   const typeLabel =
@@ -49,16 +46,22 @@ function MemberCard({ org, lang }: { org: SliderOrg; lang: Lang }) {
           ? "Cố vấn"
           : "Advisor";
 
+  const initials = org.name
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((w) => w[0])
+    .join("")
+    .toUpperCase();
+
   const body = (
     <>
-      {/* Brand Logo graphic */}
       <div
         className={`w-[75px] h-[75px] rounded-2xl flex items-center justify-center text-sm font-black shrink-0 bg-gradient-to-br ${org.gradient} border border-white/10 shadow-md overflow-hidden`}
       >
         {org.logoUrl ? (
           <img
             src={org.logoUrl}
-            alt={org.name[lang]}
+            alt={org.name}
             referrerPolicy="no-referrer"
             className="w-full h-full object-contain p-0.5 bg-white rounded-2xl"
           />
@@ -68,13 +71,13 @@ function MemberCard({ org, lang }: { org: SliderOrg; lang: Lang }) {
       </div>
       <div className="min-w-0 flex-1">
         <h4 className="font-bold text-sm text-white tracking-wide truncate">
-          {org.name[lang]}
+          {org.name}
         </h4>
         <p className="text-[10px] text-muted-foreground mt-0.5 uppercase leading-none font-semibold font-mono tracking-wider">
-          {org.logoInitials} · {typeLabel}
+          {initials} · {typeLabel}
         </p>
         <p className="text-[11px] text-accent/80 truncate mt-1.5 leading-none">
-          {org.domain[lang]}
+          {org.domain}
         </p>
       </div>
     </>
@@ -96,21 +99,20 @@ function MemberCard({ org, lang }: { org: SliderOrg; lang: Lang }) {
       href={org.website}
       target="_blank"
       rel="noreferrer noopener"
-      aria-label={`${org.name[lang]} — website`}
+      aria-label={`${org.name} — website`}
       className={`${cardClass} group cursor-pointer transition-all duration-300 hover:border-accent/50 hover:shadow-[0_0_24px_oklch(0.75_0.19_235_/_0.15)] hover:-translate-y-0.5`}
       style={{ borderColor: org.borderColor }}
     >
       {body}
-      {/* Link affordance: quiet corner arrow, brightens on hover */}
       <ArrowUpRight className="absolute top-3 right-3 w-3.5 h-3.5 text-white/25 group-hover:text-accent transition-colors duration-300" />
     </a>
   );
 }
 
-/** Brand styling per member card — pure, so it lives at module level and
- *  the component memoises over the member list reference. */
-function buildSliderOrgs(members: ReturnType<typeof allMembers>): SliderOrg[] {
+/** Brand styling per member card based on name keywords. */
+function buildSliderOrgs(members: DtaMember[]): SliderOrg[] {
   return members.map((m) => {
+    const name = m.name.toLowerCase();
     let meta = {
       gradient: "from-slate-500/10 to-slate-600/10",
       borderColor: "rgba(148, 163, 184, 0.2)",
@@ -118,53 +120,49 @@ function buildSliderOrgs(members: ReturnType<typeof allMembers>): SliderOrg[] {
       icon: Building as LucideIcon,
     };
 
-    if (m.logoInitials === "FPT") {
+    if (name.includes("fpt")) {
       meta = {
         gradient: "from-orange-500/10 to-red-600/10",
         borderColor: "rgba(249, 115, 22, 0.25)",
         textColor: "text-orange-400",
         icon: Cpu,
       };
-    } else if (m.logoInitials === "DUT") {
+    } else if (name.includes("bách khoa") || name.includes("hust")) {
       meta = {
         gradient: "from-blue-500/10 to-indigo-600/10",
         borderColor: "rgba(59, 130, 246, 0.25)",
         textColor: "text-blue-400",
         icon: Globe,
       };
-    } else if (m.logoInitials === "ACR") {
+    } else if (name.includes("rmit")) {
       meta = {
         gradient: "from-emerald-500/10 to-teal-600/10",
         borderColor: "rgba(16, 185, 129, 0.25)",
         textColor: "text-emerald-400",
         icon: Layers,
       };
-    } else if (m.logoInitials === "ENV") {
+    } else if (name.includes("viettel")) {
       meta = {
         gradient: "from-pink-500/10 to-rose-600/10",
         borderColor: "rgba(236, 72, 153, 0.25)",
         textColor: "text-pink-400",
         icon: Briefcase,
       };
-    } else if (m.logoInitials === "BAP") {
+    } else if (name.includes("vnpt")) {
       meta = {
         gradient: "from-violet-500/10 to-fuchsia-600/10",
         borderColor: "rgba(139, 92, 246, 0.25)",
         textColor: "text-violet-400",
         icon: ShieldCheck,
       };
-    } else if (
-      m.logoInitials === "NTB" ||
-      m.logoInitials === "LNB" ||
-      m.logoInitials === "TKC"
-    ) {
+    } else if (name.includes("tma") || name.includes("ntq")) {
       meta = {
         gradient: "from-teal-500/10 to-cyan-600/10",
         borderColor: "rgba(20, 184, 166, 0.25)",
         textColor: "text-teal-400",
         icon: User,
       };
-    } else if (m.logoInitials === "HHH") {
+    } else if (name.includes("lak") || name.includes("jinbourg")) {
       meta = {
         gradient: "from-amber-500/10 to-yellow-600/10",
         borderColor: "rgba(245, 158, 11, 0.25)",
@@ -184,10 +182,12 @@ function buildSliderOrgs(members: ReturnType<typeof allMembers>): SliderOrg[] {
 }
 
 export function MembersDirectorySection({ lang }: { lang: Lang }) {
-  /* allMembers() is raw-string memoised (stable ref), so this memo only
-     recomputes when membership actually changes — not on every lang toggle
-     or parent re-render of the marquee. */
-  const members = allMembers();
+  const [members, setMembers] = useState<DtaMember[]>(() => allMembers());
+
+  useEffect(() => {
+    loadMembersFromApi().then(setMembers);
+  }, []);
+
   const sliderOrganizations = useMemo(
     () => buildSliderOrgs(members),
     [members],
@@ -209,15 +209,10 @@ export function MembersDirectorySection({ lang }: { lang: Lang }) {
         tintBottom={seamTint.moss}
       />
 
-      {/* Background contrast stack (same recipe as TopicsSection):
-          image -> dark overlay -> black-to-transparent gradient
-          -> faint noise -> content. */}
       <div
         aria-hidden
         className="absolute inset-0 z-0 pointer-events-none [mask-image:linear-gradient(to_bottom,transparent,black_10%,black_90%,transparent)]"
       >
-        {/* scale-[1.04] hides the transparent fringe a CSS blur creates at
-            the element edges. */}
         <img
           src={doiTacBg}
           alt=""

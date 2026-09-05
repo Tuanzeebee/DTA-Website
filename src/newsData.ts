@@ -74,6 +74,48 @@ export function categoryBySlug(
 
 export const mainTopics: MainTopic[] = [];
 
+let topicsLoaded = false;
+
+/** Fetch topics + categories from the backend API and populate mainTopics. */
+export async function loadMainTopics(): Promise<MainTopic[]> {
+  if (topicsLoaded && mainTopics.length > 0) return mainTopics;
+  try {
+    const res = await fetch("/api/news/topics");
+    if (!res.ok) return mainTopics;
+    const data = (await res.json()) as Array<{
+      slug: string;
+      name: string;
+      shortName: string | null;
+      nameEn: string | null;
+      shortEn: string | null;
+      categories: Array<{
+        slug: string;
+        name: string;
+        description: string | null;
+      }>;
+    }>;
+    mainTopics.length = 0;
+    for (const t of data) {
+      mainTopics.push({
+        slug: t.slug,
+        name: t.name,
+        short: t.shortName ?? t.name,
+        nameEn: t.nameEn ?? undefined,
+        shortEn: t.shortEn ?? undefined,
+        categories: (t.categories ?? []).map((c) => ({
+          slug: c.slug,
+          name: c.name,
+          desc: c.description ?? "",
+        })),
+      });
+    }
+    topicsLoaded = true;
+  } catch {
+    // keep empty — fallback to null-safe access
+  }
+  return mainTopics;
+}
+
 export const ADMIN_ARTICLES_KEY = "dta-admin-articles";
 export const ADMIN_HIDDEN_KEY = "dta-admin-hidden";
 
@@ -144,6 +186,7 @@ export type ArticleBlock = string | ArticleImage | ArticleBox;
 
 export interface PortalArticle {
   id: string;
+  slug?: string;
   title: string;
   summary: string;
   topic: string;

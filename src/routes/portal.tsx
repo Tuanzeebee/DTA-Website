@@ -1,14 +1,23 @@
-import { createFileRoute, Outlet, Link } from "@tanstack/react-router";
+import { createFileRoute, Outlet, Link, redirect } from "@tanstack/react-router";
 import { PageShell } from "@/compenents/layout/PageShell";
 import { PortalHeader } from "@/compenents/member/PortalHeader";
 import { useLang } from "@/hooks/useLang";
+import { authService } from "@/lib/auth/service";
 
 /**
  * Member-portal layout: shared chrome for /portal and /portal/dang-ky —
  * the fixed header, the ambient page shell, and a compact footer. Child
  * routes render in <Outlet />; each brings its own main content.
+ *
+ * Admin/Editor users are redirected to /admin — the portal is for members only.
  */
 export const Route = createFileRoute("/portal")({
+  beforeLoad: () => {
+    const role = authService.getRole();
+    if (role === "admin" || role === "editor") {
+      throw redirect({ to: "/admin" });
+    }
+  },
   component: PortalLayout,
 });
 

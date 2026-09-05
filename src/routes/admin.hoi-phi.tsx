@@ -219,7 +219,7 @@ function FeeForm({
   onCancel: () => void;
 }) {
   const members = allMembers();
-  const [memberName, setMemberName] = useState(members[0]?.name.vn ?? "");
+  const [memberName, setMemberName] = useState(members[0]?.name ?? "");
   const [year, setYear] = useState(new Date().getFullYear());
   const [amount, setAmount] = useState(10_000_000);
   const [status, setStatus] = useState<FeeRecord["status"]>("pending");
@@ -234,8 +234,8 @@ function FeeForm({
             className={INPUT}
           >
             {members.map((m) => (
-              <option key={m.id} value={m.name.vn}>
-                {m.name.vn}
+              <option key={m.id} value={m.name}>
+                {m.name}
               </option>
             ))}
           </select>

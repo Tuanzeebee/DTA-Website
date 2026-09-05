@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   adminFetchArticles,
+  adminFetchArticle,
   adminCreateArticle,
   adminUpdateArticle,
   adminDeleteArticle,
@@ -8,6 +9,7 @@ import {
   adminUnpublishArticle,
   adminFetchCategories,
   type AdminArticleItem,
+  type AdminArticleDetailResponse,
 } from "@/lib/api";
 import { authService } from "@/lib/auth/service";
 import { categoryBySlug, type PortalArticle } from "@/newsData";
@@ -42,10 +44,21 @@ function fmtDate(iso: string | null): string {
   return `${dd}/${mm}/${yyyy}`;
 }
 
+/** Convert dd/mm/yyyy to ISO date string for backend. */
+function vnDateToIso(dateStr: string): string | undefined {
+  const parts = dateStr.split("/");
+  if (parts.length !== 3) return undefined;
+  const [dd, mm, yyyy] = parts;
+  const d = new Date(Number(yyyy), Number(mm) - 1, Number(dd));
+  if (isNaN(d.getTime())) return undefined;
+  return d.toISOString();
+}
+
 /** Map backend article item to frontend PortalArticle. */
 function mapArticle(item: AdminArticleItem): PortalArticle {
   return {
     id: item.id,
+    slug: item.slug,
     title: item.title,
     summary: item.summary ?? "",
     topic: item.topic,
@@ -76,12 +89,62 @@ export async function loadArticles(): Promise<PortalArticle[]> {
     cachedArticles = res.items.map(mapArticle);
     cacheRaw = JSON.stringify(cachedArticles);
     notify();
-  } catch {
+  } catch (err) {
+    console.error("[adminStore] loadArticles failed:", err);
     // keep stale data on error
   } finally {
     loading = false;
   }
   return cachedArticles;
+}
+
+/** Map backend detail blocks to frontend ArticleBlock[]. */
+function mapDetailBlocks(blocks: unknown[]): import("@/newsData").ArticleBlock[] {
+  return blocks.map((b) => {
+    if (typeof b === "string") return b;
+    if (b && typeof b === "object" && "src" in b) {
+      return {
+        src: (b as { src: string }).src,
+        caption: (b as { caption?: string }).caption,
+        align: (b as { align?: string }).align ?? "center",
+        wrap: (b as { wrap?: string }).wrap ?? "none",
+        width: (b as { width?: number }).width,
+      } as import("@/newsData").ArticleImage;
+    }
+    if (b && typeof b === "object" && "box" in b) {
+      return { box: (b as { box: string }).box } as import("@/newsData").ArticleBox;
+    }
+    return "";
+  });
+}
+
+/** Fetch a single article by ID from the API, including body blocks. */
+export async function loadArticleDetail(
+  id: string,
+): Promise<PortalArticle | null> {
+  try {
+    const detail: AdminArticleDetailResponse = await adminFetchArticle(id);
+    return {
+      id: detail.id,
+      slug: detail.slug,
+      title: detail.title,
+      summary: detail.summary ?? "",
+      topic: detail.topic,
+      category: detail.category,
+      date: fmtDate(detail.publishedAt ?? detail.date),
+      image: detail.image ?? "",
+      tags: detail.tags ?? [],
+      views: detail.views ?? 0,
+      pdfUrl: detail.pdfUrl ?? undefined,
+      memberUrl: detail.memberUrl ?? undefined,
+      isIntern: detail.isIntern || undefined,
+      author: detail.author ?? undefined,
+      status: mapStatus(detail.status),
+      body: mapDetailBlocks(detail.blocks ?? []),
+    };
+  } catch {
+    return null;
+  }
 }
 
 /* ---------------- reactive hook ---------------- */
@@ -192,6 +255,7 @@ export async function saveArticle(
     tags: article.tags.length > 0 ? article.tags : undefined,
     isIntern: article.isIntern || undefined,
     status: article.status === "published" ? "PUBLISHED" : "DRAFT",
+    publishedAt: article.date ? vnDateToIso(article.date) : undefined,
     blocks: blocks.length > 0 ? blocks : undefined,
   };
 

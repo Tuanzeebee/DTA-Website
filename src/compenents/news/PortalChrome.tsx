@@ -15,11 +15,8 @@ import useEmblaCarousel, {
 import { topicName, topicShort, categoryName } from "@/newsData";
 import { useTopics } from "@/hooks/useNewsApi";
 import { useLang } from "@/hooks/useLang";
-import {
-  adStore,
-  activeAdsForSlot,
-  type AdPlacement,
-} from "@/compenents/admin/opsData";
+import { fetchAdsBySlot } from "@/lib/api";
+import type { AdPlacement } from "@/compenents/admin/opsData";
 import type { Lang } from "@/types";
 
 type EmblaApi = NonNullable<UseEmblaCarouselType[1]>;
@@ -310,12 +307,28 @@ function MenuSearchForm() {
 /**
  * Banner zone — full-width propaganda/campaign banner.
  * The main banner becomes a carousel when multiple active ads exist.
- * Shows ACTIVE ads from /admin/quang-cao; a dashed placeholder
- * holds the slot when nothing is booked. */
+ * Fetches active ads from backend API. */
 export function PortalBanner() {
   const { lang } = useLang();
-  const ads = adStore.useItems();
-  const bannerAds = activeAdsForSlot(ads, "banner");
+  const [bannerAds, setBannerAds] = useState<AdPlacement[]>([]);
+
+  useEffect(() => {
+    fetchAdsBySlot("banner")
+      .then((data) =>
+        setBannerAds(
+          data.map((a) => ({
+            id: a.id,
+            title: a.title,
+            slot: a.slot as AdPlacement["slot"],
+            imageUrl: a.imageUrl,
+            linkUrl: a.linkUrl,
+            active: a.active,
+            note: a.note ?? undefined,
+          })),
+        ),
+      )
+      .catch(() => {});
+  }, []);
 
   return (
     <div className="max-w-7xl mx-auto px-4 md:px-6 mt-6">
