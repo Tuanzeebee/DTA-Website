@@ -1,8 +1,11 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useCallback } from "react";
 import {
   fetchTopics,
   fetchArticles,
   fetchArticleBySlug,
+  fetchAdsBySlot,
+  fetchDigest,
 } from "@/lib/api";
 import {
   mapTopicToMainTopic,
@@ -11,6 +14,7 @@ import {
 } from "@/lib/newsMappers";
 import type { ArticlesQueryParams } from "@/lib/newsApiTypes";
 import type { MainTopic, PortalArticle, ArticlePageResult } from "@/newsData";
+import type { AdPlacementItem } from "@/lib/api";
 
 /** Sort mapping: frontend slug → backend value. */
 const sortMap: Record<string, ArticlesQueryParams["sort"]> = {
@@ -90,4 +94,67 @@ export function useLatestArticles(n = 5) {
 /** Convenience hook: most-read N articles portal-wide. */
 export function useMostReadArticles(n = 5) {
   return useArticles({ sort: "doc-nhieu", pageSize: n });
+}
+
+/** Ads for a given slot — cached 5 min via React Query. */
+export function useAds(slot: string) {
+  return useQuery<AdPlacementItem[]>({
+    queryKey: ["ads", slot],
+    queryFn: () => fetchAdsBySlot(slot),
+    staleTime: 5 * 60 * 1000,
+  });
+}
+
+/**
+ * Digest: single API call that returns latest articles grouped by topic.
+ * Replaces 4 separate useArticles() calls in HomeDigest.
+ */
+export function useDigest(
+  topicSlugs: string[],
+  pageSize = 3,
+) {
+  return useQuery<Record<string, PortalArticle[]>>({
+    queryKey: ["digest", topicSlugs, pageSize],
+    queryFn: async () => {
+      const raw = await fetchDigest(topicSlugs, pageSize);
+      const result: Record<string, PortalArticle[]> = {};
+      for (const [topic, items] of Object.entries(raw)) {
+        result[topic] = items.map(mapListItemToPortal);
+      }
+      return result;
+    },
+    staleTime: 2 * 60 * 1000,
+  });
+}
+
+/**
+ * Prefetch articles for a topic/category on hover.
+ * Returns an onMouseEnter handler to attach to nav links.
+ */
+export function usePrefetchArticles() {
+  const qc = useQueryClient();
+  return useCallback(
+    (topic?: string, category?: string) => {
+      const queryParams = {
+        topic,
+        category,
+        sort: "latest" as const,
+        pageSize: 8,
+      };
+      qc.prefetchQuery({
+        queryKey: ["articles", queryParams],
+        queryFn: async () => {
+          const data = await fetchArticles(queryParams);
+          return {
+            items: data.items.map(mapListItemToPortal),
+            total: data.total,
+            page: data.page,
+            pageCount: data.pageCount,
+          };
+        },
+        staleTime: 2 * 60 * 1000,
+      });
+    },
+    [qc],
+  );
 }

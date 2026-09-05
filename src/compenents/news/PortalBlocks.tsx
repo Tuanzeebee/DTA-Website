@@ -23,8 +23,7 @@ import {
 import { useSavedArticles } from "@/hooks/useSavedArticles";
 import { useLang } from "@/hooks/useLang";
 import { allMembers } from "@/data";
-import { fetchAdsBySlot } from "@/lib/api";
-import type { AdPlacement } from "@/compenents/admin/opsData";
+import type { AdPlacementItem } from "@/lib/api";
 import {
   topicName,
   categoryName,
@@ -38,7 +37,7 @@ import {
   type ArticleSort,
   type ArticleFlag,
 } from "@/newsData";
-import { useTopics, useArticles } from "@/hooks/useNewsApi";
+import { useTopics, useArticles, useAds, useDigest } from "@/hooks/useNewsApi";
 
 export interface ArticleListSearch {
   sort?: ArticleSort;
@@ -184,6 +183,8 @@ export function ArticleCard({
             alt=""
             loading="lazy"
             referrerPolicy="no-referrer"
+            width={640}
+            height={360}
             className="w-full h-full object-cover group-hover:scale-110 group-hover:brightness-110 transition-all duration-700"
           />
           <div className="absolute top-3 left-3">
@@ -237,6 +238,8 @@ export function TopStories({ articles }: { articles: PortalArticle[] }) {
                 src={lead.image}
                 alt=""
                 referrerPolicy="no-referrer"
+                width={640}
+                height={400}
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
               />
             </div>
@@ -286,6 +289,8 @@ export function TopStories({ articles }: { articles: PortalArticle[] }) {
                   alt=""
                   loading="lazy"
                   referrerPolicy="no-referrer"
+                  width={144}
+                  height={108}
                   className="w-full h-full object-cover group-hover:scale-110 group-hover:brightness-110 transition-all duration-700"
                 />
               </div>
@@ -592,6 +597,8 @@ export function SidebarLatest() {
                     alt=""
                     loading="lazy"
                     referrerPolicy="no-referrer"
+                    width={96}
+                    height={64}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
                 </div>
@@ -644,6 +651,8 @@ export function SidebarMostRead() {
                     alt=""
                     loading="lazy"
                     referrerPolicy="no-referrer"
+                    width={96}
+                    height={64}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
                   <span className="absolute top-0 left-0 px-1.5 py-0.5 rounded-br-lg bg-black/70 display text-sm font-black text-gradient-cyan leading-none">
@@ -670,25 +679,8 @@ export function SidebarMostRead() {
 
 export function SidebarAds({ count = 3 }: { count?: number }) {
   const { lang } = useLang();
-  const [ads, setAds] = useState<AdPlacement[]>([]);
-
-  useEffect(() => {
-    fetchAdsBySlot("sidebar")
-      .then((data) =>
-        setAds(
-          data.slice(0, count).map((a) => ({
-            id: a.id,
-            title: a.title,
-            slot: a.slot as AdPlacement["slot"],
-            imageUrl: a.imageUrl,
-            linkUrl: a.linkUrl,
-            active: a.active,
-            note: a.note ?? undefined,
-          })),
-        ),
-      )
-      .catch(() => {});
-  }, [count]);
+  const { data: rawAds = [] } = useAds("sidebar");
+  const ads: AdPlacementItem[] = rawAds.slice(0, count);
 
   const empty = count - ads.length;
   return (
@@ -706,6 +698,8 @@ export function SidebarAds({ count = 3 }: { count?: number }) {
             src={ad.imageUrl}
             alt={ad.title}
             loading="lazy"
+            width={320}
+            height={112}
             className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-500"
           />
           <span className="absolute top-1 right-1.5 text-[8px] font-bold uppercase tracking-[0.2em] text-white/55 bg-black/35 rounded px-1 py-px">
@@ -794,6 +788,8 @@ export function SidebarSameCategory({ article }: { article: PortalArticle }) {
                   alt=""
                   loading="lazy"
                   referrerPolicy="no-referrer"
+                  width={64}
+                  height={44}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 />
               </div>
@@ -827,27 +823,18 @@ export function PortalSidebar() {
 export function HomeDigest() {
   const { lang } = useLang();
   const { data: topics } = useTopics();
-  const { data: suKien } = useArticles({ topic: "su-kien", pageSize: 3 });
-  const { data: digiTech } = useArticles({ topic: "digi-tech", pageSize: 3 });
-  const { data: maiNhaChung } = useArticles({ topic: "mai-nha-chung", pageSize: 3 });
-  const { data: daNang24h } = useArticles({ topic: "da-nang-24h", pageSize: 3 });
-
-  const topicArticles = useMemo(
-    () => ({
-      "su-kien": suKien?.items ?? [],
-      "digi-tech": digiTech?.items ?? [],
-      "mai-nha-chung": maiNhaChung?.items ?? [],
-      "da-nang-24h": daNang24h?.items ?? [],
-    }),
-    [suKien, digiTech, maiNhaChung, daNang24h],
+  const topicSlugs = useMemo(
+    () => topics?.map((t) => t.slug) ?? [],
+    [topics],
   );
+  const { data: digest } = useDigest(topicSlugs, 3);
 
   if (!topics) return null;
 
   return (
     <div className="space-y-8">
       {topics.map((t) => {
-        const heads = topicArticles[t.slug as keyof typeof topicArticles] ?? [];
+        const heads = digest?.[t.slug] ?? [];
         return (
           <section key={t.slug}>
             <Link

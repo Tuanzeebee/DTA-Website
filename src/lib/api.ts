@@ -81,6 +81,19 @@ export function fetchArticleBySlug(
   return fetchJson(`/news/articles/${encodeURIComponent(slug)}`);
 }
 
+export type DigestResponse = Record<string, ArticleListItem[]>;
+
+export function fetchDigest(
+  topicSlugs: string[],
+  pageSize = 3,
+): Promise<DigestResponse> {
+  const qs = new URLSearchParams({
+    topics: topicSlugs.join(","),
+    pageSize: String(pageSize),
+  });
+  return fetchJson(`/news/articles/digest?${qs.toString()}`);
+}
+
 /* ---------------- admin endpoints ---------------- */
 
 export interface AdminArticleItem {

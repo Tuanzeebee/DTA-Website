@@ -13,10 +13,9 @@ import useEmblaCarousel, {
   type UseEmblaCarouselType,
 } from "embla-carousel-react";
 import { topicName, topicShort, categoryName } from "@/newsData";
-import { useTopics } from "@/hooks/useNewsApi";
+import { useAds, useTopics, usePrefetchArticles } from "@/hooks/useNewsApi";
 import { useLang } from "@/hooks/useLang";
-import { fetchAdsBySlot } from "@/lib/api";
-import type { AdPlacement } from "@/compenents/admin/opsData";
+import type { AdPlacementItem } from "@/lib/api";
 import type { Lang } from "@/types";
 
 type EmblaApi = NonNullable<UseEmblaCarouselType[1]>;
@@ -49,6 +48,7 @@ export function PortalMenuBar() {
   const clock = useClock(lang);
   const navRef = useRef<HTMLElement>(null);
   const { data: mainTopics = [] } = useTopics();
+  const prefetch = usePrefetchArticles();
 
   /* State-driven dropdown instead of pure CSS hover/focus-within: navigation
      here is client-side (no page reload), so a clicked link KEEPS focus and a
@@ -132,7 +132,10 @@ export function PortalMenuBar() {
               <div
                 key={t.slug}
                 className="relative shrink-0"
-                onMouseEnter={() => setOpenTopic(t.slug)}
+                onMouseEnter={() => {
+                  setOpenTopic(t.slug);
+                  prefetch(t.slug);
+                }}
                 onMouseLeave={() => setOpenTopic(null)}
                 /* Keyboard: opens when any link inside receives focus, closes
                    when focus moves outside this topic's subtree. */
@@ -171,6 +174,7 @@ export function PortalMenuBar() {
                         key={c.slug}
                         to="/news/$topic/$category"
                         params={{ topic: t.slug, category: c.slug }}
+                        onMouseEnter={() => prefetch(t.slug, c.slug)}
                         onClick={(e) => {
                           setOpenTopic(null);
                           e.currentTarget.blur();
@@ -310,25 +314,8 @@ function MenuSearchForm() {
  * Fetches active ads from backend API. */
 export function PortalBanner() {
   const { lang } = useLang();
-  const [bannerAds, setBannerAds] = useState<AdPlacement[]>([]);
-
-  useEffect(() => {
-    fetchAdsBySlot("banner")
-      .then((data) =>
-        setBannerAds(
-          data.map((a) => ({
-            id: a.id,
-            title: a.title,
-            slot: a.slot as AdPlacement["slot"],
-            imageUrl: a.imageUrl,
-            linkUrl: a.linkUrl,
-            active: a.active,
-            note: a.note ?? undefined,
-          })),
-        ),
-      )
-      .catch(() => {});
-  }, []);
+  const { data: rawAds = [] } = useAds("banner");
+  const bannerAds: AdPlacementItem[] = rawAds;
 
   return (
     <div className="max-w-7xl mx-auto px-4 md:px-6 mt-6">
@@ -355,7 +342,7 @@ function BannerCarousel({
   className,
   placeholder,
 }: {
-  ads: AdPlacement[];
+  ads: AdPlacementItem[];
   lang: Lang;
   className: string;
   placeholder: string;
@@ -432,6 +419,8 @@ function BannerCarousel({
           src={ad.imageUrl}
           alt={ad.title}
           loading="lazy"
+          width={640}
+          height={288}
           className="w-full h-full object-cover"
         />
         <span className="absolute top-1.5 right-2 text-[8px] font-bold uppercase tracking-[0.2em] text-white/55 bg-black/35 rounded px-1 py-px">
@@ -467,6 +456,8 @@ function BannerCarousel({
                   src={ad.imageUrl}
                   alt={ad.title}
                   loading="lazy"
+                  width={640}
+                  height={288}
                   className="w-full h-full object-cover"
                 />
               </a>
