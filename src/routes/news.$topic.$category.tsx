@@ -1,20 +1,19 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 import { Download, Send, ExternalLink, UserPlus } from "lucide-react";
 import { allMembers } from "@/data";
 import {
-  topicBySlug,
-  categoryBySlug,
-  queryArticles,
-  availableFlags,
-  isArticleSort,
-  isArticleFlag,
-  DEFAULT_SORT,
   topicShort,
   categoryName,
   categoryDesc,
+  isArticleSort,
+  isArticleFlag,
+  DEFAULT_SORT,
+  articleFlags,
+  articleFlagLabels,
 } from "@/newsData";
+import { useTopics, useArticles } from "@/hooks/useNewsApi";
 import { useLang } from "@/hooks/useLang";
 import {
   ArticleCard,
@@ -26,18 +25,7 @@ import {
   type ArticleListSearch,
 } from "@/compenents/news/PortalBlocks";
 
-/**
- * Category page. Most categories are a plain article list; a few carry the
- * extra functions the brief mandates:
- *  - tài nguyên – chính sách: per-article PDF download
- *  - cộng đồng: member logo + self-introduction grid
- *  - gia nhập: portal hand-off to /portal (application flow lives there)
- *  - nối vòng tay lớn: direct partnership-request form
- */
 export const Route = createFileRoute("/news/$topic/$category")({
-  /** List state lives in the URL. Unknown values are dropped (not errors)
-   *  and defaults are normalised to `undefined` so canonical URLs stay
-   *  clean: /news/a/b?sort=moi-nhat collapses to /news/a/b. */
   validateSearch: (search: Record<string, unknown>): ArticleListSearch => {
     const out: ArticleListSearch = {};
     if (isArticleSort(search.sort) && search.sort !== DEFAULT_SORT)
@@ -46,12 +34,6 @@ export const Route = createFileRoute("/news/$topic/$category")({
     const page = Number(search.page);
     if (Number.isInteger(page) && page > 1) out.page = page;
     return out;
-  },
-  loader: ({ params }) => {
-    const topic = topicBySlug(params.topic);
-    const category = categoryBySlug(params.topic, params.category);
-    if (!topic || !category) throw notFound();
-    return { topic, category };
   },
   component: CategoryPage,
 });
@@ -214,32 +196,27 @@ function JoinPortalCta() {
 
 function CategoryPage() {
   const { lang } = useLang();
-  const { topic, category } = Route.useLoaderData();
+  const { topic: topicSlug, category: categorySlug } = Route.useParams();
   const search = Route.useSearch();
+  const { data: topics } = useTopics();
 
-  // Pure filter -> sort -> paginate over the in-memory dataset; memoised so
-  // re-renders (forms, toasts) don't re-sort. With a backend this becomes a
-  // loader/query fetch keyed on the same params.
-  const result = useMemo(
-    () =>
-      queryArticles({
-        topic: topic.slug,
-        category: category.slug,
-        ...search,
-      }),
-    [topic.slug, category.slug, search],
-  );
-  const flags = useMemo(
-    () => availableFlags(topic.slug, category.slug),
-    [topic.slug, category.slug],
-  );
-  // Distinguish "category is empty" from "the active filter matches nothing".
-  const categoryHasArticles = result.total > 0 || search.flag !== undefined;
+  const topic = topics?.find((t) => t.slug === topicSlug);
+  const category = topic?.categories.find((c) => c.slug === categorySlug);
 
-  /* Brief-mandated 3-column layout for a category page:
-     col 1 — the category's own articles (list, filters, pagination)
-     col 2 — compact repeat of the homepage
-     col 3 — 3 ad banners on top, then the member logos */
+  const { data: result, isLoading } = useArticles({
+    topic: topicSlug,
+    category: categorySlug,
+    sort: search.sort,
+    flag: search.flag,
+    page: search.page,
+    pageSize: 6,
+  });
+
+  if (!topic || !category) throw notFound();
+
+  const flags = [...articleFlags];
+  const categoryHasArticles = (result?.total ?? 0) > 0 || search.flag !== undefined;
+
   return (
     <div className="grid lg:grid-cols-12 gap-x-8 gap-y-14">
       <div className="lg:col-span-6">
@@ -266,26 +243,31 @@ function CategoryPage() {
           {categoryDesc(category, lang)}
         </p>
 
-        {category.slug === "gia-nhap" && <JoinPortalCta />}
-        {category.slug === "noi-vong-tay-lon" && <PartnershipForm />}
-        {category.slug === "cong-dong" && <CommunityGrid />}
+        {categorySlug === "gia-nhap" && <JoinPortalCta />}
+        {categorySlug === "noi-vong-tay-lon" && <PartnershipForm />}
+        {categorySlug === "cong-dong" && <CommunityGrid />}
 
-        {categoryHasArticles ? (
+        {isLoading ? (
+          <div className="space-y-4">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="h-20 bg-white/5 rounded-xl animate-pulse" />
+            ))}
+          </div>
+        ) : categoryHasArticles ? (
           <>
             <ArticleListControls
               topic={topic.slug}
               category={category.slug}
               search={search}
-              total={result.total}
+              total={result?.total ?? 0}
               flags={flags}
             />
 
-            {result.total > 0 ? (
+            {(result?.items.length ?? 0) > 0 ? (
               <div className="divide-y divide-white/10">
-                {result.items.map((a) => (
+                {result!.items.map((a) => (
                   <div key={a.id} className="relative">
                     <ArticleCard article={a} />
-                    {/* Policy library: download directly from the list. */}
                     {a.pdfUrl && (
                       <a
                         href={a.pdfUrl}
@@ -300,7 +282,6 @@ function CategoryPage() {
                 ))}
               </div>
             ) : (
-              /* Filter matched nothing — offer the way back out. */
               <div className="rounded-xl border border-dashed border-white/10 p-8 text-center text-xs text-white/45">
                 {lang === "vn"
                   ? "Không có bài viết nào khớp bộ lọc."
@@ -320,8 +301,8 @@ function CategoryPage() {
               topic={topic.slug}
               category={category.slug}
               search={search}
-              page={result.page}
-              pageCount={result.pageCount}
+              page={result?.page ?? 1}
+              pageCount={result?.pageCount ?? 1}
             />
           </>
         ) : (
@@ -333,7 +314,6 @@ function CategoryPage() {
         )}
       </div>
 
-      {/* Column 2: homepage repeat. */}
       <div className="lg:col-span-3">
         <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40 mb-4">
           {lang === "vn" ? "Trên trang chủ" : "On the homepage"}
@@ -341,7 +321,6 @@ function CategoryPage() {
         <HomeDigest />
       </div>
 
-      {/* Column 3: ads then member logos, in that order per the brief. */}
       <aside className="lg:col-span-3 space-y-6">
         <SidebarAds count={3} />
         <SidebarLogos />

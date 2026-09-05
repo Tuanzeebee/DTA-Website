@@ -37,29 +37,7 @@ export const USER_STORE_KEY = "dta-admin-users";
  *   bt.vien@dta.org.vn / bien-tap    → Biên tập viên (content)
  *   hoi.vien@dta.org.vn / hoi-vien   → Hội viên (portal workspace only)
  */
-export const SEED_USERS: AdminUser[] = [
-  {
-    id: "usr-01",
-    name: "Quản trị viên DTA",
-    email: "admin@gmail.com",
-    password: "admin",
-    role: "admin",
-  },
-  {
-    id: "usr-02",
-    name: "Trần Biên Tập",
-    email: "bt.vien@dta.org.vn",
-    password: "bien-tap",
-    role: "editor",
-  },
-  {
-    id: "usr-03",
-    name: "Lê Hội Viên",
-    email: "hoi.vien@dta.org.vn",
-    password: "hoi-vien",
-    role: "member",
-  },
-];
+export const SEED_USERS: AdminUser[] = [];
 
 /** Directory storage. Like the other admin stores: seed shows until the
  *  first edit, then the whole list persists in localStorage. */

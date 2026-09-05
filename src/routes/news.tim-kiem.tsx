@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { Search } from "lucide-react";
-import { searchArticles } from "@/newsData";
+import { useArticles } from "@/hooks/useNewsApi";
 import {
   ArticleCard,
   SidebarAds,
@@ -9,11 +9,6 @@ import {
 } from "@/compenents/news/PortalBlocks";
 import { useLang } from "@/hooks/useLang";
 
-/**
- * Keyword search page ("từ khóa - tìm kiếm" utility in the brief). The query
- * lives in the URL (?q=) so results are shareable and the back button works;
- * matching is diacritic-insensitive via searchArticles().
- */
 export const Route = createFileRoute("/news/tim-kiem")({
   validateSearch: (search: Record<string, unknown>): { q?: string } => {
     const q = typeof search.q === "string" ? search.q.trim() : "";
@@ -26,10 +21,12 @@ function SearchPage() {
   const { lang } = useLang();
   const { q } = Route.useSearch();
   const navigate = Route.useNavigate();
-  // Local draft so typing doesn't spam history; URL updates on submit.
   const [draft, setDraft] = useState(q ?? "");
 
-  const results = useMemo(() => (q ? searchArticles(q) : []), [q]);
+  const { data: result, isLoading } = useArticles({
+    q: q ?? undefined,
+    pageSize: 20,
+  });
 
   return (
     <div className="grid lg:grid-cols-12 gap-x-10 gap-y-14">
@@ -48,8 +45,6 @@ function SearchPage() {
           {lang === "vn" ? "Tìm kiếm tin bài" : "Search articles"}
         </h1>
 
-        {/* On-page search box — the primary input on mobile, where the menu
-            bar only shows an icon. */}
         <form
           role="search"
           className="flex items-center h-11 max-w-xl rounded-xl border border-white/10 bg-white/[0.04] focus-within:border-cyan-400/50 transition-colors mb-8"
@@ -83,12 +78,18 @@ function SearchPage() {
         {q ? (
           <>
             <p className="text-[11px] text-white/45 font-mono mb-6">
-              {results.length} {lang === "vn" ? "kết quả cho" : "results for"} “
-              {q}”
+              {result?.total ?? 0}{" "}
+              {lang === "vn" ? "kết quả cho" : "results for"} "{q}"
             </p>
-            {results.length > 0 ? (
+            {isLoading ? (
+              <div className="space-y-4">
+                {Array.from({ length: 4 }).map((_, i) => (
+                  <div key={i} className="h-20 bg-white/5 rounded-xl animate-pulse" />
+                ))}
+              </div>
+            ) : (result?.items.length ?? 0) > 0 ? (
               <div className="space-y-5">
-                {results.map((a) => (
+                {result!.items.map((a) => (
                   <ArticleCard key={a.id} article={a} />
                 ))}
               </div>

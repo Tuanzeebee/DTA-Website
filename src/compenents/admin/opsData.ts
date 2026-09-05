@@ -26,54 +26,7 @@ export const FEE_STATUS_LABEL: Record<FeeRecord["status"], string> = {
   exempt: "Miễn phí",
 };
 
-export const feeStore = createCollectionStore<FeeRecord>("dta-admin-fees", [
-  {
-    id: "fee-01",
-    memberName: "Công ty Cổ phần FPT (Chi nhánh Đà Nẵng)",
-    year: 2026,
-    amount: 10_000_000,
-    status: "paid",
-    paidDate: "15/01/2026",
-  },
-  {
-    id: "fee-02",
-    memberName: "Công ty Cổ phần Enouvo",
-    year: 2026,
-    amount: 10_000_000,
-    status: "paid",
-    paidDate: "02/02/2026",
-  },
-  {
-    id: "fee-03",
-    memberName: "BAP IT Co., Ltd",
-    year: 2026,
-    amount: 10_000_000,
-    status: "pending",
-  },
-  {
-    id: "fee-04",
-    memberName: "Tổng Công ty Giải pháp Doanh nghiệp Viettel (Đà Nẵng)",
-    year: 2026,
-    amount: 10_000_000,
-    status: "pending",
-  },
-  {
-    id: "fee-05",
-    memberName: "Trường Đại học Bách khoa – Đại học Đà Nẵng",
-    year: 2026,
-    amount: 0,
-    status: "exempt",
-    note: "Viện trường — miễn hội phí theo điều lệ",
-  },
-  {
-    id: "fee-06",
-    memberName: "PGS. TS. Nguyễn Thanh Bình",
-    year: 2026,
-    amount: 2_000_000,
-    status: "paid",
-    paidDate: "20/01/2026",
-  },
-]);
+export const feeStore = createCollectionStore<FeeRecord>("dta-admin-fees", []);
 
 /* ---------------- Ấn phẩm & Tài nguyên ---------------- */
 
@@ -104,40 +57,7 @@ export const RESOURCE_CATEGORIES: {
 
 export const resourceStore = createCollectionStore<ResourceDoc>(
   "dta-admin-resources",
-  [
-    {
-      id: "res-01",
-      title: "Thông tư hướng dẫn định danh điện tử cho doanh nghiệp",
-      code: "12/2026/TT-BKHCN",
-      category: "thong-tu",
-      date: "09/07/2026",
-      fileUrl: "/documents/thong-tu-dinh-danh-dien-tu.pdf",
-      desc: "Toàn văn thông tư kèm phụ lục biểu mẫu.",
-    },
-    {
-      id: "res-02",
-      title: "Nghị định về giao dịch điện tử (toàn văn)",
-      code: "45/2026/NĐ-CP",
-      category: "nghi-dinh",
-      date: "18/07/2026",
-      fileUrl: "/documents/nghi-dinh-giao-dich-dien-tu.pdf",
-    },
-    {
-      id: "res-03",
-      title: "Biểu mẫu đăng ký gia nhập Hiệp hội (bản Word + PDF)",
-      category: "bieu-mau",
-      date: "01/06/2026",
-      fileUrl: "/documents/bieu-mau-gia-nhap-dta.pdf",
-      desc: "Dành cho tổ chức và cá nhân nộp hồ sơ gia nhập.",
-    },
-    {
-      id: "res-04",
-      title: "Ấn phẩm quý II/2026: Toàn cảnh công nghệ số Đà Nẵng",
-      category: "an-pham",
-      date: "30/06/2026",
-      fileUrl: "/documents/an-pham-quy-2-2026.pdf",
-    },
-  ],
+  [],
 );
 
 /* ---------------- Diễn đàn phản biện ---------------- */
@@ -164,34 +84,7 @@ export const SUBMISSION_STATUS_LABEL: Record<
 
 export const forumStore = createCollectionStore<ForumSubmission>(
   "dta-admin-forum",
-  [
-    {
-      id: "sub-01",
-      title: "Đề xuất cơ chế chia sẻ dữ liệu mở giữa các sở ngành",
-      memberName: "Công ty Cổ phần Enouvo",
-      link: "https://example-member.vn/de-xuat-du-lieu-mo",
-      note: "Bài phản biện cho dự thảo kế hoạch dữ liệu mở của thành phố.",
-      date: "20/07/2026",
-      status: "pending",
-    },
-    {
-      id: "sub-02",
-      title: "Góp ý dự thảo quy chế sandbox fintech từ góc nhìn doanh nghiệp",
-      memberName: "BAP IT Co., Ltd",
-      link: "https://example-member.vn/gop-y-sandbox",
-      date: "18/07/2026",
-      status: "pending",
-    },
-    {
-      id: "sub-03",
-      title: "Báo cáo khảo sát lương ngành CNTT Đà Nẵng 2026",
-      memberName: "PGS. TS. Nguyễn Thanh Bình",
-      link: "https://example-member.vn/bao-cao-luong-2026",
-      note: "Đã đăng bản rút gọn ở chuyên mục Tin trong ngành.",
-      date: "10/07/2026",
-      status: "approved",
-    },
-  ],
+  [],
 );
 
 /* ---------------- Đăng ký hội viên mới ---------------- */
@@ -220,43 +113,7 @@ export const APPLICATION_STATUS_LABEL: Record<
 
 export const applicationStore = createCollectionStore<MemberApplication>(
   "dta-admin-applications",
-  [
-    {
-      id: "app-01",
-      orgName: "Công ty TNHH Rockship Việt Nam",
-      contactName: "Trần Quốc Bảo",
-      email: "bao.tran@rockship.example",
-      phone: "0905 123 456",
-      type: "organization",
-      domain: "Phát triển ứng dụng AI cho thương mại điện tử",
-      message:
-        "Chúng tôi muốn gia nhập DTA để kết nối với cộng đồng doanh nghiệp công nghệ Đà Nẵng và tham gia các chương trình đào tạo nhân lực.",
-      date: "21/07/2026",
-      status: "pending",
-    },
-    {
-      id: "app-02",
-      orgName: "Green Cloud JSC",
-      contactName: "Lê Thị Hạnh",
-      email: "hanh.le@greencloud.example",
-      phone: "0912 888 999",
-      type: "organization",
-      domain: "Hạ tầng đám mây tiết kiệm năng lượng",
-      date: "19/07/2026",
-      status: "pending",
-    },
-    {
-      id: "app-03",
-      orgName: "TS. Phan Minh Đức",
-      contactName: "Phan Minh Đức",
-      email: "duc.phan@univ.example",
-      type: "individual",
-      domain: "Nghiên cứu bảo mật hệ thống nhúng",
-      message: "Đăng ký hội viên cá nhân, mảng an toàn thông tin.",
-      date: "16/07/2026",
-      status: "approved",
-    },
-  ],
+  [],
 );
 
 /* ---------------- Quảng cáo & Banner ---------------- */
@@ -298,83 +155,6 @@ export const adSlotLabel = (slot: AdSlot) =>
 export const activeAdsForSlot = (ads: AdPlacement[], slot: AdSlot) =>
   ads.filter((a) => a.active && a.slot === slot);
 
-export const adStore = createCollectionStore<AdPlacement>("dta-admin-ads", [
-  {
-    id: "ad-01",
-    title: "Chiến dịch Chuyển đổi số TP. Đà Nẵng 2026",
-    slot: "banner",
-    imageUrl: "/ads/banner-chuyen-doi-so.svg",
-    linkUrl: "https://danang.gov.vn",
-    active: true,
-    note: "Banner tuyên truyền đầu trang tin",
-  },
-  {
-    id: "ad-02",
-    title: "DTA Summit 2026 — Sự kiện công nghệ lớn nhất miền Trung",
-    slot: "banner",
-    imageUrl: "/ads/banner-dta-summit.svg",
-    linkUrl: "https://dtadanang.org.vn/dta-summit-2026",
-    active: true,
-    note: "Banner sự kiện DTA Summit 2026",
-  },
-  {
-    id: "ad-03",
-    title: "Hội thảo Chuyển đổi số cho Doanh nghiệp VN",
-    slot: "banner",
-    imageUrl: "/ads/banner-hoi-thao-cds.svg",
-    linkUrl: "https://dtadanang.org.vn/hoi-thao-cds",
-    active: true,
-    note: "Banner hội thảo chuyển đổi số",
-  },
-  {
-    id: "ad-04",
-    title: "Chương trình Hỗ trợ số hóa SME Đà Nẵng",
-    slot: "banner",
-    imageUrl: "/ads/banner-sme-digital.svg",
-    linkUrl: "https://dxd.danang.gov.vn/sme",
-    active: true,
-    note: "Banner chương trình SME",
-  },
-  {
-    id: "ad-05",
-    title: "DTA Summit 2026 — Đăng ký tham dự",
-    slot: "ad",
-    imageUrl: "/ads/ad-dta-summit.svg",
-    linkUrl: "https://dtadanang.org.vn",
-    active: true,
-  },
-  {
-    id: "ad-06",
-    title: "Enouvo — Đối tác đồng hành chuyển đổi số",
-    slot: "sponsor",
-    imageUrl: "/ads/sponsor-enouvo.svg",
-    linkUrl: "https://enouvo.com",
-    active: true,
-  },
-  {
-    id: "ad-07",
-    title: "Gia nhập Hội viên DTA",
-    slot: "sidebar",
-    imageUrl: "/ads/side-gia-nhap-dta.svg",
-    linkUrl: "https://dtadanang.org.vn",
-    active: true,
-  },
-  {
-    id: "ad-08",
-    title: "Đào tạo AI cho doanh nghiệp",
-    slot: "sidebar",
-    imageUrl: "/ads/side-dao-tao-ai.svg",
-    linkUrl: "https://dtadanang.org.vn",
-    active: true,
-  },
-  {
-    id: "ad-09",
-    title: "FPT Software Đà Nẵng — Tuyển dụng",
-    slot: "sidebar",
-    imageUrl: "/ads/side-tuyen-dung-it.svg",
-    linkUrl: "https://career.fpt-software.com",
-    active: true,
-  },
-]);
+export const adStore = createCollectionStore<AdPlacement>("dta-admin-ads", []);
 
 export { genId };

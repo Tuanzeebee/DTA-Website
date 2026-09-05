@@ -12,24 +12,7 @@ interface Feedback {
   status: string;
 }
 
-const SEED: Feedback[] = [
-  {
-    id: 1,
-    author: "Hội viên BAP IT",
-    date: "14/07/2026",
-    text: "Kiến nghị thành phố có chính sách miễn giảm 50% tiền thuê đất phòng máy chủ đặt tại Công viên phần mềm số 2 Đà Nẵng.",
-    category: "Chính sách hạ tầng",
-    status: "Văn phòng DTA đã chuyển giao Sở TTTT thẩm tra",
-  },
-  {
-    id: 2,
-    author: "Hội viên DUT",
-    date: "05/07/2026",
-    text: "Đề xuất tài trợ 100% chi phí bản quyền công cụ EDA thiết kế chip Synopsys cho các phòng Lab nghiên cứu đại học.",
-    category: "Phát triển vi mạch",
-    status: "Đang chờ Ban Chấp hành tổng hợp",
-  },
-];
+const SEED: Feedback[] = [];
 
 const LABEL =
   "block text-[11px] uppercase tracking-wider text-muted-foreground font-bold mb-1.5";

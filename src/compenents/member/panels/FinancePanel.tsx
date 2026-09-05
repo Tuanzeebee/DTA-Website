@@ -17,24 +17,7 @@ import type { Lang } from "@/types";
 export function FinancePanel({ lang }: { lang: Lang }) {
   const [paid, setPaid] = useState(false);
 
-  const ledger = [
-    {
-      label: lang === "vn" ? "Tổng quỹ thu tích lũy" : "Accumulated revenue",
-      value: "145.000.000",
-      tone: "text-white",
-    },
-    {
-      label:
-        lang === "vn" ? "Tổng chi hoạt động (XTTM, Đào tạo)" : "Total expenses",
-      value: "-112.000.000",
-      tone: "text-rose-400",
-    },
-    {
-      label: lang === "vn" ? "Dư quỹ hiện tại" : "Current balance",
-      value: "33.000.000",
-      tone: "text-emerald-400",
-    },
-  ];
+  const ledger: { label: string; value: string; tone: string }[] = [];
 
   return (
     <div className="space-y-6">
@@ -69,7 +52,7 @@ export function FinancePanel({ lang }: { lang: Lang }) {
                 {lang === "vn" ? "Niên khóa 2026" : "Term 2026"}
               </span>
               <span className="font-mono text-3xl font-black text-white mt-1.5 block tracking-tight">
-                5.000.000
+                —
                 <span className="text-sm font-bold text-muted-foreground ml-1.5">
                   VNĐ
                 </span>

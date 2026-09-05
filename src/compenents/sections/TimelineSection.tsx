@@ -14,15 +14,11 @@ import type { Lang } from "@/types";
 import tinTucCutout from "@/assets/image-1566.webp";
 import leftGradientBg from "@/assets/left-gradient-start-background.webp";
 
-/** Landing-page teaser -> portal article mapping, by card position. The
- *  landing teasers (dtaNews) and the portal articles (newsData.ts) are
- *  separate mock datasets, so until they share a real backend each teaser
- *  simply deep-links to a representative published article. */
-const teaserArticleIds = ["cs-01", "nganh-01", "dn-02"];
+/** Landing-page teaser -> portal article mapping, by card position. */
+const teaserArticleIds: string[] = [];
 
-/** Same idea for the events column: each upcoming-event card deep-links to a
- *  representative portal article until events get real detail pages. */
-const eventArticleIds = ["td-01", "td-02", "dn-03"];
+/** Same idea for the events column. */
+const eventArticleIds: string[] = [];
 
 export function TimelineSection({ lang }: { lang: Lang }) {
   return (
@@ -129,8 +125,8 @@ export function TimelineSection({ lang }: { lang: Lang }) {
                         also contains the PDF button — nesting interactive
                         elements is invalid; the button sits above on z-[2]. */}
                     <Link
-                      to="/news/article/$id"
-                      params={{ id: teaserArticleIds[idx] }}
+                      to="/news/article/$slug"
+                      params={{ slug: teaserArticleIds[idx] }}
                       aria-label={news.title[lang]}
                       className="absolute inset-0 z-[1] rounded-3xl"
                     />
@@ -223,21 +219,15 @@ export function TimelineSection({ lang }: { lang: Lang }) {
                         same overlay-Link pattern as the news column: the
                         register button keeps its own click on z-[2]. */}
                     <Link
-                      to="/news/article/$id"
-                      params={{ id: eventArticleIds[idx] }}
+                      to="/news/article/$slug"
+                      params={{ slug: eventArticleIds[idx] }}
                       aria-label={event.title[lang]}
                       className="absolute inset-0 z-[1] rounded-3xl"
                     />
                     {/* Event Image */}
                     <div className="w-full md:w-44 h-36 md:h-auto shrink-0 relative overflow-hidden">
                       <img
-                        src={
-                          idx === 0
-                            ? "https://picsum.photos/seed/microchip/400/300"
-                            : idx === 1
-                              ? "https://picsum.photos/seed/dataserver/400/300"
-                              : "https://picsum.photos/seed/robotics/400/300"
-                        }
+                        src=""
                         alt={event.title[lang]}
                         referrerPolicy="no-referrer"
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"

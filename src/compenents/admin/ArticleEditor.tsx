@@ -93,7 +93,7 @@ export function ArticleEditor({
         topic.categories.find((c) => c.slug === categorySlug)?.slug ??
         topic.categories[0].slug,
       date: date.trim() || todayVn(),
-      image: image.trim() || `https://picsum.photos/seed/${Date.now()}/800/450`,
+      image: image.trim() || "",
       tags: tags
         .split(",")
         .map((t) => t.trim())

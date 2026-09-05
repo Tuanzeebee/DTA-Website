@@ -73,7 +73,7 @@ function AdminForum() {
       topic: "su-kien",
       category: "tin-trong-nganh",
       date: s.date,
-      image: `https://picsum.photos/seed/${s.id}/800/450`,
+      image: "",
       tags: ["Diễn đàn", "Phản biện"],
       views: 0,
       memberUrl: s.link,

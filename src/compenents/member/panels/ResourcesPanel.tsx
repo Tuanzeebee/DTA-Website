@@ -14,35 +14,7 @@ import type { Lang } from "@/types";
  * like a library catalogue.
  */
 export function ResourcesPanel({ lang }: { lang: Lang }) {
-  const files = [
-    {
-      icon: FileBarChart,
-      title:
-        lang === "vn"
-          ? "Ấn phẩm Toàn cảnh CNTT & Vi mạch Đà Nẵng 2026"
-          : "Danang Semiconductor & IT Landscape Report 2026",
-      size: "12.4 MB",
-      type: lang === "vn" ? "Báo cáo PDF" : "PDF Report",
-    },
-    {
-      icon: Scale,
-      title:
-        lang === "vn"
-          ? "Nghị quyết số 02/2026/NQ-HĐND về cơ chế ưu đãi Vi mạch bán dẫn"
-          : "Decree No.02/2026/NQ-HDND on Semiconductor Incentives",
-      size: "2.1 MB",
-      type: lang === "vn" ? "Văn bản pháp quy" : "Government Bill",
-    },
-    {
-      icon: BookOpen,
-      title:
-        lang === "vn"
-          ? "Cẩm nang Đăng ký Sở hữu trí tuệ phần mềm quốc tế"
-          : "Manual for Software IP Registries & Patents in USA/EU",
-      size: "4.8 MB",
-      type: lang === "vn" ? "Cẩm nang pháp lý" : "Legal Manual",
-    },
-  ];
+  const files: { icon: typeof FileText; title: string; size: string; type: string }[] = [];
 
   const handleDownload = () => {
     toast.loading(

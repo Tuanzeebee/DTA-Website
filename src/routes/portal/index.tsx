@@ -244,11 +244,11 @@ function Lobby({
 /* ------------------------------------------------------------------ */
 
 const INITIAL_PROFILE: ProfileData = {
-  companyName: "Công ty Cổ phần Công nghệ Số Đà Nẵng",
-  representative: "Nguyễn Văn Trọng",
-  techStack: "Trí tuệ nhân tạo (AI), IoT & Thiết kế vi mạch nhúng",
-  website: "https://danangtech.vn",
-  staffCount: "45",
+  companyName: "",
+  representative: "",
+  techStack: "",
+  website: "",
+  staffCount: "",
 };
 
 function Dashboard({
@@ -301,7 +301,7 @@ function Dashboard({
           lang={lang}
           companyName={profileData.companyName}
           representative={profileData.representative}
-          memberId="DTA-2026-0941"
+          memberId=""
         />
 
         <div className="card-surface rounded-2xl p-6 flex flex-col justify-between gap-6">

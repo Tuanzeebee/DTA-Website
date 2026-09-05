@@ -12,7 +12,8 @@ import {
 import useEmblaCarousel, {
   type UseEmblaCarouselType,
 } from "embla-carousel-react";
-import { mainTopics, topicName, topicShort, categoryName } from "@/newsData";
+import { topicName, topicShort, categoryName } from "@/newsData";
+import { useTopics } from "@/hooks/useNewsApi";
 import { useLang } from "@/hooks/useLang";
 import {
   adStore,
@@ -50,6 +51,7 @@ export function PortalMenuBar() {
   const { lang } = useLang();
   const clock = useClock(lang);
   const navRef = useRef<HTMLElement>(null);
+  const { data: mainTopics = [] } = useTopics();
 
   /* State-driven dropdown instead of pure CSS hover/focus-within: navigation
      here is client-side (no page reload), so a clicked link KEEPS focus and a
@@ -586,6 +588,7 @@ function BannerSlot({
  */
 export function PortalBottomMenu() {
   const { lang } = useLang();
+  const { data: mainTopics = [] } = useTopics();
   return (
     <nav
       aria-label={
@@ -624,6 +627,7 @@ export function PortalBottomMenu() {
 }
 
 export function PortalFooter() {
+  const { data: mainTopics = [] } = useTopics();
   return (
     <footer className="border-t border-white/10 bg-black/40 mt-16">
       <div className="max-w-7xl mx-auto px-4 md:px-6 py-10 grid md:grid-cols-3 gap-8 text-xs text-white/60">

@@ -1,13 +1,8 @@
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { Eye, Tag, Newspaper } from "lucide-react";
-import {
-  publishedArticles,
-  topicBySlug,
-  categoryBySlug,
-  topicShort,
-  categoryName,
-} from "@/newsData";
+import { topicShort, categoryName } from "@/newsData";
+import { useArticleDetail, useTopics } from "@/hooks/useNewsApi";
 import { ArticleBody } from "@/compenents/news/ArticleBody";
 import { useLang } from "@/hooks/useLang";
 import {
@@ -19,24 +14,10 @@ import {
   SidebarLogos,
 } from "@/compenents/news/PortalBlocks";
 
-/** Single-article page — the third of the three mandated layout types. */
-export const Route = createFileRoute("/news/article/$id")({
-  loader: ({ params }) => {
-    const article = publishedArticles().find((a) => a.id === params.id);
-    if (!article) throw notFound();
-    const topic = topicBySlug(article.topic);
-    const category = categoryBySlug(article.topic, article.category);
-    return { article, topic, category };
-  },
+export const Route = createFileRoute("/news/article/$slug")({
   component: ArticlePage,
 });
 
-/**
- * Facebook-style author avatar: initials of the author's last two name
- * words on the brand gradient; the editorial default ("DTA News") gets the
- * newspaper mark instead of initials. No photo data yet — when the CMS
- * arrives this swaps to a real avatar image with the same slot.
- */
 function AuthorAvatar({ author }: { author?: string }) {
   const initials = author
     ?.split(/\s+/)
@@ -59,17 +40,63 @@ function AuthorAvatar({ author }: { author?: string }) {
 
 function ArticlePage() {
   const { lang } = useLang();
-  const { article, topic, category } = Route.useLoaderData();
+  const { slug } = Route.useParams();
+  const { data: topics } = useTopics();
+  const { data: article, isLoading, isError } = useArticleDetail(slug);
 
-  /* Tab/history title follows the article (helps "Quay lại" and sharing).
-     Proper OG tags for Zalo/FB previews need SSR — backend backlog. */
+  const topic = topics?.find((t) => t.slug === article?.topic);
+  const category = topic?.categories.find(
+    (c) => c.slug === article?.category,
+  );
+
   useEffect(() => {
-    const prev = document.title;
-    document.title = `${article.title} | DTA News`;
-    return () => {
-      document.title = prev;
-    };
-  }, [article.title]);
+    if (article) {
+      const prev = document.title;
+      document.title = `${article.title} | DTA News`;
+      return () => {
+        document.title = prev;
+      };
+    }
+  }, [article?.title]);
+
+  if (isLoading) {
+    return (
+      <div className="grid lg:grid-cols-12 gap-x-10 gap-y-14">
+        <article className="lg:col-span-9">
+          <div className="animate-pulse space-y-4">
+            <div className="h-3 w-48 bg-white/10 rounded" />
+            <div className="h-8 w-3/4 bg-white/10 rounded" />
+            <div className="h-4 w-64 bg-white/10 rounded" />
+            <div className="aspect-[16/9] bg-white/10 rounded-2xl" />
+            <div className="space-y-2">
+              <div className="h-4 bg-white/10 rounded" />
+              <div className="h-4 bg-white/10 rounded w-5/6" />
+              <div className="h-4 bg-white/10 rounded w-4/5" />
+            </div>
+          </div>
+        </article>
+        <aside className="lg:col-span-3 space-y-6">
+          <div className="h-32 bg-white/5 rounded-2xl animate-pulse" />
+        </aside>
+      </div>
+    );
+  }
+
+  if (isError || !article) {
+    return (
+      <div className="text-center py-20">
+        <h1 className="text-2xl font-black text-white mb-4">
+          {lang === "vn" ? "Không tìm thấy bài viết" : "Article not found"}
+        </h1>
+        <Link
+          to="/news"
+          className="text-accent hover:text-cyan-300 font-bold transition-colors"
+        >
+          {lang === "vn" ? "Về trang chủ" : "Back to home"}
+        </Link>
+      </div>
+    );
+  }
 
   return (
     <div className="grid lg:grid-cols-12 gap-x-10 gap-y-14">
@@ -90,12 +117,15 @@ function ArticlePage() {
               </Link>
             </>
           )}
-          {topic && category && (
+          {category && (
             <>
               <span className="mx-1.5">/</span>
               <Link
                 to="/news/$topic/$category"
-                params={{ topic: topic.slug, category: category.slug }}
+                params={{
+                  topic: topic!.slug,
+                  category: category.slug,
+                }}
                 className="hover:text-cyan-300 transition-colors"
               >
                 {categoryName(category, lang)}
@@ -108,8 +138,6 @@ function ArticlePage() {
           {article.title}
         </h1>
 
-        {/* Byline, social-style: avatar + author name, with date + view
-            count stacked under the name; topic tags trail on the right. */}
         <div className="flex items-center flex-wrap gap-x-4 gap-y-3 mt-5">
           <div className="flex items-center gap-3">
             <AuthorAvatar author={article.author} />
@@ -141,8 +169,6 @@ function ArticlePage() {
           </div>
         </div>
 
-        {/* Reader utility menu, directly under the header block — and
-            repeated after the body, per the brief. */}
         <div className="mt-5">
           <ReaderUtilityBar title={article.title} articleId={article.id} />
         </div>
@@ -162,8 +188,6 @@ function ArticlePage() {
 
         <ArticleBody body={article.body} />
 
-        {/* Author, end of body, right-aligned per the brief — same right
-            edge as the lead image and body. */}
         <p className="mt-6 text-right text-sm text-white/85">
           <span className="text-white/50 font-normal">
             {lang === "vn" ? "Tác giả: " : "Author: "}
@@ -175,14 +199,11 @@ function ArticlePage() {
 
         <ArticleActions article={article} />
 
-        {/* Utility menu repeated at the end of the article. */}
         <div className="mt-8">
           <ReaderUtilityBar title={article.title} articleId={article.id} />
         </div>
       </article>
 
-      {/* Column 3, top-down order fixed by the brief: 3 ad banners ->
-          5 same-category articles -> association -> member logos. */}
       <aside className="lg:col-span-3 space-y-6">
         <SidebarAds count={3} />
         <SidebarSameCategory article={article} />

@@ -31,7 +31,7 @@ import { Route as AdminBaiVietIndexRouteImport } from './routes/admin.bai-viet.i
 import { Route as AdminBaiVietIdRouteImport } from './routes/admin.bai-viet.$id'
 import { Route as NewsTopicIndexRouteImport } from './routes/news.$topic.index'
 import { Route as NewsTopicCategoryRouteImport } from './routes/news.$topic.$category'
-import { Route as NewsArticleIdRouteImport } from './routes/news.article.$id'
+import { Route as NewsArticleSlugRouteImport } from './routes/news.article.$slug'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -143,9 +143,9 @@ const NewsTopicCategoryRoute = NewsTopicCategoryRouteImport.update({
   path: '/$topic/$category',
   getParentRoute: () => NewsRoute,
 } as any)
-const NewsArticleIdRoute = NewsArticleIdRouteImport.update({
-  id: '/article/$id',
-  path: '/article/$id',
+const NewsArticleSlugRoute = NewsArticleSlugRouteImport.update({
+  id: '/article/$slug',
+  path: '/article/$slug',
   getParentRoute: () => NewsRoute,
 } as any)
 
@@ -170,7 +170,7 @@ export interface FileRoutesByFullPath {
   '/portal/': typeof PortalIndexRoute
   '/admin/bai-viet/$id': typeof AdminBaiVietIdRoute
   '/news/$topic/$category': typeof NewsTopicCategoryRoute
-  '/news/article/$id': typeof NewsArticleIdRoute
+  '/news/article/$slug': typeof NewsArticleSlugRoute
   '/admin/bai-viet/': typeof AdminBaiVietIndexRoute
   '/news/$topic/': typeof NewsTopicIndexRoute
 }
@@ -192,7 +192,7 @@ export interface FileRoutesByTo {
   '/portal': typeof PortalIndexRoute
   '/admin/bai-viet/$id': typeof AdminBaiVietIdRoute
   '/news/$topic/$category': typeof NewsTopicCategoryRoute
-  '/news/article/$id': typeof NewsArticleIdRoute
+  '/news/article/$slug': typeof NewsArticleSlugRoute
   '/admin/bai-viet': typeof AdminBaiVietIndexRoute
   '/news/$topic': typeof NewsTopicIndexRoute
 }
@@ -218,7 +218,7 @@ export interface FileRoutesById {
   '/portal/': typeof PortalIndexRoute
   '/admin/bai-viet/$id': typeof AdminBaiVietIdRoute
   '/news/$topic/$category': typeof NewsTopicCategoryRoute
-  '/news/article/$id': typeof NewsArticleIdRoute
+  '/news/article/$slug': typeof NewsArticleSlugRoute
   '/admin/bai-viet/': typeof AdminBaiVietIndexRoute
   '/news/$topic/': typeof NewsTopicIndexRoute
 }
@@ -245,7 +245,7 @@ export interface FileRouteTypes {
     | '/portal/'
     | '/admin/bai-viet/$id'
     | '/news/$topic/$category'
-    | '/news/article/$id'
+    | '/news/article/$slug'
     | '/admin/bai-viet/'
     | '/news/$topic/'
   fileRoutesByTo: FileRoutesByTo
@@ -267,7 +267,7 @@ export interface FileRouteTypes {
     | '/portal'
     | '/admin/bai-viet/$id'
     | '/news/$topic/$category'
-    | '/news/article/$id'
+    | '/news/article/$slug'
     | '/admin/bai-viet'
     | '/news/$topic'
   id:
@@ -292,7 +292,7 @@ export interface FileRouteTypes {
     | '/portal/'
     | '/admin/bai-viet/$id'
     | '/news/$topic/$category'
-    | '/news/article/$id'
+    | '/news/article/$slug'
     | '/admin/bai-viet/'
     | '/news/$topic/'
   fileRoutesById: FileRoutesById
@@ -461,11 +461,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof NewsTopicCategoryRouteImport
       parentRoute: typeof NewsRoute
     }
-    '/news/article/$id': {
-      id: '/news/article/$id'
-      path: '/article/$id'
-      fullPath: '/news/article/$id'
-      preLoaderRoute: typeof NewsArticleIdRouteImport
+    '/news/article/$slug': {
+      id: '/news/article/$slug'
+      path: '/article/$slug'
+      fullPath: '/news/article/$slug'
+      preLoaderRoute: typeof NewsArticleSlugRouteImport
       parentRoute: typeof NewsRoute
     }
   }
@@ -504,7 +504,7 @@ interface NewsRouteChildren {
   NewsTimKiemRoute: typeof NewsTimKiemRoute
   NewsIndexRoute: typeof NewsIndexRoute
   NewsTopicCategoryRoute: typeof NewsTopicCategoryRoute
-  NewsArticleIdRoute: typeof NewsArticleIdRoute
+  NewsArticleSlugRoute: typeof NewsArticleSlugRoute
   NewsTopicIndexRoute: typeof NewsTopicIndexRoute
 }
 
@@ -513,7 +513,7 @@ const NewsRouteChildren: NewsRouteChildren = {
   NewsTimKiemRoute: NewsTimKiemRoute,
   NewsIndexRoute: NewsIndexRoute,
   NewsTopicCategoryRoute: NewsTopicCategoryRoute,
-  NewsArticleIdRoute: NewsArticleIdRoute,
+  NewsArticleSlugRoute: NewsArticleSlugRoute,
   NewsTopicIndexRoute: NewsTopicIndexRoute,
 }
 

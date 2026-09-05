@@ -25,17 +25,10 @@ import { useLang } from "@/hooks/useLang";
 import { allMembers } from "@/data";
 import { adStore, activeAdsForSlot } from "@/compenents/admin/opsData";
 import {
-  latestArticles,
-  mostReadArticles,
-  relatedArticles,
-  articlesByTopic,
-  mainTopics,
   topicName,
-  categoryBySlug,
   categoryName,
   timeAgo,
   isFresh,
-  boardMembers,
   articleSorts,
   articleSortLabels,
   articleFlagLabels,
@@ -44,19 +37,14 @@ import {
   type ArticleSort,
   type ArticleFlag,
 } from "@/newsData";
+import { useTopics, useArticles } from "@/hooks/useNewsApi";
 
-/** URL-borne list state for a category page (?sort=&flag=&page=).
- *  Defaults are OMITTED from the URL, so plain links stay clean. */
 export interface ArticleListSearch {
   sort?: ArticleSort;
   flag?: ArticleFlag;
   page?: number;
 }
 
-/** Shared building blocks for every portal page. */
-
-/** Pulsing emerald dot + label for stories younger than isFresh()'s window —
- *  the freshness cue that tells scanners "this is worth your click NOW". */
 export function FreshDot() {
   const { lang } = useLang();
   return (
@@ -70,8 +58,6 @@ export function FreshDot() {
   );
 }
 
-/** Glass chip naming the article's category — information scent: readers
- *  click more when they know WHAT KIND of story sits behind the link. */
 function CategoryChip({
   article,
   onImage = false,
@@ -80,7 +66,9 @@ function CategoryChip({
   onImage?: boolean;
 }) {
   const { lang } = useLang();
-  const cat = categoryBySlug(article.topic, article.category);
+  const { data: topics } = useTopics();
+  const topic = topics?.find((t) => t.slug === article.topic);
+  const cat = topic?.categories.find((c) => c.slug === article.category);
   if (!cat) return null;
   return (
     <span
@@ -95,8 +83,6 @@ function CategoryChip({
   );
 }
 
-/** Relative time + read count — the two fastest trust signals in a list.
- *  Absolute date survives in the title tooltip. */
 function CardMeta({
   article,
   className = "text-white/45",
@@ -121,7 +107,6 @@ function CardMeta({
   );
 }
 
-/** The badge cluster shared by both card faces (fresh / intern / pdf). */
 function CardBadges({ article }: { article: PortalArticle }) {
   const { lang } = useLang();
   return (
@@ -141,15 +126,6 @@ function CardBadges({ article }: { article: PortalArticle }) {
   );
 }
 
-/**
- * Article teaser in two faces:
- *  - featured: boxed card-surface, 16/9 image with a category chip riding
- *    the corner, headline + standfirst + an explicit "Đọc bài" call to
- *    action that slides in on hover (desktop; always visible on touch).
- *  - row: a flat editorial line (no box) — thumbnail, badges, headline,
- *    meta — meant to sit inside a `divide-y` parent so a list reads as ONE
- *    scannable column instead of a stack of identical boxes.
- */
 export function ArticleCard({
   article,
   featured = false,
@@ -162,8 +138,8 @@ export function ArticleCard({
   if (!featured) {
     return (
       <Link
-        to="/news/article/$id"
-        params={{ id: article.id }}
+        to="/news/article/$slug"
+        params={{ slug: article.id }}
         className="group flex gap-4 py-4"
       >
         <div className="w-28 md:w-36 shrink-0 overflow-hidden rounded-xl border border-white/10">
@@ -196,8 +172,8 @@ export function ArticleCard({
 
   return (
     <Link
-      to="/news/article/$id"
-      params={{ id: article.id }}
+      to="/news/article/$slug"
+      params={{ slug: article.id }}
       className="group block"
     >
       <article className="card-surface rounded-2xl overflow-hidden">
@@ -234,13 +210,6 @@ export function ArticleCard({
   );
 }
 
-/**
- * "Tin tiêu điểm" — the front-page's front page. One lead story rendered as
- * a broadsheet-style splash (full-bleed image, gradient overlay, oversized
- * headline, gold "Nổi bật" marker, hover-revealed CTA pill) plus up to
- * three secondary stories as flat rows. This is the single visual anchor
- * between the banner zone and the topic columns: the eye lands HERE first.
- */
 export function TopStories({ articles }: { articles: PortalArticle[] }) {
   const { lang } = useLang();
   const [lead, ...rest] = articles;
@@ -256,10 +225,9 @@ export function TopStories({ articles }: { articles: PortalArticle[] }) {
       </div>
 
       <div className="grid lg:grid-cols-12 gap-x-8 gap-y-8">
-        {/* Lead story */}
         <Link
-          to="/news/article/$id"
-          params={{ id: lead.id }}
+          to="/news/article/$slug"
+          params={{ slug: lead.id }}
           className="group block lg:col-span-7"
         >
           <article className="card-surface relative rounded-2xl overflow-hidden h-full">
@@ -275,8 +243,6 @@ export function TopStories({ articles }: { articles: PortalArticle[] }) {
               aria-hidden
               className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/10 pointer-events-none"
             />
-
-            {/* Top strip: category + the gold "Nổi bật" marker. */}
             <div className="absolute top-0 left-0 right-0 p-4 md:p-5 flex items-center gap-2">
               <CategoryChip article={lead} onImage />
               <span
@@ -287,8 +253,6 @@ export function TopStories({ articles }: { articles: PortalArticle[] }) {
                 {lang === "vn" ? "Nổi bật" : "Featured"}
               </span>
             </div>
-
-            {/* Bottom strip: headline, standfirst, meta, CTA. */}
             <div className="absolute bottom-0 left-0 right-0 p-4 md:p-6">
               <h3 className="display text-xl md:text-2xl xl:text-[28px] font-black text-white leading-tight line-clamp-2 group-hover:text-cyan-200 transition-colors">
                 {lead.title}
@@ -307,13 +271,12 @@ export function TopStories({ articles }: { articles: PortalArticle[] }) {
           </article>
         </Link>
 
-        {/* Secondary stories */}
         <div className="lg:col-span-5 flex flex-col justify-between divide-y divide-white/10">
           {rest.slice(0, 3).map((a) => (
             <Link
               key={a.id}
-              to="/news/article/$id"
-              params={{ id: a.id }}
+              to="/news/article/$slug"
+              params={{ slug: a.id }}
               className="group flex items-center gap-4 py-4 first:pt-0 last:pb-0"
             >
               <div className="w-28 md:w-32 shrink-0 aspect-[4/3] rounded-xl overflow-hidden border border-white/10">
@@ -347,12 +310,6 @@ export function TopStories({ articles }: { articles: PortalArticle[] }) {
   );
 }
 
-/**
- * Sort + facet-filter toolbar for a category list. All state is URL search
- * params on /news/$topic/$category, so every control is a real <Link>:
- * shareable, back-button friendly, crawlable. Changing sort or filter drops
- * `page` (a new ordering invalidates the old page number).
- */
 export function ArticleListControls({
   topic,
   category,
@@ -364,7 +321,6 @@ export function ArticleListControls({
   category: string;
   search: ArticleListSearch;
   total: number;
-  /** Flags with >=1 match in this category — zero-result chips are hidden. */
   flags: ArticleFlag[];
 }) {
   const { lang } = useLang();
@@ -372,7 +328,6 @@ export function ArticleListControls({
 
   return (
     <div className="flex flex-wrap items-center gap-x-4 gap-y-3 mb-6">
-      {/* Segmented sort control */}
       <div
         role="group"
         aria-label={lang === "vn" ? "Sắp xếp bài viết" : "Sort articles"}
@@ -400,7 +355,6 @@ export function ArticleListControls({
         ))}
       </div>
 
-      {/* Facet chips — toggle on/off */}
       {flags.length > 0 && (
         <div className="flex flex-wrap items-center gap-2">
           {flags.map((f) => {
@@ -437,8 +391,6 @@ export function ArticleListControls({
   );
 }
 
-/** 1 … 4 [5] 6 … 12 — first, last and the current neighbourhood, with
- *  ellipsis for the gaps. */
 function pageItems(page: number, count: number): (number | "gap")[] {
   if (count <= 7) return Array.from({ length: count }, (_, i) => i + 1);
   const keep = new Set([1, count, page - 1, page, page + 1]);
@@ -458,7 +410,6 @@ const PAGE_NUM_ACTIVE = "border-accent/50 bg-accent/15 text-accent";
 const PAGE_NUM_IDLE =
   "border-white/10 bg-white/[0.03] text-white/60 hover:text-white hover:border-white/25";
 
-/** Category-page pagination (?sort/&flag preserved across pages). */
 export function ArticlePagination({
   topic,
   category,
@@ -478,7 +429,6 @@ export function ArticlePagination({
   const pageLink = (p: number) => ({
     to: "/news/$topic/$category" as const,
     params: { topic, category },
-    // page 1 is the default — keep it out of the URL.
     search: { ...search, page: p === 1 ? undefined : p },
   });
   const jumpTop = () => window.scrollTo({ top: 0 });
@@ -535,8 +485,6 @@ export function ArticlePagination({
   );
 }
 
-/** Topic-page pagination — same look, links stay on /news/$topic with a
- *  bare ?page= param. */
 export function TopicPagination({
   topic,
   page,
@@ -609,103 +557,116 @@ export function TopicPagination({
 }
 
 /* ------------------------------------------------------------------ *
- * Column-3 building blocks. The brief prescribes a DIFFERENT rail per
- * page type (topic: news + logos; category: 3 ads + logos; article:
- * 3 ads + same-category + association + logos), so each block is
- * exported separately and pages compose them in the mandated order.
+ * Column-3 building blocks
  * ------------------------------------------------------------------ */
 
-/** 5 latest — "tin-bài mới đăng, số lượng 5" per the brief. Thumbnail-first
- *  rows so the rail scans visually, not just by title. */
 export function SidebarLatest() {
   const { lang } = useLang();
+  const { data, isLoading } = useArticles({ sort: "moi-nhat", pageSize: 5 });
+  const articles = data?.items ?? [];
+
   return (
     <section className="card-surface rounded-2xl p-4">
       <h4 className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-accent mb-3">
         <Clock className="w-3.5 h-3.5" /> {lang === "vn" ? "Tin mới" : "Latest"}
       </h4>
-      <ul className="divide-y divide-white/5">
-        {latestArticles(5).map((a) => (
-          <li key={a.id}>
-            <Link
-              to="/news/article/$id"
-              params={{ id: a.id }}
-              className="group flex gap-3 py-2.5"
-            >
-              <div className="w-24 h-16 shrink-0 rounded-lg overflow-hidden border border-white/10">
-                <img
-                  src={a.image}
-                  alt=""
-                  loading="lazy"
-                  referrerPolicy="no-referrer"
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                />
-              </div>
-              <div className="min-w-0">
-                <span className="block text-[12.5px] text-white/85 group-hover:text-cyan-300 leading-snug transition-colors line-clamp-3">
-                  {a.title}
-                </span>
-                <span className="block mt-1 text-[10px] text-white/40 font-mono">
-                  {a.date}
-                </span>
-              </div>
-            </Link>
-          </li>
-        ))}
-      </ul>
+      {isLoading ? (
+        <div className="space-y-3">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <div key={i} className="h-14 bg-white/5 rounded-lg animate-pulse" />
+          ))}
+        </div>
+      ) : (
+        <ul className="divide-y divide-white/5">
+          {articles.map((a) => (
+            <li key={a.id}>
+              <Link
+                to="/news/article/$slug"
+                params={{ slug: a.id }}
+                className="group flex gap-3 py-2.5"
+              >
+                <div className="w-24 h-16 shrink-0 rounded-lg overflow-hidden border border-white/10">
+                  <img
+                    src={a.image}
+                    alt=""
+                    loading="lazy"
+                    referrerPolicy="no-referrer"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                </div>
+                <div className="min-w-0">
+                  <span className="block text-[12.5px] text-white/85 group-hover:text-cyan-300 leading-snug transition-colors line-clamp-3">
+                    {a.title}
+                  </span>
+                  <span className="block mt-1 text-[10px] text-white/40 font-mono">
+                    {a.date}
+                  </span>
+                </div>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      )}
     </section>
   );
 }
 
 export function SidebarMostRead() {
   const { lang } = useLang();
+  const { data, isLoading } = useArticles({ sort: "doc-nhieu", pageSize: 5 });
+  const articles = data?.items ?? [];
+
   return (
     <section className="card-surface rounded-2xl p-4">
       <h4 className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-accent mb-3">
         <Flame className="w-3.5 h-3.5" />{" "}
         {lang === "vn" ? "Đọc nhiều" : "Most read"}
       </h4>
-      <ol className="divide-y divide-white/5">
-        {mostReadArticles(5).map((a, i) => (
-          <li key={a.id}>
-            <Link
-              to="/news/article/$id"
-              params={{ id: a.id }}
-              className="group flex gap-3 py-2.5"
-            >
-              {/* Rank badge rides the thumbnail's corner to keep row width. */}
-              <div className="relative w-24 h-16 shrink-0 rounded-lg overflow-hidden border border-white/10">
-                <img
-                  src={a.image}
-                  alt=""
-                  loading="lazy"
-                  referrerPolicy="no-referrer"
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                />
-                <span className="absolute top-0 left-0 px-1.5 py-0.5 rounded-br-lg bg-black/70 display text-sm font-black text-gradient-cyan leading-none">
-                  {i + 1}
-                </span>
-              </div>
-              <div className="min-w-0">
-                <span className="block text-[12.5px] text-white/85 group-hover:text-cyan-300 leading-snug transition-colors line-clamp-3">
-                  {a.title}
-                </span>
-                <span className="block mt-1 text-[10px] text-white/40 font-mono">
-                  {a.views.toLocaleString("vi-VN")}{" "}
-                  {lang === "vn" ? "lượt đọc" : "reads"}
-                </span>
-              </div>
-            </Link>
-          </li>
-        ))}
-      </ol>
+      {isLoading ? (
+        <div className="space-y-3">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <div key={i} className="h-14 bg-white/5 rounded-lg animate-pulse" />
+          ))}
+        </div>
+      ) : (
+        <ol className="divide-y divide-white/5">
+          {articles.map((a, i) => (
+            <li key={a.id}>
+              <Link
+                to="/news/article/$slug"
+                params={{ slug: a.id }}
+                className="group flex gap-3 py-2.5"
+              >
+                <div className="relative w-24 h-16 shrink-0 rounded-lg overflow-hidden border border-white/10">
+                  <img
+                    src={a.image}
+                    alt=""
+                    loading="lazy"
+                    referrerPolicy="no-referrer"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                  <span className="absolute top-0 left-0 px-1.5 py-0.5 rounded-br-lg bg-black/70 display text-sm font-black text-gradient-cyan leading-none">
+                    {i + 1}
+                  </span>
+                </div>
+                <div className="min-w-0">
+                  <span className="block text-[12.5px] text-white/85 group-hover:text-cyan-300 leading-snug transition-colors line-clamp-3">
+                    {a.title}
+                  </span>
+                  <span className="block mt-1 text-[10px] text-white/40 font-mono">
+                    {a.views.toLocaleString("vi-VN")}{" "}
+                    {lang === "vn" ? "lượt đọc" : "reads"}
+                  </span>
+                </div>
+              </Link>
+            </li>
+          ))}
+        </ol>
+      )}
     </section>
   );
 }
 
-/** Ad banners — the brief pins 3 stacked banners atop the rail on
- *  category and article pages. Filled with ACTIVE "sidebar" ads from
- *  /admin/quang-cao; any slot still unbooked shows the placeholder. */
 export function SidebarAds({ count = 3 }: { count?: number }) {
   const { lang } = useLang();
   const ads = activeAdsForSlot(adStore.useItems(), "sidebar").slice(0, count);
@@ -745,7 +706,6 @@ export function SidebarAds({ count = 3 }: { count?: number }) {
   );
 }
 
-/** "Lặp lại như trang chủ: Logo hội viên" — member logos on every rail. */
 export function SidebarLogos() {
   const { lang } = useLang();
   return (
@@ -759,8 +719,6 @@ export function SidebarLogos() {
   );
 }
 
-/** Association card — the article-page rail repeats "Hiệp hội" above the
- *  member logos. */
 export function SidebarAssociation() {
   const { lang } = useLang();
   return (
@@ -786,11 +744,15 @@ export function SidebarAssociation() {
   );
 }
 
-/** 5 articles from the same category — article-page rail, with a thumbnail
- *  per row so the list scans faster than titles alone. */
 export function SidebarSameCategory({ article }: { article: PortalArticle }) {
   const { lang } = useLang();
-  const related = relatedArticles(article, 5);
+  const { data } = useArticles({
+    topic: article.topic,
+    category: article.category,
+    pageSize: 6,
+  });
+  const related = (data?.items ?? []).filter((a) => a.id !== article.id).slice(0, 5);
+
   if (related.length === 0) return null;
   return (
     <section className="card-surface rounded-2xl p-4">
@@ -802,8 +764,8 @@ export function SidebarSameCategory({ article }: { article: PortalArticle }) {
         {related.map((a) => (
           <li key={a.id}>
             <Link
-              to="/news/article/$id"
-              params={{ id: a.id }}
+              to="/news/article/$slug"
+              params={{ slug: a.id }}
               className="group flex gap-2.5 py-2.5"
             >
               <div className="w-16 h-11 shrink-0 rounded-lg overflow-hidden border border-white/10">
@@ -831,10 +793,6 @@ export function SidebarSameCategory({ article }: { article: PortalArticle }) {
   );
 }
 
-/**
- * Default rail for the portal home and topic pages, per the brief:
- * 5 latest (+ most-read) then the member logos, exactly like the homepage.
- */
 export function PortalSidebar() {
   return (
     <aside className="space-y-6">
@@ -846,17 +804,30 @@ export function PortalSidebar() {
   );
 }
 
-/**
- * Compact repeat of the homepage for the category page's COLUMN 2 —
- * "Cột 2: Lặp lại nội dung của trang chủ". Each main topic: header link
- * plus its newest headlines, text-only so the column stays narrow.
- */
 export function HomeDigest() {
   const { lang } = useLang();
+  const { data: topics } = useTopics();
+  const { data: suKien } = useArticles({ topic: "su-kien", pageSize: 3 });
+  const { data: digiTech } = useArticles({ topic: "digi-tech", pageSize: 3 });
+  const { data: maiNhaChung } = useArticles({ topic: "mai-nha-chung", pageSize: 3 });
+  const { data: daNang24h } = useArticles({ topic: "da-nang-24h", pageSize: 3 });
+
+  const topicArticles = useMemo(
+    () => ({
+      "su-kien": suKien?.items ?? [],
+      "digi-tech": digiTech?.items ?? [],
+      "mai-nha-chung": maiNhaChung?.items ?? [],
+      "da-nang-24h": daNang24h?.items ?? [],
+    }),
+    [suKien, digiTech, maiNhaChung, daNang24h],
+  );
+
+  if (!topics) return null;
+
   return (
     <div className="space-y-8">
-      {mainTopics.map((t) => {
-        const heads = articlesByTopic(t.slug).slice(0, 3);
+      {topics.map((t) => {
+        const heads = topicArticles[t.slug as keyof typeof topicArticles] ?? [];
         return (
           <section key={t.slug}>
             <Link
@@ -870,8 +841,8 @@ export function HomeDigest() {
               {heads.map((a) => (
                 <li key={a.id}>
                   <Link
-                    to="/news/article/$id"
-                    params={{ id: a.id }}
+                    to="/news/article/$slug"
+                    params={{ slug: a.id }}
                     className="block py-2 text-[12.5px] text-white/80 hover:text-cyan-300 leading-snug transition-colors line-clamp-2"
                   >
                     {a.title}
@@ -886,12 +857,6 @@ export function HomeDigest() {
   );
 }
 
-/**
- * Reader utility menu — mandated both directly under the article header
- * AND repeated at the end of the body, so readers never scroll back up
- * to act on the article. Full utility set per the brief: back, share,
- * copy link, save ("lưu"), print.
- */
 export function ReaderUtilityBar({
   title,
   articleId,
@@ -992,7 +957,6 @@ export function ReaderUtilityBar({
   );
 }
 
-/** Fisher-Yates; runs only client-side after mount so the render is stable. */
 function useShuffled<T>(items: readonly T[]) {
   const [list, setList] = useState<readonly T[]>(items);
   useEffect(() => {
@@ -1006,15 +970,7 @@ function useShuffled<T>(items: readonly T[]) {
   return list;
 }
 
-/**
- * Member logo strip. Order is shuffled on every load so each logo gets equal
- * odds of the first slot (an explicit fairness requirement in the brief),
- * and every logo links out to the member's site.
- */
 export function MemberLogoGrid({ compact = false }: { compact?: boolean }) {
-  // allMembers() is raw-string memoised (stable ref), so this memo only
-  // recomputes when the admin overlay actually changes — and useShuffled's
-  // effect keys off a stable array, avoiding a shuffle loop.
   const all = allMembers();
   const orgs = useMemo(
     () => all.filter((m) => m.type === "organization"),
@@ -1059,58 +1015,20 @@ export function MemberLogoGrid({ compact = false }: { compact?: boolean }) {
   );
 }
 
-/** BCH – Ban Kiểm tra, photo + name + title, sits directly above the footer. */
 export function BoardSection() {
-  const groups = [
-    { key: "bch" as const, label: "Ban Chấp hành" },
-    { key: "kiem-tra" as const, label: "Ban Kiểm tra" },
-  ];
   return (
     <section className="max-w-7xl mx-auto px-4 md:px-6 mt-16">
       <h3 className="flex items-center gap-2 text-sm font-black uppercase tracking-wider text-white mb-6">
         <BadgeCheck className="w-4 h-4 text-accent" />
         Ban Chấp hành – Ban Kiểm tra
       </h3>
-      <div className="space-y-8">
-        {groups.map((g) => (
-          <div key={g.key}>
-            <div className="text-[11px] font-bold uppercase tracking-[0.18em] text-white/50 mb-3">
-              {g.label}
-            </div>
-            <div className="flex flex-wrap gap-4">
-              {boardMembers
-                .filter((b) => b.board === g.key)
-                .map((b) => (
-                  <figure
-                    key={b.name}
-                    className="card-surface rounded-2xl p-3 w-[150px] text-center"
-                  >
-                    <img
-                      src={b.photo}
-                      alt={b.name}
-                      loading="lazy"
-                      referrerPolicy="no-referrer"
-                      className="w-16 h-16 rounded-full object-cover mx-auto border border-white/15"
-                    />
-                    <figcaption className="mt-2">
-                      <div className="text-[12px] font-bold text-white leading-tight">
-                        {b.name}
-                      </div>
-                      <div className="text-[10px] text-accent mt-0.5">
-                        {b.role}
-                      </div>
-                    </figcaption>
-                  </figure>
-                ))}
-            </div>
-          </div>
-        ))}
+      <div className="rounded-xl border border-dashed border-white/10 p-8 text-center text-xs text-white/45">
+        Dữ liệu Ban Chấp hành đang được cập nhật.
       </div>
     </section>
   );
 }
 
-/** Row with a PDF download action — mandatory for the policy library. */
 export function ArticleActions({ article }: { article: PortalArticle }) {
   const { lang } = useLang();
   if (!article.pdfUrl && !article.memberUrl) return null;

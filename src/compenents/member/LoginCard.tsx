@@ -29,8 +29,8 @@ export function LoginCard({
   onLogin: () => void;
   onAdminLogin?: (user: AdminUser) => void;
 }) {
-  const [email, setEmail] = useState("hoivien.demo@dta.org.vn");
-  const [password, setPassword] = useState("demo2026");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -185,34 +185,9 @@ export function LoginCard({
 
         <p className="text-[11px] text-center text-muted-foreground leading-relaxed">
           {lang === "vn"
-            ? "Bản demo — tài khoản hội viên mẫu đã điền sẵn,"
-            : "Demo build — the sample member account is prefilled,"}
-          <br className="hidden sm:block" />{" "}
-          {lang === "vn"
-            ? "bấm đăng nhập để trải nghiệm toàn bộ chức năng."
-            : "just sign in to explore every panel."}
+            ? "Đăng nhập bằng tài khoản hội viên đã được cấp."
+            : "Sign in with your assigned member account."}
         </p>
-        <div className="rounded-xl border border-white/8 bg-white/[0.02] p-3 text-[10px] leading-relaxed">
-          <p className="uppercase tracking-wider font-bold text-muted-foreground mb-1.5">
-            {lang === "vn" ? "Tài khoản quản trị demo" : "Demo admin accounts"}
-          </p>
-          <ul className="space-y-1 font-mono text-white/60">
-            <li>
-              admin@gmail.com / admin{" "}
-              <span className="font-sans text-white/35">— Quản trị viên</span>
-            </li>
-            <li>
-              bt.vien@dta.org.vn / bien-tap{" "}
-              <span className="font-sans text-white/35">— Biên tập</span>
-            </li>
-            <li>
-              hoi.vien@dta.org.vn / hoi-vien{" "}
-              <span className="font-sans text-white/35">
-                — Hội viên (Portal)
-              </span>
-            </li>
-          </ul>
-        </div>
       </form>
 
       {/* Enrollment cross-link */}
