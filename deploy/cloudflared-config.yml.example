@@ -1,0 +1,9 @@
+tunnel: replace-with-cloudflare-tunnel-id
+credentials-file: C:/ProgramData/cloudflared/replace-with-cloudflare-tunnel-id.json
+
+ingress:
+  - hostname: dta.com.vn
+    service: http://127.0.0.1:8088
+  - hostname: www.dta.com.vn
+    service: http://127.0.0.1:8088
+  - service: http_status:404

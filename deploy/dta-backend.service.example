@@ -1,0 +1,19 @@
+[Unit]
+Description=DTA NestJS API
+After=network.target postgresql.service
+Requires=postgresql.service
+
+[Service]
+Type=simple
+User=dta
+Group=dta
+WorkingDirectory=/opt/dta-new-backend
+EnvironmentFile=/etc/dta/backend.env
+ExecStart=/usr/bin/node /opt/dta-new-backend/dist/main.js
+Restart=on-failure
+RestartSec=5
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
