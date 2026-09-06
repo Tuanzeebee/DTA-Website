@@ -4,7 +4,7 @@ import { useLang } from "@/hooks/useLang";
 import { PageShell } from "@/compenents/layout/PageShell";
 import { TrongDongDisc } from "@/compenents/TrongDongDisc";
 import { ScrollReveal } from "@/compenents/ScrollReveal";
-import logoDta from "@/assets/logoDTA.webp";
+import logoDta from "@/assets/Logo1.png";
 
 /**
  * Immersive standalone 404 — handles BOTH unmatched URLs and the

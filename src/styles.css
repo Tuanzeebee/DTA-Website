@@ -217,6 +217,11 @@
   backdrop-filter: blur(14px);
   border: 1px solid oklch(0.97 0.01 155 / 0.1);
 }
+@utility glass-white {
+  background: oklch(1 0 0);
+  backdrop-filter: blur(14px);
+  border: 1px solid oklch(0 0 0 / 0.06);
+}
 @utility glow {
   box-shadow: var(--shadow-glow);
 }

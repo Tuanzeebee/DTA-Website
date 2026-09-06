@@ -1,6 +1,6 @@
 import { MapPin, Phone, Mail } from "lucide-react";
 import type { Lang } from "@/types";
-import logoDta from "@/assets/logoDTA.webp";
+import logoDta from "@/assets/Logo1.png";
 
 export function Footer({ lang }: { lang: Lang }) {
   return (

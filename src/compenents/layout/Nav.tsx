@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Link } from "@tanstack/react-router";
 import { Globe, Building } from "lucide-react";
 import { navItems } from "@/data";
-import logoDta from "@/assets/logoDTA.webp";
+import logoDta from "@/assets/Logo1.png";
 import type { Lang } from "@/types";
 import { useScrolled } from "@/hooks/useScrolled";
 import { resolveHref } from "@/lib/nav";
@@ -56,8 +56,8 @@ export function Nav({ lang, toggleLang, isLoggedIn, role }: NavProps) {
       <header
         className={`fixed top-0 inset-x-0 z-50 transition-all duration-300 ${
           scrolled || menuOpen
-            ? "glass border-b"
-            : "bg-transparent border-b border-transparent shadow-none"
+            ? "glass-white border-b border-gray-200"
+            : "bg-white border-b border-gray-100 shadow-none"
         }`}
       >
         <div
@@ -79,19 +79,19 @@ export function Nav({ lang, toggleLang, isLoggedIn, role }: NavProps) {
             <img
               src={logoDta}
               alt="DTA Logo"
-              className={`transition-all duration-300 w-auto object-contain ${
-                scrolled ? "h-8 md:h-9" : "h-10 md:h-12"
+              className={`transition-all duration-300 w-auto object-contain mix-blend-multiply ${
+                scrolled ? "h-10 md:h-11" : "h-12 md:h-14"
               }`}
             />
           </a>
 
-          <nav className="hidden lg:flex items-center gap-6 text-xs font-bold uppercase tracking-wider text-white whitespace-nowrap flex-nowrap shrink-0 font-['Be_Vietnam_Pro']">
+          <nav className="hidden lg:flex items-center gap-6 text-xs font-bold uppercase tracking-wider text-gray-900 whitespace-nowrap flex-nowrap shrink-0 font-['Be_Vietnam_Pro']">
             {navItems.map((n) => {
               const isPageRoute = n.href.startsWith("/");
               const targetHref = resolveHref(n.href);
 
               const linkClasses =
-                "text-white font-bold hover:text-cyan-300 hover:scale-105 hover:drop-shadow-[0_0_8px_rgba(130,175,110,0.75)] transition-all duration-200 cursor-pointer whitespace-nowrap font-['Be_Vietnam_Pro'] relative py-1 after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[2px] after:bg-cyan-400 after:transition-all after:duration-300 hover:after:w-full";
+                "text-gray-900 font-bold hover:text-green-600 hover:scale-105 hover:drop-shadow-[0_0_8px_rgba(34,197,94,0.35)] transition-all duration-200 cursor-pointer whitespace-nowrap font-['Be_Vietnam_Pro'] relative py-1 after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[2px] after:bg-green-500 after:transition-all after:duration-300 hover:after:w-full";
 
               return isPageRoute ? (
                 <Link
@@ -116,13 +116,13 @@ export function Nav({ lang, toggleLang, isLoggedIn, role }: NavProps) {
               onClick={toggleLang}
               /* min-h-9 / min-w-11: below lg this is a real touch target rather
                than the 20px-tall pill it used to be. */
-              className="px-2.5 min-h-9 lg:min-h-0 lg:py-1 rounded-md text-[10px] font-bold text-white border border-white/20 hover:border-cyan-400 hover:text-cyan-300 hover:bg-cyan-500/10 active:scale-95 transition-all flex items-center justify-center gap-1 cursor-pointer shrink-0 whitespace-nowrap font-['Be_Vietnam_Pro']"
+              className="px-2.5 min-h-9 lg:min-h-0 lg:py-1 rounded-md text-[10px] font-bold text-gray-700 border border-gray-300 hover:border-green-500 hover:text-green-600 hover:bg-green-50 active:scale-95 transition-all flex items-center justify-center gap-1 cursor-pointer shrink-0 whitespace-nowrap font-['Be_Vietnam_Pro']"
               id="lang-toggle-btn"
               aria-label={
                 lang === "vn" ? "Chuyển sang tiếng Anh" : "Switch to Vietnamese"
               }
             >
-              <Globe className="w-3 h-3 text-cyan-400" />
+              <Globe className="w-3 h-3 text-green-500" />
               <span>{lang === "vn" ? "EN" : "VN"}</span>
             </button>
 
@@ -169,17 +169,17 @@ export function Nav({ lang, toggleLang, isLoggedIn, role }: NavProps) {
                     ? "Mở menu"
                     : "Open menu"
               }
-              className="lg:hidden relative w-11 h-11 -mr-1 shrink-0 rounded-xl border border-white/15 hover:border-cyan-400/50 active:scale-95 transition-all flex items-center justify-center cursor-pointer"
+              className="lg:hidden relative w-11 h-11 -mr-1 shrink-0 rounded-xl border border-gray-300 hover:border-green-500 active:scale-95 transition-all flex items-center justify-center cursor-pointer"
             >
               <span
                 aria-hidden
-                className={`absolute block h-[1.5px] w-[18px] bg-white transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] ${
+                className={`absolute block h-[1.5px] w-[18px] bg-gray-900 transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] ${
                   menuOpen ? "rotate-45" : "-translate-y-[3.5px]"
                 }`}
               />
               <span
                 aria-hidden
-                className={`absolute block h-[1.5px] w-[18px] bg-white transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] ${
+                className={`absolute block h-[1.5px] w-[18px] bg-gray-900 transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] ${
                   menuOpen ? "-rotate-45" : "translate-y-[3.5px]"
                 }`}
               />

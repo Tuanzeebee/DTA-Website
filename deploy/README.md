@@ -4,7 +4,7 @@ For a Windows VPS, follow [windows-README.md](windows-README.md). The steps
 below are for Linux only.
 
 This deployment does not use Docker. Nginx serves the React SPA on the private
-loopback port `8088`, systemd runs NestJS, PostgreSQL runs locally, and
+loopback port `8080`, systemd runs NestJS, PostgreSQL runs locally, and
 Cloudflare Tunnel exposes only Nginx. Existing IIS/HTTP.sys websites on ports
 80/443 are left untouched.
 Nginx proxies `/api`, `/uploads`, and `/news-images` to NestJS.
@@ -59,7 +59,7 @@ Nginx proxies `/api`, `/uploads`, and `/news-images` to NestJS.
    sudo cp /opt/dta-news/deploy/dta-backend.service.example /etc/systemd/system/dta-backend.service
    sudo systemctl daemon-reload
    sudo systemctl enable --now dta-backend
-   sudo ss -ltnp | grep ':8088' || true
+   sudo ss -ltnp | grep ':8080' || true
    sudo nginx -t && sudo systemctl reload nginx
    ```
 
@@ -84,11 +84,11 @@ Nginx proxies `/api`, `/uploads`, and `/news-images` to NestJS.
 
    ```bash
    sudo systemctl status dta-backend nginx cloudflared
-   curl -I http://127.0.0.1:8088
+   curl -I http://127.0.0.1:8080
    sudo journalctl -u cloudflared -n 50 --no-pager
    ```
 
 The Cloudflare DNS records are managed by the tunnel commands. The tunnel
-connects directly to `127.0.0.1:8088`; no public port 80/443 is needed for DTA.
+connects directly to `127.0.0.1:8080`; no public port 80/443 is needed for DTA.
 Keep SSH restricted to trusted IPs and do not publish PostgreSQL port 5432.
 The application currently has no Redis dependency or Redis configuration.
