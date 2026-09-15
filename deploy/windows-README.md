@@ -132,3 +132,74 @@ service: http://127.0.0.1:8080
 
 No Windows firewall rule for public port 80/443 is needed for DTA. Keep
 PostgreSQL port 5432 private and do not expose NestJS port 3000 publicly.
+
+## 6. IIS direct deployment (after the read-only audit)
+
+The repository includes `public\web.config`. Vite copies it to `dist\web.config`
+during `npm run build`. It provides SPA fallback and proxies `/api`,
+`/uploads`, and `/news-images` to `127.0.0.1:3000` through IIS URL Rewrite and
+ARR. Install and enable URL Rewrite/ARR before creating this site. Do not use
+this section until the audit confirms that `dta.com.vn` and
+`www.dta.com.vn` are not bound to another site.
+
+Run the read-only audit first:
+
+```powershell
+Set-Location C:\DTAWeb\DTA-Website-main\dta-news
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+.\deploy\iis-audit.ps1
+```
+
+Review the generated report and keep the `applicationHost.config.backup` file.
+The script does not create sites, bindings, firewall rules, certificates,
+services, or DNS records. It redacts the Cloudflare tunnel ID and credential
+path in its report. Never send private keys, tunnel tokens, or application
+secrets with the audit output.
+
+After the audit is reviewed and no hostname conflict exists, create a
+dedicated IIS site. Replace the path and certificate thumbprint placeholders;
+do not reuse another site's application pool or certificate binding:
+
+```powershell
+Import-Module WebAdministration
+$siteName = 'DTA-Website'
+$physicalPath = 'C:\DTAWeb\DTA-Website-main\dta-news\dist'
+$appPool = 'DTA-Website'
+$thumbprint = '<CERTIFICATE_THUMBPRINT>'
+
+New-WebAppPool -Name $appPool
+Set-ItemProperty "IIS:\AppPools\$appPool" -Name managedRuntimeVersion -Value ''
+New-Website -Name $siteName -PhysicalPath $physicalPath -ApplicationPool $appPool `
+	-Port 80 -HostHeader 'dta.com.vn'
+New-WebBinding -Name $siteName -Protocol http -Port 80 -HostHeader 'www.dta.com.vn'
+
+New-WebBinding -Name $siteName -Protocol https -Port 443 -HostHeader 'dta.com.vn' -SslFlags 1
+New-WebBinding -Name $siteName -Protocol https -Port 443 -HostHeader 'www.dta.com.vn' -SslFlags 1
+Get-Item "Cert:\LocalMachine\My\$thumbprint" | New-Item "IIS:\SslBindings\0.0.0.0!443!dta.com.vn"
+Get-Item "Cert:\LocalMachine\My\$thumbprint" | New-Item "IIS:\SslBindings\0.0.0.0!443!www.dta.com.vn"
+```
+
+The binding commands above are intentionally not run by the repository
+scripts. Before running them, verify that the certificate contains both names
+and that the exact HTTPS bindings do not already exist. If either hostname is
+already used, stop and resolve the conflict first.
+
+Add only missing public firewall rules, without opening application or
+database ports:
+
+```powershell
+New-NetFirewallRule -DisplayName 'DTA HTTP' -Direction Inbound -Protocol TCP -LocalPort 80 -Action Allow
+New-NetFirewallRule -DisplayName 'DTA HTTPS' -Direction Inbound -Protocol TCP -LocalPort 443 -Action Allow
+```
+
+Before DNS changes, test the site from a client using a temporary hosts-file
+entry for the VPS public IP. Then change only these Tenten records:
+
+```text
+@      A       <PUBLIC_IP_VPS>
+www    A       <PUBLIC_IP_VPS>
+```
+
+Keep the Cloudflare Tunnel running until HTTPS, SPA routes, `/api`, uploads,
+images, database access, and every existing IIS website have been tested.
+Do not stop or remove a tunnel that serves another hostname.

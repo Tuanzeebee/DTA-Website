@@ -138,7 +138,7 @@ export function Nav({ lang, toggleLang, isLoggedIn, role }: NavProps) {
                 }}
               >
                 <Building className="w-3.5 h-3.5" />
-                <span>{lang === "vn" ? "Văn phòng số" : "Digital Office"}</span>
+                <span>{lang === "vn" ? "Không gian số" : "Member Space"}</span>
               </Link>
             ) : (
               <Link

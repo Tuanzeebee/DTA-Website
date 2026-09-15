@@ -1,17 +1,17 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "motion/react";
 import {
   User,
   CreditCard,
-  FileText,
   MessageSquare,
   LogOut,
   ShieldCheck,
   FileCheck,
   BadgeCheck,
   Handshake,
+  FileText,
 } from "lucide-react";
 import { useLang, useSession } from "@/hooks/useLang";
 import { LoginCard } from "@/compenents/member/LoginCard";
@@ -24,15 +24,18 @@ import {
   type ProfileData,
 } from "@/compenents/member/panels/ProfilePanel";
 import { FinancePanel } from "@/compenents/member/panels/FinancePanel";
-import { ResourcesPanel } from "@/compenents/member/panels/ResourcesPanel";
 import { ForumPanel } from "@/compenents/member/panels/ForumPanel";
+import { MemberArticlePanel } from "@/compenents/member/panels/MemberArticlePanel";
+import { memberFetchProfile } from "@/lib/api";
+// ẨN theo yêu cầu 09/2026: Ấn phẩm & Tài nguyên nội bộ tạm ẩn khỏi Không gian số.
+// import { ResourcesPanel } from "@/compenents/member/panels/ResourcesPanel";
 import { TrongDongDisc } from "@/compenents/TrongDongDisc";
 
 export const Route = createFileRoute("/portal/")({
   component: PortalIndex,
 });
 
-type TabId = "profile" | "finance" | "resources" | "forum";
+type TabId = "profile" | "finance" | "feedback" | "articles";
 
 function PortalIndex() {
   const { lang } = useLang();
@@ -70,10 +73,7 @@ function PortalIndex() {
             exit={{ opacity: 0, y: -12 }}
             transition={{ duration: 0.35, ease: [0.32, 0.72, 0, 1] }}
           >
-            <Lobby
-              lang={lang}
-              onAdminLogin={handleAdminLogin}
-            />
+            <Lobby lang={lang} onAdminLogin={handleAdminLogin} />
           </motion.div>
         )}
       </AnimatePresence>
@@ -97,29 +97,36 @@ function Lobby({
       icon: BadgeCheck,
       text:
         lang === "vn"
-          ? "Hồ sơ năng lực trong danh bạ Hội viên toàn Hiệp hội"
-          : "Capability profile in the association-wide directory",
+          ? "Chúng tôi nói về mình — hồ sơ năng lực trong danh bạ Hội viên"
+          : "About us — capability profile in the member directory",
+    },
+    {
+      icon: Handshake,
+      text:
+        lang === "vn"
+          ? "Mời hợp tác, liên danh-liên kết giữa các hội viên"
+          : "Invite cooperation, joint ventures and partnerships",
+    },
+    {
+      icon: FileCheck,
+      text:
+        lang === "vn"
+          ? "Mỗi hội viên 1 bài viết giới thiệu, quản trị duyệt rồi đăng"
+          : "One foundation post per member, published after review",
     },
     {
       icon: CreditCard,
       text:
         lang === "vn"
-          ? "Giám sát thu chi quỹ công khai, theo thở gian thực"
-          : "Real-time oversight of the transparent fund ledger",
-    },
-    {
-      icon: FileText,
-      text:
-        lang === "vn"
-          ? "Ấn phẩm & nghiên cứu vi mạch lưu hành nội bộ"
-          : "Internal semiconductor research and publications",
+          ? "Theo dõi nộp hội phí trực tuyến"
+          : "Track your membership fee payments online",
     },
     {
       icon: MessageSquare,
       text:
         lang === "vn"
-          ? "Đường dây phản biện trực tiếp tới chính quyền thành phố"
-          : "A direct policy-feedback line to the city government",
+          ? "Gửi yêu cầu, góp ý tới Văn phòng Hiệp hội"
+          : "Send requests and feedback to the DTA office",
     },
   ];
 
@@ -132,18 +139,18 @@ function Lobby({
           : "Declare legal status and tech focus in five minutes.",
     },
     {
-      t: lang === "vn" ? "Thẩm tra trong 30 ngày" : "30-day review",
+      t: lang === "vn" ? "Hiệp hội duyệt hồ sơ theo quy trình" : "Association review by procedure",
       d:
         lang === "vn"
-          ? "Ban Thư ký xác thực và trình Ban Chấp hành thông qua."
-          : "The Secretariat verifies and the Executive Board approves.",
+          ? "Thẩm tra trong vòng 30 ngày: Ban Thư ký xác thực, trình Ban Chấp hành và cấp tài khoản + mật khẩu."
+          : "Review within 30 days: verification, board approval and login issuance.",
     },
     {
-      t: lang === "vn" ? "Nhận Thẻ Hội viên số" : "Receive your digital card",
+      t: lang === "vn" ? "Quyết định công nhận thành viên mới" : "Membership recognition",
       d:
         lang === "vn"
-          ? "Tài khoản Văn phòng số và thẻ ID mã QR được kích hoạt."
-          : "Your Digital Office account and QR member ID go live.",
+          ? "Nhận quyết định kết nạp, kích hoạt tài khoản Không gian số và thẻ ID QR."
+          : "Receive your recognition decision and activate your Member Space account and QR ID.",
     },
   ];
 
@@ -170,11 +177,11 @@ function Lobby({
       <div className="relative">
         <p className="text-[11px] md:text-xs tracking-[0.25em] font-bold text-accent uppercase mb-4">
           {lang === "vn"
-            ? "Cổng Hội viên · Văn phòng số DTA"
-            : "Member Portal · DTA Digital Office"}
+            ? "Cổng Hội viên · Không gian số DTA"
+            : "Member Portal · DTA Member Space"}
         </p>
         <h1 className="display text-3xl sm:text-4xl md:text-5xl font-black leading-[1.25] text-white">
-          {lang === "vn" ? "Văn phòng số" : "The Digital Office"}
+          {lang === "vn" ? "Không gian số" : "The Member Space"}
           <br />
           <span className="text-gradient-gold">
             {lang === "vn" ? "của Hội viên DTA" : "for DTA Members"}
@@ -182,8 +189,8 @@ function Lobby({
         </h1>
         <p className="mt-5 text-sm md:text-base text-muted-foreground leading-relaxed max-w-xl">
           {lang === "vn"
-            ? "Một điểm chạm duy nhất: quản lý hồ sơ doanh nghiệp, theo dõi hội phí công khai, truy cập tài nguyên nội bộ và gửi phản biện chính sách — dân chủ, minh bạch, tự động."
-            : "One touchpoint: manage your company profile, track transparent dues, access internal resources, and file policy feedback — democratic, transparent, automated."}
+            ? "Một điểm chạm duy nhất: giới thiệu năng lực của doanh nghiệp, tổ chức, đơn vị mình; mời hợp tác, liên danh-liên kết. Đăng ký làm Thành viên mới DTA với hồ sơ trực tuyến; theo dõi nộp hội phí, gửi yêu cầu, góp ý."
+            : "One touchpoint: showcase your company or organization's capabilities; invite cooperation and joint ventures. Register as a new DTA member online; track fee payments, send requests and feedback."}
         </p>
 
         {/* Membership perks */}
@@ -229,7 +236,11 @@ function Lobby({
       </div>
 
       {/* Right: sign-in */}
-      <LoginCard lang={lang} onAdminLogin={onAdminLogin} onMemberLogin={() => {}} />
+      <LoginCard
+        lang={lang}
+        onAdminLogin={onAdminLogin}
+        onMemberLogin={() => {}}
+      />
     </div>
   );
 }
@@ -240,10 +251,16 @@ function Lobby({
 
 const INITIAL_PROFILE: ProfileData = {
   companyName: "",
+  companyNameEn: "",
+  ownership: "",
   representative: "",
+  phone: "",
   techStack: "",
+  strengths: "",
   website: "",
   staffCount: "",
+  cooperationNeed: "",
+  contactInvite: "",
 };
 
 function Dashboard({
@@ -256,6 +273,35 @@ function Dashboard({
   const [activeTab, setActiveTab] = useState<TabId>("profile");
   const [profileData, setProfileData] = useState<ProfileData>(INITIAL_PROFILE);
 
+  /* Nạp hồ sơ thật của hội viên đang đăng nhập (User.memberId). */
+  useEffect(() => {
+    let alive = true;
+    memberFetchProfile()
+      .then((m) => {
+        if (!alive) return;
+        setProfileData((prev) => ({
+          ...prev,
+          companyName: m.name,
+          companyNameEn: m.nameEn ?? "",
+          ownership:
+            m.ownership === "fdi" || m.ownership === "domestic"
+              ? m.ownership
+              : "",
+          representative: m.leader ?? "",
+          phone: m.phone ?? "",
+          techStack: m.domain,
+          strengths: m.strengths ?? "",
+          website: m.website ?? "",
+        }));
+      })
+      .catch(() => {
+        /* tài khoản chưa liên kết hồ sơ — giữ form trống để nhập */
+      });
+    return () => {
+      alive = false;
+    };
+  }, []);
+
   const tabs: {
     id: TabId;
     icon: typeof User;
@@ -265,26 +311,27 @@ function Dashboard({
     {
       id: "profile",
       icon: User,
-      label: lang === "vn" ? "Hồ sơ Hội viên" : "My Profile",
-      hint: lang === "vn" ? "Năng lực doanh nghiệp" : "Capability record",
+      label: lang === "vn" ? "Chúng tôi nói về mình" : "About Us",
+      hint: lang === "vn" ? "Hồ sơ năng lực" : "Capability profile",
     },
     {
       id: "finance",
       icon: CreditCard,
-      label: lang === "vn" ? "Hội phí & Tài chính" : "Fees & Ledger",
-      hint: lang === "vn" ? "Thu chi công khai" : "Transparent fund",
+      label: lang === "vn" ? "Hội phí" : "Membership Fee",
+      hint: lang === "vn" ? "Theo dõi nộp phí" : "Track payments",
     },
+    // ẨN theo yêu cầu 09/2026: tab Ấn phẩm & Tài nguyên lưu hành nội bộ.
     {
-      id: "resources",
+      id: "articles",
       icon: FileText,
-      label: lang === "vn" ? "Ấn phẩm & Tài nguyên" : "Publications",
-      hint: lang === "vn" ? "Lưu hành nội bộ" : "Members-only library",
+      label: lang === "vn" ? "Bài viết của chúng tôi" : "Our Articles",
+      hint: lang === "vn" ? "Chờ duyệt & đã đăng" : "Drafts & published",
     },
     {
-      id: "forum",
+      id: "feedback",
       icon: MessageSquare,
-      label: lang === "vn" ? "Diễn đàn phản biện" : "Policy Forum",
-      hint: lang === "vn" ? "Kiến nghị chính sách" : "Propose & review",
+      label: lang === "vn" ? "Gửi yêu cầu & Góp ý" : "Requests & Feedback",
+      hint: lang === "vn" ? "Hợp tác, liên kết" : "Cooperation",
     },
   ];
 
@@ -312,8 +359,8 @@ function Dashboard({
             </h1>
             <p className="text-xs text-muted-foreground mt-2 leading-relaxed">
               {lang === "vn"
-                ? "Văn phòng số đang kết nối. Mọi thao tác hồ sơ, hội phí và phản biện đều được ghi nhận công khai."
-                : "Your Digital Office is connected. Every profile, fee and feedback action is recorded openly."}
+                ? "Không gian số đang kết nối. Giới thiệu năng lực đơn vị mình, mời hợp tác, theo dõi hội phí và gửi yêu cầu, góp ý."
+                : "Your Member Space is connected. Showcase your capabilities, invite cooperation, track fees and send requests."}
             </p>
           </div>
 
@@ -398,8 +445,9 @@ function Dashboard({
                 />
               )}
               {activeTab === "finance" && <FinancePanel lang={lang} />}
-              {activeTab === "resources" && <ResourcesPanel lang={lang} />}
-              {activeTab === "forum" && <ForumPanel lang={lang} />}
+              {/* ẨN theo yêu cầu 09/2026: {activeTab === "resources" && <ResourcesPanel lang={lang} />} */}
+              {activeTab === "articles" && <MemberArticlePanel lang={lang} />}
+              {activeTab === "feedback" && <ForumPanel lang={lang} />}
             </motion.div>
           </AnimatePresence>
         </div>

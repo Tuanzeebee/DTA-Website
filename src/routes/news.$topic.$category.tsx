@@ -1,8 +1,9 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Download, Send, ExternalLink, UserPlus } from "lucide-react";
-import { allMembers } from "@/data";
+import { Download, Send, ExternalLink, UserPlus, IdCard } from "lucide-react";
+import { allMembers, type DtaMember } from "@/data";
+import { MemberDetailDialog } from "@/compenents/member/MemberDetailDialog";
 import {
   topicShort,
   categoryName,
@@ -119,13 +120,15 @@ function PartnershipForm() {
   );
 }
 
-function CommunityGrid() {
+function CommunityGrid({ lang }: { lang: "vn" | "en" }) {
+  const [selected, setSelected] = useState<DtaMember | null>(null);
   return (
-    <div className="grid sm:grid-cols-2 gap-5 mb-10">
-      {allMembers()
-        .filter((m) => m.type === "organization")
-        .map((m) => (
-          <div key={m.id} className="card-surface rounded-2xl p-4 flex gap-4">
+    <>
+      <div className="grid sm:grid-cols-2 gap-5 mb-10">
+        {allMembers()
+          .filter((m) => m.type === "organization")
+          .map((m) => (
+            <div key={m.id} className="card-surface rounded-2xl p-4 flex gap-4">
             <a
               href={m.website ?? "#"}
               target="_blank"
@@ -152,19 +155,34 @@ function CommunityGrid() {
               <p className="text-[11px] text-white/55 mt-1 line-clamp-2">
                 {m.domain}
               </p>
-              <a
-                href={m.website ?? "#"}
-                target="_blank"
-                rel="noreferrer noopener"
-                className="inline-flex items-center gap-1 mt-2 text-[10px] font-bold uppercase text-accent hover:text-cyan-300 transition-colors"
-              >
-                <ExternalLink className="w-3 h-3" />
-                Website hội viên
-              </a>
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-2">
+                <a
+                  href={m.website ?? "#"}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  className="inline-flex items-center gap-1 text-[10px] font-bold uppercase text-accent hover:text-cyan-300 transition-colors"
+                >
+                  <ExternalLink className="w-3 h-3" />
+                  Website hội viên
+                </a>
+                <button
+                  onClick={() => setSelected(m)}
+                  className="inline-flex items-center gap-1 text-[10px] font-bold uppercase text-white/60 hover:text-cyan-300 transition-colors cursor-pointer"
+                >
+                  <IdCard className="w-3 h-3" />
+                  {lang === "vn" ? "Hồ sơ hội viên" : "Profile"}
+                </button>
+              </div>
             </div>
           </div>
         ))}
-    </div>
+      </div>
+      <MemberDetailDialog
+        member={selected}
+        lang={lang}
+        onClose={() => setSelected(null)}
+      />
+    </>
   );
 }
 
@@ -179,7 +197,7 @@ function JoinPortalCta() {
         </h3>
         <p className="text-xs text-white/60 mt-1 max-w-md">
           Hướng dẫn thủ tục, biểu mẫu và quy định hội phí — hoàn tất đăng ký
-          ngay trên Văn phòng số DTA.
+          ngay trên Không gian số DTA.
         </p>
       </div>
       <Link
@@ -248,7 +266,7 @@ function CategoryPage() {
 
         {categorySlug === "gia-nhap" && <JoinPortalCta />}
         {categorySlug === "noi-vong-tay-lon" && <PartnershipForm />}
-        {categorySlug === "cong-dong" && <CommunityGrid />}
+        {categorySlug === "cong-dong" && <CommunityGrid lang={lang} />}
 
         {isLoading ? (
           <div className="space-y-4">

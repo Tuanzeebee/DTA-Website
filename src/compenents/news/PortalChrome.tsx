@@ -598,7 +598,7 @@ export function PortalFooter() {
                 office@dtadanang.org.vn
               </a>
             </li>
-            <li>Đơn vị phát triển: Văn phòng số DTA</li>
+            <li>Đơn vị phát triển: Không gian số DTA</li>
           </ul>
         </div>
 

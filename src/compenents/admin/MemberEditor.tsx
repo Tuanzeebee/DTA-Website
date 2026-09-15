@@ -1,7 +1,7 @@
 import { useState, type ReactNode } from "react";
 import { toast } from "sonner";
 import { Save, X } from "lucide-react";
-import type { DtaMember } from "@/data";
+import type { DtaMember, MemberOwnership } from "@/data";
 import { uploadImage } from "@/lib/api";
 
 const INPUT =
@@ -20,6 +20,8 @@ function Field({ label, children }: { label: string; children: ReactNode }) {
 
 /**
  * Add/edit form for one member. Calls API via parent onSave callback.
+ * Đủ 7 trường Danh bạ: tên Việt/Anh, loại hình, lãnh đạo, điện thoại,
+ * lĩnh vực, thế mạnh — đồng nhất với form đăng ký + ProfilePanel.
  */
 export function MemberEditor({
   initial,
@@ -31,11 +33,18 @@ export function MemberEditor({
   onCancel: () => void;
 }) {
   const [name, setName] = useState(initial?.name ?? "");
+  const [nameEn, setNameEn] = useState(initial?.nameEn ?? "");
   const [role, setRole] = useState(initial?.role ?? "Hội viên");
   const [type, setType] = useState<DtaMember["type"]>(
     initial?.type ?? "organization",
   );
   const [domain, setDomain] = useState(initial?.domain ?? "");
+  const [ownership, setOwnership] = useState<MemberOwnership | "">(
+    initial?.ownership ?? "",
+  );
+  const [leader, setLeader] = useState(initial?.leader ?? "");
+  const [phone, setPhone] = useState(initial?.phone ?? "");
+  const [strengths, setStrengths] = useState(initial?.strengths ?? "");
   const [logoUrl, setLogoUrl] = useState(initial?.logoUrl ?? "");
   const [website, setWebsite] = useState(initial?.website ?? "");
   const [saving, setSaving] = useState(false);
@@ -50,9 +59,14 @@ export function MemberEditor({
       onSave({
         id: initial?.id ?? "",
         name: name.trim(),
+        nameEn: nameEn.trim() || undefined,
         role: role.trim() || "Hội viên",
         type,
         domain: domain.trim(),
+        ownership: (ownership || undefined) as MemberOwnership | undefined,
+        leader: leader.trim() || undefined,
+        phone: phone.trim() || undefined,
+        strengths: strengths.trim() || undefined,
         logoUrl: logoUrl.trim() || undefined,
         website: website.trim() || undefined,
       });
@@ -87,11 +101,19 @@ export function MemberEditor({
       </div>
 
       <div className="grid sm:grid-cols-2 gap-4">
-        <Field label="Tên hội viên *">
+        <Field label="Tên hội viên (tiếng Việt) *">
           <input
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="Công ty Cổ phần…"
+            className={INPUT}
+          />
+        </Field>
+        <Field label="Tên tiếng Anh">
+          <input
+            value={nameEn}
+            onChange={(e) => setNameEn(e.target.value)}
+            placeholder="… Co., Ltd."
             className={INPUT}
           />
         </Field>
@@ -100,15 +122,6 @@ export function MemberEditor({
             value={role}
             onChange={(e) => setRole(e.target.value)}
             placeholder="Hội viên Tổ chức"
-            className={INPUT}
-          />
-        </Field>
-
-        <Field label="Lĩnh vực hoạt động">
-          <input
-            value={domain}
-            onChange={(e) => setDomain(e.target.value)}
-            placeholder="Phát triển phần mềm, AI…"
             className={INPUT}
           />
         </Field>
@@ -123,6 +136,53 @@ export function MemberEditor({
             <option value="advisory">Cố vấn</option>
           </select>
         </Field>
+        <Field label="Loại hình (trong nước / FDI)">
+          <select
+            value={ownership}
+            onChange={(e) =>
+              setOwnership(e.target.value as MemberOwnership | "")
+            }
+            className={INPUT}
+          >
+            <option value="">— Chưa rõ —</option>
+            <option value="domestic">Trong nước</option>
+            <option value="fdi">FDI</option>
+          </select>
+        </Field>
+        <Field label="Lãnh đạo / Người đại diện">
+          <input
+            value={leader}
+            onChange={(e) => setLeader(e.target.value)}
+            placeholder="Họ tên lãnh đạo"
+            className={INPUT}
+          />
+        </Field>
+        <Field label="Điện thoại">
+          <input
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            placeholder="0236 …"
+            className={INPUT}
+          />
+        </Field>
+        <Field label="Lĩnh vực hoạt động">
+          <input
+            value={domain}
+            onChange={(e) => setDomain(e.target.value)}
+            placeholder="Phát triển phần mềm, AI…"
+            className={INPUT}
+          />
+        </Field>
+        <div className="sm:col-span-2">
+          <Field label="Thế mạnh">
+            <input
+              value={strengths}
+              onChange={(e) => setStrengths(e.target.value)}
+              placeholder="Năng lực nổi bật…"
+              className={INPUT}
+            />
+          </Field>
+        </div>
       </div>
 
       <div className="mt-4 space-y-4">

@@ -11,7 +11,7 @@ export const navItems: NavItem[] = [
   { label: { vn: "Tin tức - Sự kiện", en: "News & Events" }, href: "/news" },
   { label: { vn: "Danh bạ Hội viên", en: "Members" }, href: "#members" },
   {
-    label: { vn: "Cổng Hội viên & Diễn đàn", en: "Digital Portal" },
+    label: { vn: "Không gian số Hội viên", en: "Member Space" },
     href: "/portal",
   },
 ];
@@ -124,12 +124,31 @@ export const programsAndServices: ProgramService[] = [
   },
 ];
 
+export type MemberOwnership = "domestic" | "fdi";
+
+export const MEMBER_OWNERSHIP_LABEL: Record<MemberOwnership, string> = {
+  domestic: "Trong nước",
+  fdi: "FDI",
+};
+
 export interface DtaMember {
   id: string;
+  /** Tên tiếng Việt — hiển thị chính trong Danh bạ. */
   name: string;
+  /** Tên tiếng Anh. */
+  nameEn?: string;
   role: string;
   type: "organization" | "individual" | "advisory";
+  /** Lĩnh vực hoạt động. */
   domain: string;
+  /** Loại hình: trong nước hay FDI. */
+  ownership?: MemberOwnership;
+  /** Lãnh đạo / người đại diện. */
+  leader?: string;
+  /** Điện thoại liên hệ. */
+  phone?: string;
+  /** Thế mạnh / năng lực nổi bật. */
+  strengths?: string;
   logoUrl?: string;
   website?: string;
 }
@@ -156,18 +175,31 @@ export async function loadMembersFromApi(): Promise<DtaMember[]> {
     const data = (await res.json()) as Array<{
       id: string;
       name: string;
+      nameEn?: string | null;
       role: string;
       type: string;
       domain: string;
+      ownership?: string | null;
+      leader?: string | null;
+      phone?: string | null;
+      strengths?: string | null;
       logoUrl: string | null;
       website: string | null;
     }>;
     const members: DtaMember[] = data.map((m) => ({
       id: m.id,
       name: m.name,
+      nameEn: m.nameEn ?? undefined,
       role: m.role,
       type: m.type as DtaMember["type"],
       domain: m.domain,
+      ownership:
+        m.ownership === "fdi" || m.ownership === "domestic"
+          ? m.ownership
+          : undefined,
+      leader: m.leader ?? undefined,
+      phone: m.phone ?? undefined,
+      strengths: m.strengths ?? undefined,
       logoUrl: m.logoUrl ?? undefined,
       website: m.website ?? undefined,
     }));
@@ -235,8 +267,8 @@ export const translationStrings = {
     en: "COLLABORATION · CONNECTION SUSTAINABLE DEVELOPMENT",
   },
   heroSub: {
-    vn: "Cầu nối liên kết, diễn đàn phản biện và nền tảng hỗ trợ đắc lực cho các doanh nghiệp, tổ chức học thuật, chuyên gia và smart city builders tại miền Trung.",
-    en: "A vital bridge, policy forum, and digital platform supporting tech enterprises, academic institutes, and smart city builders in Central Vietnam.",
+    vn: "Cầu nối liên kết và nền tảng hỗ trợ đắc lực cho các doanh nghiệp, tổ chức học thuật, chuyên gia và smart city builders tại miền Trung.",
+    en: "A vital bridge and digital platform supporting tech enterprises, academic institutes, and smart city builders in Central Vietnam.",
   },
   heroBtn1: {
     vn: "Gia nhập DTA",

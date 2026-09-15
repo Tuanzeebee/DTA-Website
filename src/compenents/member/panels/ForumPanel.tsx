@@ -17,10 +17,10 @@ const SEED: Feedback[] = [];
 const LABEL =
   "block text-[11px] uppercase tracking-wider text-muted-foreground font-bold mb-1.5";
 
-/** "Diễn đàn phản biện" — members post policy proposals to the Secretariat. */
+/** "Gửi yêu cầu & Góp ý" — hội viên gửi yêu cầu hỗ trợ, góp ý và lời mời hợp tác tới Văn phòng Hiệp hội. */
 export function ForumPanel({ lang }: { lang: Lang }) {
   const [feedbackText, setFeedbackText] = useState("");
-  const [category, setCategory] = useState("policy");
+  const [category, setCategory] = useState("request");
   const [feedbacks, setFeedbacks] = useState<Feedback[]>(SEED);
 
   const handlePost = (e: React.FormEvent) => {
@@ -29,23 +29,29 @@ export function ForumPanel({ lang }: { lang: Lang }) {
 
     const newPost: Feedback = {
       id: Date.now(),
-      author: lang === "vn" ? "Bạn (Hội viên Demo)" : "You (Demo Member)",
+      author: lang === "vn" ? "Bạn (Hội viên)" : "You (Member)",
       date: lang === "vn" ? "Hôm nay" : "Today",
       text: feedbackText,
       category:
-        category === "policy" ? "Phản biện chính sách" : "Hợp tác thương mại",
+        category === "coop"
+          ? lang === "vn"
+            ? "Mời hợp tác, liên danh-liên kết"
+            : "Cooperation invite"
+          : lang === "vn"
+            ? "Yêu cầu & Góp ý"
+            : "Request & Feedback",
       status:
         lang === "vn"
-          ? "Văn phòng DTA đang chờ tiếp nhận"
-          : "Pending DTA Reception",
+          ? "Văn phòng Hiệp hội đang chờ tiếp nhận"
+          : "Pending DTA office review",
     };
 
     setFeedbacks([newPost, ...feedbacks]);
     setFeedbackText("");
     toast.success(
       lang === "vn"
-        ? "Ý kiến đóng góp đã được gửi lên Ban Thư ký!"
-        : "Feedback posted to DTA Secretariat!",
+        ? "Đã gửi yêu cầu / góp ý tới Văn phòng Hiệp hội!"
+        : "Request sent to the DTA office!",
     );
   };
 
@@ -57,14 +63,12 @@ export function ForumPanel({ lang }: { lang: Lang }) {
         </span>
         <div>
           <h4 className="display text-base font-black text-white">
-            {lang === "vn"
-              ? "Diễn đàn phản biện chính sách"
-              : "Policy Feedback Forum"}
+            {lang === "vn" ? "Gửi yêu cầu & Góp ý" : "Requests & Feedback"}
           </h4>
           <p className="text-xs text-muted-foreground mt-0.5">
             {lang === "vn"
-              ? "Tiếng nói Hội viên chuyển trực tiếp tới Sở KH&CN, Sở Nội vụ, Sở TTTT."
-              : "Member voices delivered to municipal agencies."}
+              ? "Gửi yêu cầu hỗ trợ, góp ý và lời mời hợp tác, liên danh-liên kết tới Văn phòng Hiệp hội."
+              : "Send support requests, feedback and cooperation invites to the DTA office."}
           </p>
         </div>
       </div>
@@ -75,31 +79,29 @@ export function ForumPanel({ lang }: { lang: Lang }) {
       >
         <div>
           <label className={LABEL}>
-            {lang === "vn" ? "Phân loại kiến nghị" : "Inquiry Category"}
+            {lang === "vn" ? "Loại yêu cầu" : "Request Type"}
           </label>
           <select
             value={category}
             onChange={(e) => setCategory(e.target.value)}
             className="w-full sm:w-auto px-4 py-2.5 bg-white/[0.04] border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-cyan-400/50 cursor-pointer"
           >
-            <option value="policy">
+            <option value="request">
               {lang === "vn"
-                ? "Phản biện cơ chế / Chính sách chung"
-                : "Municipal Policy Revision"}
+                ? "Yêu cầu hỗ trợ / Góp ý"
+                : "Support request / Feedback"}
             </option>
-            <option value="trade">
+            <option value="coop">
               {lang === "vn"
-                ? "Xúc tiến thương mại / Liên minh doanh nghiệp"
-                : "B2B Trade & Partnership"}
+                ? "Mời hợp tác / Liên danh-liên kết"
+                : "Cooperation / Joint venture invite"}
             </option>
           </select>
         </div>
 
         <div>
           <label className={LABEL}>
-            {lang === "vn"
-              ? "Nội dung phản ánh / Đề xuất cơ chế đặc thù"
-              : "Proposal Details"}
+            {lang === "vn" ? "Nội dung yêu cầu / Lời mời hợp tác" : "Details"}
           </label>
           <textarea
             rows={3}
@@ -107,8 +109,8 @@ export function ForumPanel({ lang }: { lang: Lang }) {
             onChange={(e) => setFeedbackText(e.target.value)}
             placeholder={
               lang === "vn"
-                ? "Nhập chi tiết kiến nghị của doanh nghiệp bạn lên chính quyền TP..."
-                : "Describe the tax reliefs, rental subsidies or lab support your firm needs..."
+                ? "Mô tả yêu cầu của đơn vị bạn, hoặc lời mời hợp tác, liên danh-liên kết tới các hội viên..."
+                : "Describe your request, or your invitation for cooperation and joint ventures..."
             }
             className="w-full px-4 py-3 bg-white/[0.04] border border-white/10 rounded-xl text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-cyan-400/50 transition-colors"
           />
@@ -124,17 +126,15 @@ export function ForumPanel({ lang }: { lang: Lang }) {
             }}
           >
             <Send className="w-4 h-4" />
-            {lang === "vn" ? "Gửi kiến nghị" : "Submit Proposal"}
+            {lang === "vn" ? "Gửi yêu cầu" : "Send Request"}
           </button>
         </div>
       </form>
 
-      {/* Proposal feed */}
+      {/* Request feed */}
       <div className="space-y-3">
         <h5 className="text-[11px] font-black uppercase text-muted-foreground tracking-[0.18em]">
-          {lang === "vn"
-            ? "Kiến nghị đang được xử lý"
-            : "Proposals in Progress"}
+          {lang === "vn" ? "Yêu cầu đang được xử lý" : "Requests in Progress"}
         </h5>
 
         {feedbacks.map((f) => (

@@ -13,17 +13,26 @@ import {
   BadgeCheck,
   Clock,
   CreditCard,
-  LogIn,
   Upload,
 } from "lucide-react";
 import { useLang } from "@/hooks/useLang";
+import { submitApplication } from "@/lib/api";
+import {
+  EMPTY_DIRECTORY_FORM,
+  directoryErrorMessage,
+  firstMissingDirectoryField,
+  type MemberDirectoryForm,
+} from "@/lib/memberDirectory";
 
 /**
  * /portal/dang-ky — standalone membership application.
  *
  * Deliberately OUTSIDE the sign-in wall: a prospective member has no account
- * yet, so enrollment must be reachable by anyone (and shareable by URL). The
- * old flow hid this form behind a demo login — that conflated two audiences.
+ * yet, so enrollment must be reachable by anyone (and shareable by URL).
+ *
+ * Step 1 = Thông tin Hội viên: đúng 7 trường Danh bạ hội viên
+ * (tên Việt/Anh, loại hình, lãnh đạo, điện thoại, lĩnh vực, thế mạnh)
+ * + email liên hệ. Step 2 = 2 file tải lên + lĩnh vực công nghệ.
  */
 
 export const Route = createFileRoute("/portal/dang-ky")({
@@ -40,26 +49,45 @@ function RegisterPage() {
   const { lang } = useLang();
   const [step, setStep] = useState(1);
   const [trackingCode, setTrackingCode] = useState("");
+  const [directory, setDirectory] =
+    useState<MemberDirectoryForm>({ ...EMPTY_DIRECTORY_FORM });
   const [data, setData] = useState({
-    orgName: "",
-    representative: "",
     email: "",
     techField: "AI",
+    consentFileName: "",
+    legalFileName: "",
+    hasConsentDoc: false,
     hasLegalDoc: false,
   });
+  const [consentFile, setConsentFile] = useState<File | null>(null);
+  const [legalFile, setLegalFile] = useState<File | null>(null);
+  const [submitting, setSubmitting] = useState(false);
 
   const stepLabels = [
-    lang === "vn" ? "Thông tin tổ chức" : "Organization",
-    lang === "vn" ? "Pháp lý & Lĩnh vực" : "Legal & Field",
+    lang === "vn" ? "Thông tin Hội viên" : "Member Info",
+    lang === "vn" ? "Pháp lý & Hồ sơ" : "Legal & Files",
     lang === "vn" ? "Hoàn tất" : "Done",
   ];
 
+  const setDir = (key: keyof MemberDirectoryForm) => (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >,
+  ) => setDirectory((prev) => ({ ...prev, [key]: e.target.value }));
+
   const requireStep1 = (): boolean => {
-    if (!data.orgName.trim() || !data.email.trim()) {
+    const missing = firstMissingDirectoryField(directory);
+    if (missing) {
+      const phoneTooShort =
+        missing === "phone" && directory.phone.trim().length > 0;
+      toast.error(directoryErrorMessage(lang, missing, phoneTooShort));
+      return false;
+    }
+    if (!data.email.trim()) {
       toast.error(
         lang === "vn"
-          ? "Vui lòng nhập đầy đủ các trường bắt buộc (*)."
-          : "Please fill in all required fields (*).",
+          ? 'Vui lòng nhập "Email liên hệ chính" — trường bắt buộc.'
+          : 'Please fill in "Primary email" — required.',
       );
       return false;
     }
@@ -74,35 +102,111 @@ function RegisterPage() {
     return true;
   };
 
-  const handleSubmit = () => {
-    if (!data.hasLegalDoc) {
+  const handleSubmit = async () => {
+    if (!consentFile) {
       toast.error(
         lang === "vn"
-          ? "Vui lòng tải lên tài liệu chứng minh tư cách pháp lý."
-          : "Please upload your legal status document.",
+          ? "Vui lòng tải lên Công văn đồng ý trở thành Hội viên DTA."
+          : "Please upload the consent letter to join DTA.",
       );
       return;
     }
-    const code = "DTA-" + Math.floor(1000 + Math.random() * 9000);
-    setTrackingCode(code);
-    setStep(3);
-    toast.success(
-      lang === "vn"
-        ? "Đã nộp đơn gia nhập DTA số hóa thành công!"
-        : "DTA digital enrollment submitted!",
-    );
+    if (!legalFile) {
+      toast.error(
+        lang === "vn"
+          ? "Vui lòng tải lên GPKD / Giấy chứng nhận ĐKKD / Quyết định thành lập."
+          : "Please upload your business certificate / establishment decision.",
+      );
+      return;
+    }
+    setSubmitting(true);
+    try {
+      const form = new FormData();
+      form.append("orgName", directory.nameVi.trim());
+      form.append("nameEn", directory.nameEn.trim());
+      form.append("ownership", directory.ownership);
+      form.append("leader", directory.leader.trim());
+      form.append("contactName", directory.leader.trim());
+      form.append("email", data.email.trim());
+      form.append("phone", directory.phone.trim());
+      form.append("type", "organization");
+      form.append("domain", directory.field.trim());
+      form.append("strengths", directory.strengths.trim());
+      form.append("techField", data.techField);
+      form.append("consentDoc", consentFile);
+      form.append("legalDoc", legalFile);
+      const created = await submitApplication(form);
+      setTrackingCode(created.trackingCode);
+      setStep(3);
+      toast.success(
+        lang === "vn"
+          ? "Đã nộp đơn gia nhập DTA thành công! Hiệp hội sẽ duyệt hồ sơ theo quy trình."
+          : "Application submitted! The association will review it by procedure.",
+      );
+    } catch (err: unknown) {
+      toast.error(
+        err instanceof Error
+          ? err.message
+          : lang === "vn"
+            ? "Nộp hồ sơ thất bại, vui lòng thử lại."
+            : "Submission failed, please try again.",
+      );
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const reset = () => {
     setStep(1);
+    setDirectory({ ...EMPTY_DIRECTORY_FORM });
+    setConsentFile(null);
+    setLegalFile(null);
     setData({
-      orgName: "",
-      representative: "",
       email: "",
       techField: "AI",
+      consentFileName: "",
+      legalFileName: "",
+      hasConsentDoc: false,
       hasLegalDoc: false,
     });
   };
+
+  const uploadBox = (
+    attached: boolean,
+    fileName: string,
+    onFile: (f: File) => void,
+    emptyText: string,
+  ) => (
+    <label
+      className={`flex items-center gap-3 px-4 py-3 rounded-xl border border-dashed cursor-pointer transition-colors ${
+        attached
+          ? "border-emerald-500/40 bg-emerald-500/[0.06]"
+          : "border-white/15 bg-white/[0.03] hover:border-accent/40"
+      }`}
+    >
+      {attached ? (
+        <CheckCircle2 className="w-4.5 h-4.5 text-emerald-400 shrink-0" />
+      ) : (
+        <Upload className="w-4.5 h-4.5 text-white/40 shrink-0" />
+      )}
+      <span
+        className={`text-sm truncate ${
+          attached ? "text-emerald-400 font-bold" : "text-muted-foreground"
+        }`}
+      >
+        {attached ? fileName : emptyText}
+      </span>
+      <input
+        type="file"
+        accept=".pdf,.jpg,.jpeg,.png"
+        className="sr-only"
+        onChange={(e) => {
+          const file = e.target.files?.[0];
+          if (file) onFile(file);
+        }}
+      />
+    </label>
+  );
 
   return (
     <main className="flex-grow pt-28 md:pt-32 pb-20 px-4 md:px-6 relative">
@@ -121,8 +225,8 @@ function RegisterPage() {
           </h1>
           <p className="mt-4 text-sm md:text-base text-muted-foreground leading-relaxed">
             {lang === "vn"
-              ? "Số hóa 100% quy trình: nộp hồ sơ, thẩm tra tư cách pháp nhân và phê duyệt theo Điều lệ — tối đa 30 ngày, không cần giấy tờ bản cứng."
-              : "A fully digitized pipeline: apply, legal verification and charter approval — within 30 days, no paperwork required."}
+              ? "Số hóa 100% quy trình: nộp hồ sơ, Hiệp hội duyệt theo quy trình và phê duyệt theo Điều lệ — tối đa 30 ngày, không cần giấy tờ bản cứng."
+              : "A fully digitized pipeline: apply, association review by procedure and charter approval — within 30 days, no paperwork required."}
           </p>
         </div>
 
@@ -185,7 +289,7 @@ function RegisterPage() {
               </ol>
 
               <AnimatePresence mode="wait">
-                {/* STEP 1 — organization info */}
+                {/* STEP 1 — Thông tin Hội viên = 7 trường Danh bạ + email */}
                 {step === 1 && (
                   <motion.div
                     key="step1"
@@ -195,36 +299,81 @@ function RegisterPage() {
                     transition={{ duration: 0.25, ease: "easeOut" }}
                     className="space-y-5"
                   >
+                    <p className="text-xs text-muted-foreground leading-relaxed rounded-xl border border-white/8 bg-white/[0.02] px-4 py-3">
+                      {lang === "vn"
+                        ? "Thông tin căn bản này sẽ xuất hiện trong mục Danh bạ hội viên sau khi được duyệt. Tất cả 7 trường đều bắt buộc."
+                        : "This basic info will appear in the member directory after approval. All 7 fields are required."}
+                    </p>
                     <div className="grid sm:grid-cols-2 gap-4">
                       <div className="sm:col-span-2">
                         <label className={LABEL}>
                           {lang === "vn"
-                            ? "Tên Cơ quan / Tổ chức nộp đơn *"
-                            : "Organization Name *"}
+                            ? "Tên công ty (tiếng Việt) *"
+                            : "Company name (Vietnamese) *"}
                         </label>
                         <input
                           type="text"
                           placeholder="e.g. Công ty TNHH SoftTech Đà Nẵng"
-                          value={data.orgName}
-                          onChange={(e) =>
-                            setData({ ...data, orgName: e.target.value })
-                          }
+                          value={directory.nameVi}
+                          onChange={setDir("nameVi")}
+                          className={FIELD}
+                        />
+                      </div>
+                      <div className="sm:col-span-2">
+                        <label className={LABEL}>
+                          {lang === "vn"
+                            ? "Tên công ty (tiếng Anh) *"
+                            : "Company name (English) *"}
+                        </label>
+                        <input
+                          type="text"
+                          placeholder="e.g. SoftTech Danang Co., Ltd."
+                          value={directory.nameEn}
+                          onChange={setDir("nameEn")}
                           className={FIELD}
                         />
                       </div>
                       <div>
                         <label className={LABEL}>
                           {lang === "vn"
-                            ? "Người đại diện pháp luật"
-                            : "Legal Representative"}
+                            ? "Loại hình (trong nước / FDI) *"
+                            : "Ownership (domestic / FDI) *"}
+                        </label>
+                        <select
+                          value={directory.ownership}
+                          onChange={setDir("ownership")}
+                          className={`${FIELD} cursor-pointer`}
+                        >
+                          <option value="">
+                            {lang === "vn" ? "— Chọn —" : "— Select —"}
+                          </option>
+                          <option value="domestic">
+                            {lang === "vn" ? "Trong nước" : "Domestic"}
+                          </option>
+                          <option value="fdi">FDI</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className={LABEL}>
+                          {lang === "vn" ? "Lãnh đạo *" : "Leader *"}
                         </label>
                         <input
                           type="text"
                           placeholder="e.g. Trần Minh Quân"
-                          value={data.representative}
-                          onChange={(e) =>
-                            setData({ ...data, representative: e.target.value })
-                          }
+                          value={directory.leader}
+                          onChange={setDir("leader")}
+                          className={FIELD}
+                        />
+                      </div>
+                      <div>
+                        <label className={LABEL}>
+                          {lang === "vn" ? "Điện thoại *" : "Phone *"}
+                        </label>
+                        <input
+                          type="tel"
+                          placeholder="e.g. 0236 3xxx xxx"
+                          value={directory.phone}
+                          onChange={setDir("phone")}
                           className={FIELD}
                         />
                       </div>
@@ -241,6 +390,40 @@ function RegisterPage() {
                           onChange={(e) =>
                             setData({ ...data, email: e.target.value })
                           }
+                          className={FIELD}
+                        />
+                      </div>
+                      <div>
+                        <label className={LABEL}>
+                          {lang === "vn"
+                            ? "Lĩnh vực hoạt động *"
+                            : "Field of activity *"}
+                        </label>
+                        <input
+                          type="text"
+                          placeholder={
+                            lang === "vn"
+                              ? "e.g. AI, vi mạch, phần mềm…"
+                              : "e.g. AI, chips, software…"
+                          }
+                          value={directory.field}
+                          onChange={setDir("field")}
+                          className={FIELD}
+                        />
+                      </div>
+                      <div>
+                        <label className={LABEL}>
+                          {lang === "vn" ? "Thế mạnh *" : "Key strengths *"}
+                        </label>
+                        <input
+                          type="text"
+                          placeholder={
+                            lang === "vn"
+                              ? "e.g. AI camera, IoT công nghiệp…"
+                              : "e.g. AI cameras, industrial IoT…"
+                          }
+                          value={directory.strengths}
+                          onChange={setDir("strengths")}
                           className={FIELD}
                         />
                       </div>
@@ -262,7 +445,7 @@ function RegisterPage() {
                   </motion.div>
                 )}
 
-                {/* STEP 2 — legal & field */}
+                {/* STEP 2 — pháp lý: 2 file tải lên + lĩnh vực */}
                 {step === 2 && (
                   <motion.div
                     key="step2"
@@ -273,7 +456,7 @@ function RegisterPage() {
                     className="space-y-5"
                   >
                     <div className="grid sm:grid-cols-2 gap-4">
-                      <div>
+                      <div className="sm:col-span-2">
                         <label className={LABEL}>
                           {lang === "vn"
                             ? "Lĩnh vực công nghệ cốt lõi"
@@ -308,47 +491,49 @@ function RegisterPage() {
                           </option>
                         </select>
                       </div>
-                      <div>
+                      <div className="sm:col-span-2">
                         <label className={LABEL}>
                           {lang === "vn"
-                            ? "Tài liệu pháp lý (GPKD) *"
-                            : "Legal Document *"}
+                            ? "Công văn đồng ý trở thành Hội viên DTA *"
+                            : "Consent letter to join DTA *"}
                         </label>
-                        <label
-                          className={`flex items-center gap-3 px-4 py-3 rounded-xl border border-dashed cursor-pointer transition-colors ${
-                            data.hasLegalDoc
-                              ? "border-emerald-500/40 bg-emerald-500/[0.06]"
-                              : "border-white/15 bg-white/[0.03] hover:border-accent/40"
-                          }`}
-                        >
-                          {data.hasLegalDoc ? (
-                            <CheckCircle2 className="w-4.5 h-4.5 text-emerald-400 shrink-0" />
-                          ) : (
-                            <Upload className="w-4.5 h-4.5 text-white/40 shrink-0" />
-                          )}
-                          <span
-                            className={`text-sm ${
-                              data.hasLegalDoc
-                                ? "text-emerald-400 font-bold"
-                                : "text-muted-foreground"
-                            }`}
-                          >
-                            {data.hasLegalDoc
-                              ? lang === "vn"
-                                ? "Đã đính kèm tài liệu"
-                                : "Document attached"
-                              : lang === "vn"
-                                ? "Tải lên GPKD / Quyết định thành lập"
-                                : "Upload business certificate"}
-                          </span>
-                          <input
-                            type="file"
-                            className="sr-only"
-                            onChange={() =>
-                              setData({ ...data, hasLegalDoc: true })
-                            }
-                          />
+                        {uploadBox(
+                          data.hasConsentDoc,
+                          data.consentFileName,
+                          (f) => {
+                            setConsentFile(f);
+                            setData({
+                              ...data,
+                              hasConsentDoc: true,
+                              consentFileName: f.name,
+                            });
+                          },
+                          lang === "vn"
+                            ? "Tải lên công văn (PDF/ảnh, tối đa 10MB)"
+                            : "Upload consent letter (PDF/image, max 10MB)",
+                        )}
+                      </div>
+                      <div className="sm:col-span-2">
+                        <label className={LABEL}>
+                          {lang === "vn"
+                            ? "GPKD / Giấy CN ĐKKD / Quyết định thành lập DN-Chi nhánh *"
+                            : "Business certificate / Establishment decision *"}
                         </label>
+                        {uploadBox(
+                          data.hasLegalDoc,
+                          data.legalFileName,
+                          (f) => {
+                            setLegalFile(f);
+                            setData({
+                              ...data,
+                              hasLegalDoc: true,
+                              legalFileName: f.name,
+                            });
+                          },
+                          lang === "vn"
+                            ? "Tải lên GPKD / Quyết định thành lập"
+                            : "Upload business certificate",
+                        )}
                       </div>
                     </div>
 
@@ -356,8 +541,8 @@ function RegisterPage() {
                       <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
                       <p>
                         {lang === "vn"
-                          ? "Cam kết: Hồ sơ nộp tự nguyện, tuân thủ nghĩa vụ hội phí thường niên và các điều khoản trong Dự thảo Điều lệ hoạt động của Hiệp hội."
-                          : "Pledge: this application is voluntary and binds you to the annual fee and the association's public charter."}
+                          ? "Cam kết: Hồ sơ nộp tự nguyện, tuân thủ nghĩa vụ hội phí thường niên và các điều khoản trong Điều lệ hoạt động của Hiệp hội (QĐ số 3189/QĐ-UBND ngày 20/7/2026)."
+                          : "Pledge: this application is voluntary and binds you to the annual fee and the association charter (Decision 3189/QD-UBND dated 20/07/2026)."}
                       </p>
                     </div>
 
@@ -371,14 +556,21 @@ function RegisterPage() {
                       </button>
                       <button
                         onClick={handleSubmit}
-                        className="px-6 h-11 rounded-xl font-bold text-sm text-accent-foreground hover:opacity-90 active:scale-[0.98] transition-all flex items-center gap-2 cursor-pointer"
+                        disabled={submitting}
+                        className="px-6 h-11 rounded-xl font-bold text-sm text-accent-foreground hover:opacity-90 active:scale-[0.98] transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50"
                         style={{
                           background: "var(--gradient-gold)",
                           boxShadow: "var(--shadow-gold)",
                         }}
                       >
                         <Check className="w-4 h-4" />
-                        {lang === "vn" ? "Nộp hồ sơ" : "Submit Application"}
+                        {submitting
+                          ? lang === "vn"
+                            ? "Đang nộp…"
+                            : "Submitting…"
+                          : lang === "vn"
+                            ? "Nộp hồ sơ"
+                            : "Submit Application"}
                       </button>
                     </div>
                   </motion.div>
@@ -403,8 +595,8 @@ function RegisterPage() {
                     </h2>
                     <p className="text-sm text-muted-foreground leading-relaxed">
                       {lang === "vn"
-                        ? "Ban Thư ký sẽ thẩm định tư cách pháp nhân trực tuyến và phản hồi chính thức trong tối đa 30 ngày làm việc."
-                        : "The Secretariat will verify your legal files online and respond within 30 business days."}
+                        ? "Hiệp hội sẽ duyệt hồ sơ theo quy trình và phản hồi chính thức trong tối đa 30 ngày làm việc. Khi được kết nạp, Ban Thư ký cấp tài khoản + mật khẩu đăng nhập Không gian số."
+                        : "The association will review your file by procedure within 30 business days. On approval, the Secretariat issues your Member Space login and password."}
                     </p>
 
                     <div className="p-5 rounded-2xl border border-accent/25 bg-accent/[0.06]">
@@ -417,8 +609,8 @@ function RegisterPage() {
                       <span className="text-[11px] text-amber-400 font-bold mt-2.5 flex items-center justify-center gap-1.5">
                         <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
                         {lang === "vn"
-                          ? "Đang thẩm tra trực tuyến"
-                          : "Under online verification"}
+                          ? "Hiệp hội đang duyệt hồ sơ"
+                          : "Under association review"}
                       </span>
                     </div>
 
@@ -437,44 +629,14 @@ function RegisterPage() {
                           boxShadow: "var(--shadow-glow)",
                         }}
                       >
-                        <LogIn className="w-4 h-4" />
                         {lang === "vn"
-                          ? "Về trang Đăng nhập"
-                          : "Back to Sign-in"}
+                          ? "Về Không gian số"
+                          : "Back to Member Space"}
                       </Link>
                     </div>
                   </motion.div>
                 )}
               </AnimatePresence>
-            </div>
-
-            {/* Sign-in cross-link: the reverse of the LoginCard enrollment
-                footer — a credentialed member landing here by habit should
-                not have to hunt for the way back to their account. */}
-            <div className="card-surface rounded-2xl p-5 md:p-6 mt-6 flex flex-col sm:flex-row sm:items-center gap-4">
-              <div className="flex-1">
-                <h3 className="text-sm font-bold text-white">
-                  {lang === "vn"
-                    ? "Bạn đã có tài khoản?"
-                    : "Already have an account?"}
-                </h3>
-                <p className="text-xs text-muted-foreground leading-relaxed mt-1">
-                  {lang === "vn"
-                    ? "Đăng nhập Văn phòng số để quản lý hồ sơ Hội viên, hội phí và phản biện."
-                    : "Sign in to the Digital Office to manage your member record, dues and feedback."}
-                </p>
-              </div>
-              <Link
-                to="/portal"
-                className="w-full sm:w-auto shrink-0 px-6 h-11 rounded-xl font-bold text-sm text-primary-foreground hover:opacity-90 active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer"
-                style={{
-                  background: "var(--gradient-primary)",
-                  boxShadow: "var(--shadow-glow)",
-                }}
-              >
-                <LogIn className="w-4 h-4" />
-                {lang === "vn" ? "Đăng nhập ngay" : "Sign in now"}
-              </Link>
             </div>
           </div>
 
@@ -492,27 +654,29 @@ function RegisterPage() {
               {
                 icon: Clock,
                 title:
-                  lang === "vn" ? "Thẩm tra trong 30 ngày" : "30-day Review",
+                  lang === "vn"
+                    ? "Hiệp hội duyệt hồ sơ theo quy trình"
+                    : "Association Review by Procedure",
                 body:
                   lang === "vn"
-                    ? "Ban Thư ký xác thực hồ sơ trực tuyến, trình Ban Chấp hành phê duyệt và thông báo qua email đăng ký."
-                    : "The Secretariat verifies online, the Executive Board approves, and you are notified by email.",
+                    ? "Thẩm tra trong vòng 30 ngày: Ban Thư ký xác thực hồ sơ trực tuyến, trình Ban Chấp hành phê duyệt, ban hành quyết định công nhận và thông báo qua email đăng ký."
+                    : "Review within 30 days: online verification, board approval, recognition decision and email notification.",
               },
               {
                 icon: CreditCard,
-                title: lang === "vn" ? "Hội phí minh bạch" : "Transparent Dues",
+                title: lang === "vn" ? "Hội phí minh bạch" : "Transparent Fees",
                 body:
                   lang === "vn"
-                    ? "Hội viên Tổ chức: 5.000.000 VNĐ/niên khóa. Mọi thu chi đều công khai trên Văn phòng số để Hội viên giám sát."
-                    : "Corporate membership: 5,000,000 VND/term. All transactions are published on the Digital Office.",
+                    ? "Hội viên tổ chức: tùy quy mô, từ 3 đến 5.000.000 VNĐ/năm. Mọi thu chi được công khai, báo cáo minh bạch tại các phiên họp toàn thể để Hội viên biết, thực hành quyền giám sát."
+                    : "Corporate members: 3 to 5,000,000 VND/year depending on scale. All income and spending is disclosed at plenary meetings for member supervision.",
               },
               {
                 icon: BadgeCheck,
                 title: lang === "vn" ? "Quyền lợi Hội viên" : "Member Benefits",
                 body:
                   lang === "vn"
-                    ? "Thẻ Hội viên số, danh bạ toàn Hiệp hội, tài nguyên nội bộ và quyền phản biện chính sách trực tiếp."
-                    : "Digital member card, association directory, internal resources and direct policy feedback rights.",
+                    ? "Được quy định cụ thể tại Điều lệ hoạt động do UBND thành phố phê duyệt (QĐ số 3189/QĐ-UBND ngày 20/7/2026)."
+                    : "As specified in the charter approved by the City People's Committee (Decision 3189/QD-UBND dated 20/07/2026).",
               },
             ].map((item) => (
               <div

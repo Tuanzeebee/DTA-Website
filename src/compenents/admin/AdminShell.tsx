@@ -151,24 +151,26 @@ const NAV: NavItem[] = [
   {
     to: "/admin/hoi-phi",
     section: "fees",
-    label: "Hội phí & Tài chính",
+    label: "Hội phí",
     icon: Wallet,
     exact: false,
   },
-  {
-    to: "/admin/tai-nguyen",
-    section: "resources",
-    label: "Ấn phẩm & Tài nguyên",
-    icon: BookOpen,
-    exact: false,
-  },
-  {
-    to: "/admin/phan-bien",
-    section: "forum",
-    label: "Diễn đàn phản biện",
-    icon: MessagesSquare,
-    exact: false,
-  },
+  // ẨN theo yêu cầu 09/2026: Ấn phẩm & Tài nguyên nội bộ (giữ route /admin/tai-nguyen để khôi phục).
+  // {
+  //   to: "/admin/tai-nguyen",
+  //   section: "resources",
+  //   label: "Ấn phẩm & Tài nguyên",
+  //   icon: BookOpen,
+  //   exact: false,
+  // },
+  // ẨN theo yêu cầu 09/2026: Diễn đàn phản biện (giữ route /admin/phan-bien để khôi phục).
+  // {
+  //   to: "/admin/phan-bien",
+  //   section: "forum",
+  //   label: "Diễn đàn phản biện",
+  //   icon: MessagesSquare,
+  //   exact: false,
+  // },
   {
     to: "/admin/dang-ky",
     section: "applications",

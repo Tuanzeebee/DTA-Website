@@ -119,8 +119,8 @@ export function CharterModal({ lang, onClose }: CharterModalProps) {
               </strong>
               <br />-{" "}
               {lang === "vn"
-                ? "Cá nhân, tổ chức tự nguyện khai báo hồ sơ năng lực trực tuyến qua Văn phòng số. Văn phòng thực hiện thẩm tra tư cách pháp lý trong vòng tối đa 30 ngày làm việc."
-                : "All applicants register online through our Digital Office. The secretariat reviews profiles within 30 business days."}
+                ? "Cá nhân, tổ chức tự nguyện khai báo hồ sơ năng lực trực tuyến qua Không gian số. Hiệp hội duyệt hồ sơ theo quy trình, thẩm tra tư cách pháp lý trong vòng tối đa 30 ngày làm việc."
+                : "All applicants register online through our Member Space. The association reviews files by procedure within 30 business days."}
             </p>
             <p>
               <strong>
@@ -130,8 +130,8 @@ export function CharterModal({ lang, onClose }: CharterModalProps) {
               </strong>
               <br />-{" "}
               {lang === "vn"
-                ? "Được quyền bỏ phiếu biểu quyết dân chủ, đề cử nhân sự vào Ban Chấp hành; được bảo vệ pháp lý bản quyền phần mềm, kết nối cung cầu thương mại, và truy cập tài nguyên nội bộ."
-                : "Members hold democratic voting rights, legal defense for software copyright patents, trade promotion resources, and access to internal tech libraries."}
+                ? "Được quyền bỏ phiếu biểu quyết dân chủ, đề cử nhân sự vào Ban Chấp hành; được bảo vệ pháp lý bản quyền phần mềm, kết nối cung cầu thương mại, giới thiệu năng lực và mời hợp tác, liên danh-liên kết. Quyền lợi chi tiết theo Điều lệ do UBND thành phố phê duyệt (QĐ số 3189/QĐ-UBND ngày 20/7/2026)."
+                : "Members hold democratic voting rights, legal defense for software copyright, trade promotion, capability showcase and joint-venture invites. Details follow the charter approved by the City People's Committee (Decision 3189/QD-UBND dated 20/07/2026)."}
             </p>
           </div>
 
@@ -150,12 +150,12 @@ export function CharterModal({ lang, onClose }: CharterModalProps) {
               </strong>
               <br />-{" "}
               {lang === "vn"
-                ? "Mọi nguồn thu từ Hội phí thường niên (5.000.000 VNĐ đối với tổ chức) và tài trợ hợp pháp đều được sử dụng 100% cho mục tiêu đào tạo, xúc tiến thương mại số."
-                : "All member fees (5,000,000 VND for corporate entities) and sponsorships are channeled directly back into technology R&D programs."}
+                ? "Mọi nguồn thu từ Hội phí thường niên (hội viên tổ chức: tùy quy mô, từ 3 đến 5.000.000 VNĐ/năm) và tài trợ hợp pháp đều được sử dụng 100% cho mục tiêu đào tạo, xúc tiến thương mại số."
+                : "All annual fees (corporate members: 3 to 5,000,000 VND/year depending on scale) and lawful sponsorships are channeled back into training and digital trade programs."}
               <br />-{" "}
               {lang === "vn"
-                ? "Hệ thống số tự động công khai dòng tiền (Thu/Chi/Tồn) chi tiết hàng tháng trên Cổng Hội viên số để đảm bảo tính dân chủ, không một cá nhân nào được trục lợi."
-                : "DTA Digital Office logs complete financial ledgers dynamically every month for complete democratic monitoring."}
+                ? "Mọi thu chi được công khai, báo cáo minh bạch tại các phiên họp toàn thể để hội viên biết, thực hành quyền giám sát; hội phí của từng đơn vị được theo dõi trên Không gian số."
+                : "All income and spending is disclosed at plenary meetings for member supervision; each member tracks its own fee payments in the Member Space."}
             </p>
           </div>
         </div>

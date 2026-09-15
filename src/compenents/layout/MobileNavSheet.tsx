@@ -110,7 +110,7 @@ export function MobileNavSheet({
                 <>
                   <Building className="w-4 h-4" />
                   <span>
-                    {lang === "vn" ? "Văn phòng số" : "Digital Office"}
+                    {lang === "vn" ? "Không gian số" : "Member Space"}
                   </span>
                 </>
               ) : (

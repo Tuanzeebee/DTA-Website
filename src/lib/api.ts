@@ -137,12 +137,18 @@ export interface AdminArticleDetailResponse extends AdminArticleItem {
 export function adminFetchArticles(params?: {
   q?: string;
   status?: string;
+  mine?: boolean;
+  topic?: string;
+  category?: string;
   page?: number;
   pageSize?: number;
 }): Promise<AdminArticleListResponse> {
   const qs = new URLSearchParams();
   if (params?.q) qs.set("q", params.q);
   if (params?.status) qs.set("status", params.status);
+  if (params?.mine) qs.set("mine", "true");
+  if (params?.topic) qs.set("topic", params.topic);
+  if (params?.category) qs.set("category", params.category);
   if (params?.page && params.page > 1) qs.set("page", String(params.page));
   if (params?.pageSize) qs.set("pageSize", String(params.pageSize));
   const query = qs.toString();
@@ -335,9 +341,14 @@ export function adminDeleteUser(
 export interface MemberItem {
   id: string;
   name: string;
+  nameEn?: string | null;
   role: string;
   type: string;
   domain: string;
+  ownership?: string | null;
+  leader?: string | null;
+  phone?: string | null;
+  strengths?: string | null;
   logoUrl: string | null;
   website: string | null;
   sortOrder: number;
@@ -358,9 +369,14 @@ export function adminFetchMembers(): Promise<MemberItem[]> {
 /** Admin: create a new member. */
 export function adminCreateMember(data: {
   name: string;
+  nameEn?: string;
   role?: string;
   type?: string;
   domain?: string;
+  ownership?: string;
+  leader?: string;
+  phone?: string;
+  strengths?: string;
   logoUrl?: string;
   website?: string;
   sortOrder?: number;
@@ -377,9 +393,14 @@ export function adminUpdateMember(
   id: string,
   data: {
     name?: string;
+    nameEn?: string;
     role?: string;
     type?: string;
     domain?: string;
+    ownership?: string;
+    leader?: string;
+    phone?: string;
+    strengths?: string;
     logoUrl?: string;
     website?: string;
     sortOrder?: number;
@@ -397,6 +418,105 @@ export function adminDeleteMember(
   id: string,
 ): Promise<{ id: string; deleted: boolean }> {
   return authFetch(`/admin/members/${id}`, { method: "DELETE" });
+}
+
+/* ---------------- member application endpoints ---------------- */
+
+export type ApplicationStatus = "PENDING" | "APPROVED" | "REJECTED";
+
+export interface ApplicationItem {
+  id: string;
+  trackingCode: string;
+  orgName: string;
+  nameEn: string | null;
+  ownership: string | null;
+  leader: string | null;
+  contactName: string | null;
+  email: string;
+  phone: string | null;
+  type: string;
+  domain: string;
+  strengths: string | null;
+  techField: string | null;
+  consentDocUrl: string | null;
+  legalDocUrl: string | null;
+  message: string | null;
+  status: ApplicationStatus;
+  createdMemberId: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/** Public: nộp đơn gia nhập (multipart gồm 7 trường + 2 file). */
+export function submitApplication(form: FormData): Promise<ApplicationItem> {
+  return fetchJson("/applications", { method: "POST", body: form });
+}
+
+/** Admin: danh sách đơn (lọc theo trạng thái). */
+export function adminFetchApplications(
+  status?: ApplicationStatus,
+): Promise<ApplicationItem[]> {
+  const qs = status ? `?status=${status}` : "";
+  return authFetch(`/admin/applications${qs}`);
+}
+
+/** Admin: duyệt đơn — tạo Member trong Danh bạ. */
+export interface ApproveApplicationResult {
+  application: ApplicationItem;
+  member: {
+    id: string;
+    name: string;
+  };
+  /** Mật khẩu tạm — backend chỉ trả 1 lần duy nhất. */
+  tempPassword: string;
+}
+
+export function adminApproveApplication(
+  id: string,
+): Promise<ApproveApplicationResult> {
+  return authFetch(`/admin/applications/${id}/approve`, { method: "PATCH" });
+}
+
+/** Admin: cấp lại mật khẩu hội viên đã duyệt — cũng chỉ trả 1 lần. */
+export function adminResetMemberPassword(
+  id: string,
+): Promise<{ email: string; tempPassword: string }> {
+  return authFetch(`/admin/applications/${id}/reset-password`, {
+    method: "PATCH",
+  });
+}
+
+/** Admin: từ chối đơn. */
+export function adminRejectApplication(
+  id: string,
+): Promise<ApplicationItem> {
+  return authFetch(`/admin/applications/${id}/reject`, { method: "PATCH" });
+}
+
+/* ---------------- member self-service (Không gian số) ---------------- */
+
+/** Hội viên lấy hồ sơ của chính mình. */
+export function memberFetchProfile(): Promise<MemberItem> {
+  return authFetch("/member/profile");
+}
+
+/** Hội viên tự cập nhật các trường được phép của chính mình. */
+export function memberUpdateProfile(data: {
+  name?: string;
+  nameEn?: string;
+  domain?: string;
+  ownership?: string;
+  leader?: string;
+  phone?: string;
+  strengths?: string;
+  logoUrl?: string;
+  website?: string;
+}): Promise<MemberItem> {
+  return authFetch("/member/profile", {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
 }
 
 /* ---------------- ad placement endpoints ---------------- */

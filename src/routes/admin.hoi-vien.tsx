@@ -45,9 +45,17 @@ function AdminMembers() {
         data.map((m) => ({
           id: m.id,
           name: m.name,
+          nameEn: m.nameEn ?? undefined,
           role: m.role,
           type: m.type as DtaMember["type"],
           domain: m.domain,
+          ownership:
+            m.ownership === "fdi" || m.ownership === "domestic"
+              ? m.ownership
+              : undefined,
+          leader: m.leader ?? undefined,
+          phone: m.phone ?? undefined,
+          strengths: m.strengths ?? undefined,
           logoUrl: m.logoUrl ?? undefined,
           website: m.website ?? undefined,
         })),
@@ -81,9 +89,14 @@ function AdminMembers() {
       if (editing === "new") {
         const created = await adminCreateMember({
           name: data.name,
+          nameEn: data.nameEn,
           role: data.role,
           type: data.type,
           domain: data.domain,
+          ownership: data.ownership,
+          leader: data.leader,
+          phone: data.phone,
+          strengths: data.strengths,
           logoUrl: data.logoUrl,
           website: data.website,
         });
@@ -91,9 +104,17 @@ function AdminMembers() {
           {
             id: created.id,
             name: created.name,
+            nameEn: created.nameEn ?? undefined,
             role: created.role,
             type: created.type as DtaMember["type"],
             domain: created.domain,
+            ownership:
+              created.ownership === "fdi" || created.ownership === "domestic"
+                ? created.ownership
+                : undefined,
+            leader: created.leader ?? undefined,
+            phone: created.phone ?? undefined,
+            strengths: created.strengths ?? undefined,
             logoUrl: created.logoUrl ?? undefined,
             website: created.website ?? undefined,
           },
@@ -103,9 +124,14 @@ function AdminMembers() {
       } else {
         const updated = await adminUpdateMember(editing.id, {
           name: data.name,
+          nameEn: data.nameEn,
           role: data.role,
           type: data.type,
           domain: data.domain,
+          ownership: data.ownership,
+          leader: data.leader,
+          phone: data.phone,
+          strengths: data.strengths,
           logoUrl: data.logoUrl,
           website: data.website,
         });
@@ -115,9 +141,18 @@ function AdminMembers() {
               ? {
                   id: updated.id,
                   name: updated.name,
+                  nameEn: updated.nameEn ?? undefined,
                   role: updated.role,
                   type: updated.type as DtaMember["type"],
                   domain: updated.domain,
+                  ownership:
+                    updated.ownership === "fdi" ||
+                    updated.ownership === "domestic"
+                      ? updated.ownership
+                      : undefined,
+                  leader: updated.leader ?? undefined,
+                  phone: updated.phone ?? undefined,
+                  strengths: updated.strengths ?? undefined,
                   logoUrl: updated.logoUrl ?? undefined,
                   website: updated.website ?? undefined,
                 }
@@ -171,12 +206,13 @@ function AdminMembers() {
         </div>
       ) : (
         <div className="rounded-2xl border border-white/10 overflow-x-auto">
-          <table className="w-full text-left text-xs min-w-[720px]">
+          <table className="w-full text-left text-xs min-w-[860px]">
             <thead>
               <tr className="border-b border-white/10 bg-white/[0.03] text-[10px] uppercase tracking-wider text-white/50">
                 <th className="px-4 py-3 font-bold">Hội viên</th>
-                <th className="px-4 py-3 font-bold">Loại</th>
+                <th className="px-4 py-3 font-bold">Loại hình</th>
                 <th className="px-4 py-3 font-bold">Lĩnh vực</th>
+                <th className="px-4 py-3 font-bold">Liên hệ</th>
                 <th className="px-4 py-3 font-bold">Website</th>
                 <th className="px-4 py-3 font-bold text-right">Hành động</th>
               </tr>
@@ -210,17 +246,35 @@ function AdminMembers() {
                         <div className="font-bold text-white/90 truncate">
                           {m.name}
                         </div>
+                        {m.nameEn && (
+                          <div className="text-[10px] text-white/40 truncate">
+                            {m.nameEn}
+                          </div>
+                        )}
                         <div className="text-[10px] text-white/40">
-                          {m.role}
+                          {m.role} · {TYPE_LABEL[m.type]}
+                          {m.leader ? ` · ${m.leader}` : ""}
                         </div>
                       </div>
                     </div>
                   </td>
                   <td className="px-4 py-3 text-white/70 whitespace-nowrap">
-                    {TYPE_LABEL[m.type]}
+                    {m.ownership === "fdi"
+                      ? "FDI"
+                      : m.ownership === "domestic"
+                        ? "Trong nước"
+                        : "—"}
                   </td>
                   <td className="px-4 py-3 text-white/60 max-w-[260px]">
                     <span className="line-clamp-2">{m.domain}</span>
+                    {m.strengths && (
+                      <span className="block text-[10px] text-white/40 line-clamp-1 mt-0.5">
+                        {m.strengths}
+                      </span>
+                    )}
+                  </td>
+                  <td className="px-4 py-3 text-white/60 whitespace-nowrap">
+                    {m.phone ?? <span className="text-white/30">—</span>}
                   </td>
                   <td className="px-4 py-3">
                     {m.website ? (
@@ -260,7 +314,7 @@ function AdminMembers() {
               {members.length === 0 && (
                 <tr>
                   <td
-                    colSpan={5}
+                    colSpan={6}
                     className="px-4 py-10 text-center text-white/45"
                   >
                     Danh sách trống — bấm "Thêm hội viên".

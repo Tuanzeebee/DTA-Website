@@ -90,8 +90,8 @@ export function ServicesSection({ lang }: { lang: Lang }) {
               </div>
               <p className="mt-4 text-xs md:text-sm text-muted-foreground max-w-2xl mx-auto leading-relaxed">
                 {lang === "vn"
-                  ? "DTA công khai 100% các báo cáo tài chính hàng tháng, danh bạ hội viên và nghị quyết của Ban Chấp hành lên Văn phòng số để mọi hội viên trực tiếp quản trị và giám sát hoạt động."
-                  : "DTA publishes 100% of financial reports, directories, and executive board resolutions onto our Digital Office, enabling total democratic supervision by all members."}
+                  ? "DTA hoạt động phi lợi nhuận: hội phí minh bạch theo quy mô, mọi thu chi được công khai, báo cáo tại các phiên họp toàn thể để hội viên biết và thực hành quyền giám sát. Danh bạ hội viên và nghị quyết của Ban Chấp hành được chia sẻ trên Không gian số."
+                  : "DTA is a non-profit: scale-based transparent fees, all income and spending reported at plenary meetings for member supervision. The member directory and board resolutions are shared in the Member Space."}
               </p>
             </div>
           </div>

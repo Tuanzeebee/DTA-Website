@@ -183,7 +183,7 @@ export function LoginCard({
                 ? "Đang đăng nhập…"
                 : "Signing in…"
               : lang === "vn"
-                ? "Đăng nhập Văn phòng số"
+                ? "Đăng nhập Không gian số"
                 : "Sign in to Portal"}
           </span>
         </button>

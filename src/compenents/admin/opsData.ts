@@ -96,11 +96,25 @@ export const forumStore = createCollectionStore<ForumSubmission>(
 export interface MemberApplication {
   id: string;
   orgName: string;
+  /** Tên tiếng Anh (7 trường Danh bạ). */
+  nameEn?: string;
+  /** Loại hình trong nước / FDI. */
+  ownership?: string;
+  /** Lãnh đạo. */
+  leader?: string;
   contactName: string;
   email: string;
   phone?: string;
   type: "organization" | "individual";
   domain?: string;
+  /** Thế mạnh. */
+  strengths?: string;
+  /** Lĩnh vực công nghệ (AI/semi/cloud/iot). */
+  techField?: string;
+  /** Tên file công văn đồng ý làm Hội viên. */
+  consentDocName?: string;
+  /** Tên file GPKD / Quyết định thành lập. */
+  legalDocName?: string;
   message?: string;
   date: string;
   status: "pending" | "approved" | "rejected";

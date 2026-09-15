@@ -15,6 +15,7 @@ import { SectionHeader } from "@/compenents/SectionHeader";
 import { allMembers, loadMembersFromApi, type DtaMember } from "@/data";
 import type { Lang } from "@/types";
 import type { LucideIcon } from "lucide-react";
+import { MemberDetailDialog } from "@/compenents/member/MemberDetailDialog";
 import doiTacBg from "@/assets/DoiTac.webp";
 
 interface SliderOrg {
@@ -30,8 +31,16 @@ interface SliderOrg {
   textColor: string;
 }
 
-/** One marquee card. Members with a website become external links. */
-function MemberCard({ org, lang }: { org: SliderOrg; lang: Lang }) {
+/** One marquee card. Click opens the full 7-field profile dialog. */
+function MemberCard({
+  org,
+  lang,
+  onOpen,
+}: {
+  org: SliderOrg;
+  lang: Lang;
+  onOpen: () => void;
+}) {
   const IconComp = org.icon;
   const typeLabel =
     org.type === "organization"
@@ -84,28 +93,18 @@ function MemberCard({ org, lang }: { org: SliderOrg; lang: Lang }) {
   );
 
   const cardClass =
-    "card-surface card-solid rounded-3xl p-4 w-[330px] shrink-0 flex items-center gap-4 relative";
-
-  if (!org.website) {
-    return (
-      <div className={cardClass} style={{ borderColor: org.borderColor }}>
-        {body}
-      </div>
-    );
-  }
+    "card-surface card-solid rounded-3xl p-4 w-[330px] shrink-0 flex items-center gap-4 relative text-left cursor-pointer transition-all duration-300 hover:border-accent/50 hover:shadow-[0_0_24px_oklch(0.75_0.19_235_/_0.15)] hover:-translate-y-0.5 group";
 
   return (
-    <a
-      href={org.website}
-      target="_blank"
-      rel="noreferrer noopener"
-      aria-label={`${org.name} — website`}
-      className={`${cardClass} group cursor-pointer transition-all duration-300 hover:border-accent/50 hover:shadow-[0_0_24px_oklch(0.75_0.19_235_/_0.15)] hover:-translate-y-0.5`}
+    <button
+      onClick={onOpen}
+      aria-label={`${org.name} — ${lang === "vn" ? "xem hồ sơ" : "view profile"}`}
+      className={cardClass}
       style={{ borderColor: org.borderColor }}
     >
       {body}
       <ArrowUpRight className="absolute top-3 right-3 w-3.5 h-3.5 text-white/25 group-hover:text-accent transition-colors duration-300" />
-    </a>
+    </button>
   );
 }
 
@@ -183,6 +182,7 @@ function buildSliderOrgs(members: DtaMember[]): SliderOrg[] {
 
 export function MembersDirectorySection({ lang }: { lang: Lang }) {
   const [members, setMembers] = useState<DtaMember[]>(() => allMembers());
+  const [selected, setSelected] = useState<DtaMember | null>(null);
 
   useEffect(() => {
     loadMembersFromApi().then(setMembers);
@@ -253,17 +253,37 @@ export function MembersDirectorySection({ lang }: { lang: Lang }) {
         {/* Row 1: Left sliding */}
         <div className="flex gap-5 animate-marquee mb-5 py-2">
           {track1.map((org, idx) => (
-            <MemberCard key={`${org.id}-t1-${idx}`} org={org} lang={lang} />
+            <MemberCard
+              key={`${org.id}-t1-${idx}`}
+              org={org}
+              lang={lang}
+              onOpen={() =>
+                setSelected(members.find((m) => m.id === org.id) ?? null)
+              }
+            />
           ))}
         </div>
 
         {/* Row 2: Right sliding */}
         <div className="flex gap-5 animate-marquee-reverse py-2">
           {track2.map((org, idx) => (
-            <MemberCard key={`${org.id}-t2-${idx}`} org={org} lang={lang} />
+            <MemberCard
+              key={`${org.id}-t2-${idx}`}
+              org={org}
+              lang={lang}
+              onOpen={() =>
+                setSelected(members.find((m) => m.id === org.id) ?? null)
+              }
+            />
           ))}
         </div>
       </div>
+
+      <MemberDetailDialog
+        member={selected}
+        lang={lang}
+        onClose={() => setSelected(null)}
+      />
     </section>
   );
 }

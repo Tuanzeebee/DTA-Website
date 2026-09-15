@@ -38,16 +38,20 @@ export function ArticleTable() {
   const articles = useAdminArticles();
   const [q, setQ] = useState("");
   const [topicFilter, setTopicFilter] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
   const [page, setPage] = useState(1);
+
+  const pendingCount = articles.filter((a) => a.status === "draft").length;
 
   const rows = useMemo(() => {
     const needle = q.trim().toLowerCase();
     return articles.filter(
       (a) =>
         (topicFilter === "" || a.topic === topicFilter) &&
+        (statusFilter === "" || a.status === statusFilter) &&
         (needle === "" || a.title.toLowerCase().includes(needle)),
     );
-  }, [articles, q, topicFilter]);
+  }, [articles, q, topicFilter, statusFilter]);
 
   // Clamp instead of storing: filters shrinking the list (or a delete on
   // the last page) can never strand the table on an empty page.
@@ -60,7 +64,7 @@ export function ArticleTable() {
       const publish = a.status === "draft";
       await saveArticle({ ...a, status: publish ? "published" : "draft" });
       toast.success(
-        publish ? "Đã xuất bản bài viết." : "Đã gỡ bài về trạng thái nháp.",
+        publish ? "Đã duyệt và đăng bài viết." : "Đã gỡ bài về chờ duyệt.",
       );
     } catch {
       toast.error("Không thể cập nhật trạng thái.");
@@ -104,6 +108,21 @@ export function ArticleTable() {
               {t.name}
             </option>
           ))}
+        </select>
+        <select
+          value={statusFilter}
+          onChange={(e) => {
+            setStatusFilter(e.target.value);
+            setPage(1);
+          }}
+          title="Lọc theo trạng thái duyệt"
+          className="px-3 py-2 bg-white/5 border border-white/10 rounded-xl text-xs text-white focus:outline-none focus:border-cyan-400/60"
+        >
+          <option value="">Tất cả trạng thái</option>
+          <option value="draft">
+            Chờ duyệt (Nháp){pendingCount > 0 ? ` · ${pendingCount}` : ""}
+          </option>
+          <option value="published">Đã đăng</option>
         </select>
         <span className="ml-auto text-[11px] text-white/45 font-mono">
           {rows.length === 0
@@ -195,7 +214,7 @@ to="/news/article/$slug"
                       </Link>
                       <button
                         onClick={() => togglePublish(a)}
-                        title={draft ? "Xuất bản" : "Gỡ về nháp"}
+                        title={draft ? "Duyệt & Đăng" : "Gỡ về chờ duyệt"}
                         className="p-1.5 rounded-lg border border-white/10 text-white/50 hover:text-accent transition-colors cursor-pointer"
                       >
                         {draft ? (

@@ -46,7 +46,7 @@ export function PortalHeader() {
               DTA Member Portal
             </span>
             <span className="block text-[9px] uppercase tracking-[0.14em] text-muted-foreground">
-              {lang === "vn" ? "Văn phòng số" : "Digital Office"}
+              {lang === "vn" ? "Không gian số" : "Member Space"}
             </span>
           </span>
         </Link>
