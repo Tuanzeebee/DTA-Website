@@ -33,9 +33,7 @@ function AdminArticleEditorPage() {
   const [fetchDone, setFetchDone] = useState(false);
 
   // Try cache first, then fetch from API
-  const cachedArticle = isNew
-    ? undefined
-    : articles.find((a) => a.id === id);
+  const cachedArticle = isNew ? undefined : articles.find((a) => a.id === id);
 
   useEffect(() => {
     if (isNew || cachedArticle) {
@@ -77,9 +75,7 @@ function AdminArticleEditorPage() {
   if (!isNew && fetchDone && !article) {
     return (
       <div className="max-w-3xl">
-        <p className="text-sm text-white/60">
-          Không tìm thấy bài viết "{id}".
-        </p>
+        <p className="text-sm text-white/60">Không tìm thấy bài viết "{id}".</p>
         <Link
           to="/admin/bai-viet"
           className="inline-flex items-center gap-1.5 mt-4 text-[11px] font-bold uppercase text-accent hover:text-cyan-300 transition-colors"
@@ -118,8 +114,15 @@ function AdminArticleEditorPage() {
                 : "Đã lưu nháp.",
             );
             navigate({ to: "/admin/bai-viet" });
-          } catch {
-            toast.error("Không thể lưu bài viết. Vui lòng thử lại.");
+          } catch (err) {
+            console.error("[admin/bai-viet] save failed:", err);
+            const msg =
+              err instanceof Error && err.message.trim()
+                ? err.message
+                : "Không thể lưu bài viết. Vui lòng thử lại.";
+            // Rút gọn body JSON dài của API để toast đọc được
+            const short = msg.length > 320 ? `${msg.slice(0, 320)}…` : msg;
+            toast.error(short);
           }
         }}
       />

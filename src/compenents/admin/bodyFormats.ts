@@ -1,4 +1,5 @@
 import type { ArticleBlock, ArticleImage } from "@/newsData";
+import { isValidColor, toSafeHtml } from "@/compenents/admin/richText";
 
 /**
  * Conversions between the article block model and other authoring formats:
@@ -14,7 +15,7 @@ const clampWidth = (n: number) => Math.min(100, Math.max(20, Math.round(n)));
 
 /**
  * Flow-text syntax, one block per blank-line-separated chunk:
- *   plain text                 -> paragraph
+ *   plain text                 -> paragraph (giữ **bold**, [color=..], <strong>, <span style="color:..">)
  *   > quoted text              -> highlight BOX
  *   ![caption](url){align=right wrap=square width=40} -> image
  * The {…} attribute group is optional and mirrors the Word layout options.
@@ -57,14 +58,12 @@ export function textToBlocks(text: string): ArticleBlock[] {
       continue;
     }
 
-    // Markdown headings/emphasis degrade to plain paragraphs — the block
+    // Giữ inline formatting: chỉ bỏ heading marks, chuẩn hóa xuống dòng
+    // trong block thành space. **bold**, [color=..], <strong>, <span color>
+    // được giữ nguyên để renderRichText hiển thị.
+    // Markdown headings degrade to plain paragraphs — the block
     // model has no heading level, and losing `#` marks beats keeping them.
-    blocks.push(
-      chunk
-        .replace(/^#{1,6}\s+/, "")
-        .replace(/\*\*([^*]+)\*\*/g, "$1")
-        .replace(/\n/g, " "),
-    );
+    blocks.push(chunk.replace(/^#{1,6}\s+/, "").replace(/\n(?!\n)/g, " "));
   }
   return blocks;
 }
@@ -148,19 +147,50 @@ const decodeXmlEntities = (s: string) =>
     .replace(/&apos;/g, "'")
     .replace(/&amp;/g, "&");
 
-/** .docx -> paragraph blocks. Visible text lives in <w:t> runs; one
- *  <w:p> = one paragraph. Formatting (bold, styles) is dropped. */
+/** .docx -> paragraph blocks. Giữ bold (<w:b>) và màu chữ (<w:color>)
+ *  thành <strong> / <span style="color:..."> để renderRichText hiển thị.
+ *  Visible text lives in <w:t> runs; one <w:p> = one paragraph. */
 export async function docxToBlocks(file: File): Promise<ArticleBlock[]> {
   const xml = await extractDocumentXml(await file.arrayBuffer());
-  return xml
-    .split(/<\/w:p>/)
-    .map((chunk) =>
-      Array.from(chunk.matchAll(/<w:t[^>]*>([^<]*)<\/w:t>/g))
+  const paragraphs = xml.split(/<\/w:p>/);
+  const out: ArticleBlock[] = [];
+  for (const p of paragraphs) {
+    const runs = Array.from(p.matchAll(/<w:r[\s\S]*?<\/w:r>/g)).map(
+      (m) => m[0],
+    );
+    const sources =
+      runs.length > 0
+        ? runs
+        : Array.from(p.matchAll(/<w:t[^>]*>([^<]*)<\/w:t>/g)).map(
+            (m) => `<w:r><w:t>${m[1]}</w:t></w:r>`,
+          );
+    let html = "";
+    for (const r of sources) {
+      // Text gốc trong run (đã decode XML entities). Không escape ở đây:
+      // renderRichText chỉ tách tags allowlist, phần còn lại React tự escape.
+      const t = Array.from(r.matchAll(/<w:t[^>]*>([^<]*)<\/w:t>/g))
         .map((m) => decodeXmlEntities(m[1]))
-        .join("")
-        .trim(),
-    )
-    .filter((t) => t !== "");
+        .join("");
+      if (!t) continue;
+      let seg = t;
+      const isBold = /<w:b[\s/>]/i.test(r);
+      const colorMatch = r.match(/<w:color[^>]*w:val="([^"]+)"/i);
+      let color: string | null = null;
+      if (colorMatch) {
+        const raw = colorMatch[1].trim();
+        // Word lưu "auto", "000000" (đen mặc định -> bỏ), hex 6 ký tự
+        if (/^[0-9a-fA-F]{6}$/.test(raw) && raw.toLowerCase() !== "000000") {
+          const hex = `#${raw}`;
+          if (isValidColor(hex)) color = hex;
+        }
+      }
+      if (color) seg = `<span style="color:${color}">${seg}</span>`;
+      if (isBold) seg = `<strong>${seg}</strong>`;
+      html += seg;
+    }
+    if (html.replace(/<[^>]+>/g, "").trim() !== "") out.push(html.trim());
+  }
+  return out;
 }
 
 /* ---------------- PDF export (browser print dialog) ---------------- */
@@ -183,8 +213,8 @@ export function exportArticlePdf(article: {
 }) {
   const bodyHtml = article.body
     .map((b) => {
-      if (typeof b === "string") return `<p>${esc(b)}</p>`;
-      if ("box" in b) return `<div class="box">${esc(b.box)}</div>`;
+      if (typeof b === "string") return `<p>${toSafeHtml(b)}</p>`;
+      if ("box" in b) return `<div class="box">${toSafeHtml(b.box)}</div>`;
       const wrap = b.wrap ?? (b.align === "center" ? "none" : "square");
       const width = b.width ?? (wrap === "square" ? 46 : 100);
       const style =

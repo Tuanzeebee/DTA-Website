@@ -39,6 +39,7 @@ import {
 import { newArticleId } from "@/compenents/admin/adminStore";
 import { EditablePreview } from "@/compenents/admin/EditablePreview";
 import { ArticleBody } from "@/compenents/news/ArticleBody";
+import { RichTextArea, isRichTextEmpty } from "@/compenents/admin/richText";
 
 /**
  * Word-style article editor. The body is the same block list the portal
@@ -56,7 +57,24 @@ export function ArticleEditor({
   const [topicsReady, setTopicsReady] = useState(mainTopics.length > 0);
 
   useEffect(() => {
-    loadMainTopics().then(() => setTopicsReady(true));
+    let alive = true;
+    loadMainTopics().then(() => {
+      if (!alive) return;
+      setTopicsReady(true);
+      // Đồng bộ giá trị mặc định sau khi topics về (lúc mount mảng còn rỗng
+      // nên useState khởi tạo "" — đây từng gây categoryId fallback 1 -> 400).
+      if (!initial) {
+        const first = mainTopics[0];
+        if (first) {
+          setTopicSlug((prev) => prev || first.slug);
+          setCategorySlug((prev) => prev || first.categories[0]?.slug || "");
+        }
+      }
+    });
+    return () => {
+      alive = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const [title, setTitle] = useState(initial?.title ?? "");
@@ -91,6 +109,29 @@ export function ArticleEditor({
       toast.error("Cần nhập tối thiểu Tiêu đề và Tóm tắt.");
       return null;
     }
+    if (title.trim().length < 3) {
+      toast.error("Tiêu đề cần ít nhất 3 ký tự (server yêu cầu).");
+      return null;
+    }
+    if (!topicsReady || !topic?.slug || !categorySlug) {
+      toast.error(
+        "Danh mục chưa tải xong — đợi 1-2 giây cho Chủ đề/Chuyên mục hiện rồi thử lại.",
+      );
+      return null;
+    }
+    if (date.trim() && !/^\d{2}\/\d{2}\/\d{4}$/.test(date.trim())) {
+      toast.error("Ngày đăng cần đúng định dạng dd/mm/yyyy.");
+      return null;
+    }
+    const body = blocks.filter((b) => {
+      if (typeof b === "string") return !isRichTextEmpty(b);
+      if ("box" in b) return !isRichTextEmpty(b.box ?? "");
+      return true;
+    });
+    if (body.length === 0) {
+      toast.error("Bài viết cần ít nhất 1 đoạn nội dung.");
+      return null;
+    }
     return {
       id: initial?.id ?? newArticleId(),
       title: title.trim(),
@@ -98,7 +139,8 @@ export function ArticleEditor({
       topic: topic?.slug ?? "",
       category:
         topic?.categories?.find((c) => c.slug === categorySlug)?.slug ??
-        topic?.categories?.[0]?.slug ?? "",
+        topic?.categories?.[0]?.slug ??
+        "",
       date: date.trim() || todayVn(),
       image: image.trim() || "",
       tags: tags
@@ -112,7 +154,8 @@ export function ArticleEditor({
       author: author.trim() || undefined,
       status: publish ? "published" : "draft",
       // Drop empty paragraphs so stray enters don't publish as gaps.
-      body: blocks.filter((b) => typeof b !== "string" || b.trim() !== ""),
+      // Dùng stripRichText để <strong></strong> rỗng cũng bị loại.
+      body,
     };
   };
 
@@ -236,6 +279,11 @@ export function ArticleEditor({
                   </option>
                 ))}
               </select>
+              {!topicsReady && (
+                <p className="mt-1 text-[10px] text-amber-300/80">
+                  Đang tải danh mục từ server…
+                </p>
+              )}
             </Field>
             <Field label="Chuyên mục">
               <select
@@ -476,26 +524,30 @@ function BodyEditor({
             }}
             rows={18}
             placeholder={
-              "Gõ liền mạch như soạn Word…\n\nCách một dòng trống = sang đoạn mới.\n\n> Dòng bắt đầu bằng dấu lớn hơn = BOX điểm nhấn.\n\n![Chú thích ảnh](https://link-anh){align=right width=40}"
+              "Gõ liền mạch như soạn Word…\n\nCách một dòng trống = sang đoạn mới.\n\n**chữ đậm** = bôi đậm · [color=#e11d48]chữ màu[/color] = đổi màu.\n\n> Dòng bắt đầu bằng dấu lớn hơn = BOX điểm nhấn.\n\n![Chú thích ảnh](https://link-anh){align=right width=40}"
             }
             className={`${INPUT} resize-y font-mono leading-relaxed`}
           />
           <p className="mt-1.5 text-[10px] text-white/40 leading-relaxed">
-            Dòng trống = đoạn mới · <code>&gt; …</code> = BOX ·{" "}
+            Dòng trống = đoạn mới · <code>**đậm**</code> = bôi đậm ·{" "}
+            <code>[color=#e11d48]màu[/color]</code> = đổi màu ·{" "}
+            <code>&gt; …</code> = BOX ·{" "}
             <code>
               ![chú thích](url)&#123;align=left|right|center width=40
               wrap=square|none&#125;
             </code>{" "}
-            = ảnh. Chuyển về tab Block để tinh chỉnh từng ảnh bằng nút bấm.
+            = ảnh. Muốn bấm nút B / bảng màu thì chuyển về tab Block.
           </p>
         </div>
       )}
 
       {mode === "import" && (
         <ImportPanel
-          hasContent={blocks.some(
-            (b) => typeof b !== "string" || b.trim() !== "",
-          )}
+          hasContent={blocks.some((b) => {
+            if (typeof b === "string") return !isRichTextEmpty(b);
+            if ("box" in b) return !isRichTextEmpty(b.box ?? "");
+            return Boolean(b.src);
+          })}
           onImport={(imported, replace) => {
             onChange(replace ? imported : [...blocks, ...imported]);
             setMode("block");
@@ -752,19 +804,19 @@ function BlockCard({
       </div>
 
       {typeof block === "string" ? (
-        <textarea
+        <RichTextArea
           value={block}
-          onChange={(e) => onUpdate(item.id, e.target.value)}
+          onChange={(v) => onUpdate(item.id, v)}
           rows={3}
-          placeholder="Nội dung đoạn văn…"
+          placeholder="Nội dung đoạn văn… (bôi đen rồi bấm B / Màu để định dạng)"
           className={`${INPUT} resize-y`}
         />
       ) : "box" in block ? (
-        <textarea
+        <RichTextArea
           value={block.box}
-          onChange={(e) => onUpdate(item.id, { box: e.target.value })}
+          onChange={(v) => onUpdate(item.id, { box: v })}
           rows={2}
-          placeholder="Trích dẫn / con số nổi bật…"
+          placeholder="Trích dẫn / con số nổi bật… (hỗ trợ B + màu)"
           className={`${INPUT} resize-y border-l-2 border-l-accent/60`}
         />
       ) : (
@@ -915,7 +967,8 @@ export function ImageInput({
   placeholder?: string;
 }) {
   const fileRef = useRef<HTMLInputElement>(null);
-  const isUploaded = value.startsWith("/uploads/") || value.startsWith("/news-images/");
+  const isUploaded =
+    value.startsWith("/uploads/") || value.startsWith("/news-images/");
 
   const pick = async (file: File) => {
     if (!file.type.startsWith("image/")) {

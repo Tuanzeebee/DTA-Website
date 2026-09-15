@@ -13,6 +13,7 @@ import {
 } from "@/lib/api";
 import { authService } from "@/lib/auth/service";
 import { categoryBySlug, type PortalArticle } from "@/newsData";
+import { isRichTextEmpty } from "@/compenents/admin/richText";
 
 /**
  * Admin article store backed by the real NestJS API.
@@ -99,7 +100,9 @@ export async function loadArticles(): Promise<PortalArticle[]> {
 }
 
 /** Map backend detail blocks to frontend ArticleBlock[]. */
-function mapDetailBlocks(blocks: unknown[]): import("@/newsData").ArticleBlock[] {
+function mapDetailBlocks(
+  blocks: unknown[],
+): import("@/newsData").ArticleBlock[] {
   return blocks.map((b) => {
     if (typeof b === "string") return b;
     if (b && typeof b === "object" && "src" in b) {
@@ -112,7 +115,9 @@ function mapDetailBlocks(blocks: unknown[]): import("@/newsData").ArticleBlock[]
       } as import("@/newsData").ArticleImage;
     }
     if (b && typeof b === "object" && "box" in b) {
-      return { box: (b as { box: string }).box } as import("@/newsData").ArticleBox;
+      return {
+        box: (b as { box: string }).box,
+      } as import("@/newsData").ArticleBox;
     }
     return "";
   });
@@ -185,6 +190,8 @@ export function useAdminArticles(): PortalArticle[] {
 /**
  * Resolve a category slug to its numeric ID for the backend API.
  * Fetches categories from the API if needed.
+ * Không fallback cứng về 1 nữa — ném lỗi rõ để UI báo đúng nguyên nhân
+ * (trước đây fallback 1 gây 400 "Danh mục không tồn tại" khó chẩn đoán).
  */
 let categoryCache: Map<string, number> | null = null;
 
@@ -192,77 +199,106 @@ async function resolveCategoryId(
   topicSlug: string,
   categorySlug: string,
 ): Promise<number> {
-  // Try the local data first
+  // Try the local data first (mainTopics giờ đã có id từ /api/news/topics)
   const local = categoryBySlug(topicSlug, categorySlug);
-  if (local) return local.id;
+  if (local?.id != null) return local.id;
 
   // Fetch from API
   if (!categoryCache) {
-    try {
-      const cats = await adminFetchCategories();
-      categoryCache = new Map(cats.map((c) => [c.slug, c.id]));
-    } catch {
-      return 1; // fallback
-    }
+    const cats = await adminFetchCategories();
+    categoryCache = new Map(cats.map((c) => [c.slug, c.id]));
   }
-  return categoryCache.get(categorySlug) ?? 1;
+  const found =
+    categoryCache.get(categorySlug) ?? [...categoryCache.values()][0];
+  if (found == null) {
+    throw new Error(
+      "Chưa tải được danh mục (topics rỗng). Đợi danh mục tải xong rồi chọn lại Chủ đề/Chuyên mục.",
+    );
+  }
+  // Nếu slug yêu cầu không khớp DB nhưng đã có categories -> vẫn báo rõ
+  if (!categorySlug || !categoryCache.has(categorySlug)) {
+    throw new Error(
+      `Chuyên mục "${categorySlug || "(trống)"}" không khớp dữ liệu server. Chọn lại Chủ đề/Chuyên mục sau khi danh mục đã tải.`,
+    );
+  }
+  return found;
 }
 
 /** Create or update article via the API. */
-export async function saveArticle(
-  article: PortalArticle,
-): Promise<void> {
+export async function saveArticle(article: PortalArticle): Promise<void> {
   const token = authService.getAccessToken();
   if (!token) throw new Error("Chưa đăng nhập");
 
-  const categoryId = await resolveCategoryId(
-    article.topic,
-    article.category,
-  );
+  const categoryId = await resolveCategoryId(article.topic, article.category);
 
-  // Build blocks from body
+  // Build blocks from body (giữ inline bold/màu trong text).
+  // Lưu ý: string có thể chứa <strong>/<span style="color:..."> — backend
+  // chỉ cần IsString nên không cần đổi DTO. BOX phải map BOX, không gộp IMAGE.
   const blocks = (article.body ?? [])
     .filter((b) => {
-      if (typeof b === "string") return b.trim() !== "";
+      if (typeof b === "string") return !isRichTextEmpty(b);
+      if ("box" in b) return !isRichTextEmpty(b.box ?? "");
       return true;
     })
     .map((b, i) => {
       if (typeof b === "string") {
         return { type: "TEXT", text: b, position: i };
       }
+      if ("box" in b) {
+        return { type: "BOX", text: b.box, position: i };
+      }
       // Image block
+      const widthNum =
+        typeof b.width === "number" && Number.isFinite(b.width)
+          ? Math.min(100, Math.max(20, Math.round(b.width)))
+          : undefined;
       return {
         type: "IMAGE",
-        imageUrl: b.src?.startsWith("/uploads/") ? undefined : b.src,
-        imageLocalPath: b.src?.startsWith("/uploads/") ? b.src : undefined,
-        caption: b.caption,
+        imageUrl:
+          b.src?.startsWith("/uploads/") || b.src?.startsWith("/news-images/")
+            ? undefined
+            : b.src || undefined,
+        imageLocalPath:
+          b.src?.startsWith("/uploads/") || b.src?.startsWith("/news-images/")
+            ? b.src
+            : undefined,
+        caption: b.caption || undefined,
         align: (b.align ?? "center").toUpperCase(),
         wrap: (b.wrap ?? "none").toUpperCase(),
-        width: b.width,
+        width: widthNum,
         position: i,
       };
     });
 
-  const isExistingBackend = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
-    article.id,
-  );
+  const isExistingBackend =
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+      article.id,
+    );
 
   const payload = {
     title: article.title,
     summary: article.summary || undefined,
     categoryId,
     thumbnailUrl: article.image || undefined,
+    sourceUrl: undefined,
     tags: article.tags.length > 0 ? article.tags : undefined,
+    pdfUrl: article.pdfUrl || undefined,
+    memberUrl: article.memberUrl || undefined,
     isIntern: article.isIntern || undefined,
     status: article.status === "published" ? "PUBLISHED" : "DRAFT",
     publishedAt: article.date ? vnDateToIso(article.date) : undefined,
     blocks: blocks.length > 0 ? blocks : undefined,
   };
 
-  if (isExistingBackend) {
-    await adminUpdateArticle(article.id, payload);
-  } else {
-    await adminCreateArticle(payload);
+  try {
+    if (isExistingBackend) {
+      await adminUpdateArticle(article.id, payload);
+    } else {
+      await adminCreateArticle(payload);
+    }
+  } catch (err) {
+    console.error("[adminStore] saveArticle failed:", err, { payload });
+    throw err;
   }
   await loadArticles();
 }
@@ -295,9 +331,8 @@ export async function resetToMockData(): Promise<void> {
 
 /** Check if an article was created locally (not yet in backend). */
 export function articleOrigin(id: string): "mock" | "admin" {
-  const isBackend = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
-    id,
-  );
+  const isBackend =
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
   return isBackend ? "admin" : "mock";
 }
 

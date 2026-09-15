@@ -6,6 +6,7 @@
  */
 
 export interface NewsCategory {
+  id?: number;
   slug: string;
   name: string;
   desc: string;
@@ -83,12 +84,14 @@ export async function loadMainTopics(): Promise<MainTopic[]> {
     const res = await fetch("/api/news/topics");
     if (!res.ok) return mainTopics;
     const data = (await res.json()) as Array<{
+      id: number;
       slug: string;
       name: string;
       shortName: string | null;
       nameEn: string | null;
       shortEn: string | null;
       categories: Array<{
+        id: number;
         slug: string;
         name: string;
         description: string | null;
@@ -103,6 +106,7 @@ export async function loadMainTopics(): Promise<MainTopic[]> {
         nameEn: t.nameEn ?? undefined,
         shortEn: t.shortEn ?? undefined,
         categories: (t.categories ?? []).map((c) => ({
+          id: c.id,
           slug: c.slug,
           name: c.name,
           desc: c.description ?? "",

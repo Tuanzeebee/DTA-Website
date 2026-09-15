@@ -1,4 +1,5 @@
 import type { ArticleBlock, ArticleImage } from "@/newsData";
+import { renderRichText } from "@/compenents/admin/richText";
 
 /**
  * Article body renderer — Word-style layout options. Shared by the portal
@@ -22,7 +23,7 @@ export function ArticleBody({ body }: { body: ArticleBlock[] }) {
         if (typeof block === "string") {
           return (
             <p key={i} className="mb-4">
-              {block}
+              {renderRichText(block)}
             </p>
           );
         }
@@ -33,7 +34,7 @@ export function ArticleBody({ body }: { body: ArticleBlock[] }) {
               key={i}
               className="clear-both my-6 rounded-xl border-l-2 border-accent/60 bg-white/[0.04] px-5 py-4 text-[13.5px] font-medium text-white/85 leading-relaxed"
             >
-              {block.box}
+              {renderRichText(block.box)}
             </aside>
           );
         }

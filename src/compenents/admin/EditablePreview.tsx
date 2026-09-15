@@ -7,6 +7,7 @@ import {
   GripHorizontal,
 } from "lucide-react";
 import type { ArticleBlock, ArticleImage } from "@/newsData";
+import { renderRichText } from "@/compenents/admin/richText";
 
 /**
  * WYSIWYG surface over the article preview — the Word-canvas feel:
@@ -234,10 +235,10 @@ export function EditablePreview({
             }}
           >
             {typeof block === "string" ? (
-              <p className="mb-4">{block}</p>
+              <p className="mb-4">{renderRichText(block)}</p>
             ) : "box" in block ? (
               <aside className="clear-both my-6 rounded-xl border-l-2 border-accent/60 bg-white/[0.04] px-5 py-4 text-[13.5px] font-medium text-white/85 leading-relaxed">
-                {block.box}
+                {renderRichText(block.box)}
               </aside>
             ) : (
               <PreviewImage
