@@ -1,41 +1,29 @@
-import { Building, ShieldCheck, Layers, FileText } from "lucide-react";
+import { Building, ShieldCheck, FileText } from "lucide-react";
 import { TraditionalClouds, AssociationSeal } from "@/compenents/Aesthetic";
 import { TrongDongDisc } from "@/compenents/TrongDongDisc";
 import { SectionBackground } from "@/compenents/SectionBackground";
 import { seamTint } from "@/compenents/seamTint";
 import { ScrollReveal } from "@/compenents/ScrollReveal";
-import { allMembers, translationStrings } from "@/data";
+import { translationStrings } from "@/data";
 import type { Lang } from "@/types";
 
 function credentials(lang: Lang) {
-  const orgs = allMembers().filter((m) => m.type === "organization").length;
-  const people = allMembers().filter((m) => m.type === "individual").length;
-  const advisors = allMembers().filter((m) => m.type === "advisory").length;
-
   return [
     {
       icon: Building,
       label: lang === "vn" ? "Cơ quan quản lý" : "Governing body",
       value:
         lang === "vn"
-          ? "UBND TP. Đà Nẵng · Sở Nội vụ"
-          : "Danang People's Committee",
+          ? "Ủy ban nhân dân Thành phố Đà Nẵng · Sở Nội vụ · Sở Khoa học và Công nghệ"
+          : "Danang People's Committee · Home Affairs · Science & Technology",
     },
     {
       icon: ShieldCheck,
       label: lang === "vn" ? "Mô hình hoạt động" : "Operating model",
       value:
         lang === "vn"
-          ? "Phi lợi nhuận · Tài chính công khai"
-          : "Non-profit · Public ledger",
-    },
-    {
-      icon: Layers,
-      label: lang === "vn" ? "Cơ cấu hội viên" : "Directory composition",
-      value:
-        lang === "vn"
-          ? `${orgs} tổ chức · ${people} cá nhân · ${advisors} cố vấn`
-          : `${orgs} orgs · ${people} individuals · ${advisors} advisor`,
+          ? "Phi lợi nhuận · Tự bảo đảm kinh phí hoạt động · Tự chịu trách nhiệm"
+          : "Non-profit · Self-financed · Self-accountable",
     },
   ];
 }
@@ -132,10 +120,21 @@ export function AboutSection({
               {lang === "vn" ? "đà nẵng vươn tầm" : "of danang globally"}
             </span>
           </h2>
-          <div className="mt-6 space-y-4 text-muted-foreground leading-relaxed text-base md:text-lg">
-            <p>{translationStrings.charterDesc1[lang]}</p>
-            <p>{translationStrings.charterDesc2[lang]}</p>
-          </div>
+          <ul className="mt-6 space-y-4 text-muted-foreground leading-relaxed text-base md:text-lg">
+            {[
+              translationStrings.charterDesc1[lang],
+              translationStrings.charterDesc2[lang],
+              translationStrings.charterDesc3[lang],
+            ].map((item) => (
+              <li key={item.slice(0, 24)} className="flex items-start gap-3">
+                <span
+                  aria-hidden
+                  className="mt-[0.65em] w-1.5 h-1.5 rounded-full bg-accent shrink-0"
+                />
+                <span>{item}</span>
+              </li>
+            ))}
+          </ul>
           <div className="mt-8">
             <button
               onClick={() => setShowCharter(true)}

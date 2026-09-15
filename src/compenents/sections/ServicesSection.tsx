@@ -90,8 +90,13 @@ export function ServicesSection({ lang }: { lang: Lang }) {
               </div>
               <p className="mt-4 text-xs md:text-sm text-muted-foreground max-w-2xl mx-auto leading-relaxed">
                 {lang === "vn"
-                  ? "DTA hoạt động phi lợi nhuận: hội phí minh bạch theo quy mô, mọi thu chi được công khai, báo cáo tại các phiên họp toàn thể để hội viên biết và thực hành quyền giám sát. Danh bạ hội viên và nghị quyết của Ban Chấp hành được chia sẻ trên Không gian số."
-                  : "DTA is a non-profit: scale-based transparent fees, all income and spending reported at plenary meetings for member supervision. The member directory and board resolutions are shared in the Member Space."}
+                  ? "DTA là cầu nối liên kết giữa các thành viên trong Hiệp hội, hỗ trợ trao đổi thông tin, kinh nghiệm và thị trường; hỗ trợ thành viên trong sản xuất, kinh doanh, cung ứng giải pháp, tư vấn và dịch vụ công nghệ số theo quy định pháp luật; đồng thời hỗ trợ quảng bá hình ảnh, thương hiệu, học hiệu, sản phẩm, đào tạo và cung ứng nguồn nhân lực."
+                  : "DTA bridges association members, supporting information, experience and market exchange; assisting members in production, business, solution delivery, consulting and digital technology services in line with the law; and promoting their image, brands, reputation, products, training and workforce supply."}
+              </p>
+              <p className="mt-3 text-xs md:text-sm text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+                {lang === "vn"
+                  ? "DTA tạo cơ hội và diễn đàn để hội viên phát biểu, bày tỏ và đóng góp ý kiến xây dựng, phát triển các chủ đề liên quan đến ngành nghề, lĩnh vực, môi trường kinh doanh và đầu tư."
+                  : "DTA provides opportunities and a forum for members to speak up and contribute ideas on their industries, business climate and investment."}
               </p>
             </div>
           </div>

@@ -8,7 +8,8 @@ import { Footer } from "@/compenents/layout/Footer";
 import { CharterModal } from "@/compenents/CharterModal";
 import { Hero } from "@/compenents/sections/Hero";
 import { AboutSection } from "@/compenents/sections/AboutSection";
-import { TopicsSection } from "@/compenents/sections/TopicsSection";
+// ẨN theo yêu cầu: TopicsSection tạm ẩn (giữ file component để khôi phục).
+// import { TopicsSection } from "@/compenents/sections/TopicsSection";
 import { ServicesSection } from "@/compenents/sections/ServicesSection";
 import { TimelineSection } from "@/compenents/sections/TimelineSection";
 import { MembersDirectorySection } from "@/compenents/sections/MembersDirectorySection";
@@ -42,7 +43,9 @@ function Index() {
           aria-hidden
           className="absolute inset-0 pointer-events-none bg-[oklch(0.26_0.04_158_/_0.4)] [mask-image:linear-gradient(to_bottom,transparent,black_12rem)]"
         />
-        <TopicsSection lang={lang} />
+        {/* ẨN theo yêu cầu: 05 Lĩnh vực công nghệ trọng tâm (giữ component
+            TopicsSection + coreTechAreas để khôi phục một chạm). */}
+        {/* <TopicsSection lang={lang} /> */}
         <ServicesSection lang={lang} />
         <TimelineSection lang={lang} />
         <MembersDirectorySection lang={lang} />

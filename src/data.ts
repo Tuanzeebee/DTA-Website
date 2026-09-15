@@ -6,7 +6,6 @@ export interface NavItem {
 export const navItems: NavItem[] = [
   { label: { vn: "Trang chủ", en: "Home" }, href: "#top" },
   { label: { vn: "Về DTA", en: "About Us" }, href: "#about" },
-  { label: { vn: "Lĩnh vực công nghệ", en: "Core Tech" }, href: "#topics" },
   { label: { vn: "Dịch vụ & Hỗ trợ", en: "Services" }, href: "#services" },
   { label: { vn: "Tin tức - Sự kiện", en: "News & Events" }, href: "/news" },
   { label: { vn: "Danh bạ Hội viên", en: "Members" }, href: "#members" },
@@ -283,12 +282,16 @@ export const translationStrings = {
     en: "DTA Core Tenets & Objectives",
   },
   charterDesc1: {
-    vn: "Hiệp hội Công nghệ số thành phố Đà Nẵng (DTA) là tổ chức xã hội - nghề nghiệp tự nguyện, tập hợp các doanh nghiệp, viện nghiên cứu, trường đại học và cá nhân tâm huyết hoạt động trong lĩnh vực nghiên cứu, ứng dụng, chuyển giao và kinh doanh sản phẩm, dịch vụ công nghệ số.",
-    en: "The Danang Digital Technology Association (DTA) is a voluntary social-professional organization gathering tech corporations, academic institutes, and dedicated experts active in research, transfer, and business of digital products and services.",
+    vn: "Tập hợp, kết nối, bảo vệ quyền và lợi ích hợp pháp của hội viên; hỗ trợ nâng cao hình ảnh, thương hiệu, học hiệu và năng lực cạnh tranh.",
+    en: "Uniting and connecting members while safeguarding their lawful rights and interests; helping elevate their image, brands, institutional reputation and competitiveness.",
   },
   charterDesc2: {
-    vn: "DTA đóng vai trò định hướng chuyển đổi số toàn diện, ươm mầm khởi nghiệp đổi mới sáng tạo, phát triển nguồn nhân lực vi mạch bán dẫn mũi nhọn, đồng thời chung tay xây dựng Đà Nẵng trở thành đô thị thông minh kiểu mẫu, có sức lan tỏa kinh tế số mạnh mẽ toàn khu vực miền Trung - Tây Nguyên.",
-    en: "DTA guides full-scale digital transformation, incubates innovative startups, develops high-end semiconductor talents, and collaborates to build Danang into a smart city hub driving the digital economy across the Central & Highlands region.",
+    vn: "Tham gia góp ý, phản biện chính sách; thúc đẩy chuyển đổi số, đô thị thông minh, đổi mới sáng tạo và khởi nghiệp.",
+    en: "Contributing policy feedback and critique; advancing digital transformation, smart cities, innovation and startups.",
+  },
+  charterDesc3: {
+    vn: "Quảng bá cộng đồng công nghệ số Đà Nẵng; mở rộng hợp tác trong nước và quốc tế, lan tỏa tới khu vực Miền Trung – Tây Nguyên.",
+    en: "Promoting Danang's digital technology community; expanding domestic and international cooperation across the Central – Highlands region.",
   },
   btnCharterDetail: {
     vn: "Xem toàn văn Điều lệ Hiệp hội (Dự thảo)",
