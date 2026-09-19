@@ -13,6 +13,7 @@ import { AboutSection } from "@/compenents/sections/AboutSection";
 import { ServicesSection } from "@/compenents/sections/ServicesSection";
 import { TimelineSection } from "@/compenents/sections/TimelineSection";
 import { MembersDirectorySection } from "@/compenents/sections/MembersDirectorySection";
+import { GallerySection } from "@/compenents/sections/GallerySection";
 import { MapAddressSection } from "@/compenents/sections/MapAddressSection";
 import { FAQSection } from "@/compenents/sections/FAQSection";
 import { authService } from "@/lib/auth/service";
@@ -49,6 +50,7 @@ function Index() {
         <ServicesSection lang={lang} />
         <TimelineSection lang={lang} />
         <MembersDirectorySection lang={lang} />
+        <GallerySection lang={lang} />
         <MapAddressSection lang={lang} />
         <FAQSection lang={lang} />
         <Footer lang={lang} />

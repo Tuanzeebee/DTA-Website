@@ -587,7 +587,7 @@ export function PortalFooter() {
           </div>
           <ul className="space-y-1.5 leading-relaxed">
             <li>Chịu trách nhiệm nội dung: Ban Biên tập DTA</li>
-            <li>Tầng 4, Tòa nhà Công Viên Phần Mềm, 02 Quang Trung, Đà Nẵng</li>
+            <li>Tầng 2, số 15 Quang Trung, Khu Công viên Phần mềm, phường Hải Châu, Đà Nẵng</li>
             <li>Điện thoại: +84 (0236) 3888-299</li>
             <li>
               Email:{" "}

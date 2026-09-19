@@ -14,6 +14,7 @@ import {
   Inbox,
   Megaphone,
   UserCog,
+  Images,
 } from "lucide-react";
 import { forumStore, applicationStore } from "@/compenents/admin/opsData";
 import { useAuthSession, useLogout } from "@/lib/auth/useAuth";
@@ -139,6 +140,13 @@ const NAV: NavItem[] = [
     section: "ads",
     label: "Thêm quảng cáo",
     icon: Megaphone,
+    exact: false,
+  },
+  {
+    to: "/admin/thu-vien-anh",
+    section: "gallery",
+    label: "Thư viện ảnh",
+    icon: Images,
     exact: false,
   },
   {

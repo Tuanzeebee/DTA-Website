@@ -39,8 +39,8 @@ export function FinancePanel({ lang }: { lang: Lang }) {
           </h5>
           <p className="text-xs text-muted-foreground leading-relaxed -mt-2 mb-4">
             {lang === "vn"
-              ? "Hội viên tổ chức: tùy quy mô, từ 3 đến 5.000.000 VNĐ/năm. Mọi thu chi được công khai, báo cáo minh bạch tại các phiên họp toàn thể."
-              : "Corporate members: 3 to 5,000,000 VND/year depending on scale. All income and spending is reported at plenary meetings."}
+              ? "Mức hội phí theo quy chế do Ban Chấp hành ban hành. Mọi thu chi được công khai, báo cáo minh bạch tại các phiên họp toàn thể."
+              : "Dues follow Board regulations. All income and spending is reported at plenary meetings."}
           </p>
 
           <div className="flex items-end justify-between gap-4">
@@ -48,11 +48,8 @@ export function FinancePanel({ lang }: { lang: Lang }) {
               <span className="text-[11px] uppercase font-bold text-muted-foreground tracking-wider block">
                 {lang === "vn" ? "Niên khóa 2026" : "Term 2026"}
               </span>
-              <span className="font-mono text-3xl font-black text-white mt-1.5 block tracking-tight">
-                3–5
-                <span className="text-sm font-bold text-muted-foreground ml-1.5">
-                  triệu VNĐ
-                </span>
+              <span className="font-mono text-xl font-black text-white mt-1.5 block tracking-tight">
+                {lang === "vn" ? "Theo quy chế BCH" : "Per Board rules"}
               </span>
             </div>
             {paid ? (

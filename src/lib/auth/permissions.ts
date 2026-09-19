@@ -11,6 +11,7 @@ export type AdminSection =
   | "overview"
   | "articles"
   | "ads"
+  | "gallery"
   | "resources"
   | "forum"
   | "members"
@@ -32,6 +33,7 @@ export const ROLE_SECTIONS: Record<AdminRole, readonly AdminSection[]> = {
     "overview",
     "articles",
     "ads",
+    "gallery",
     "resources",
     "forum",
     "members",
@@ -39,7 +41,7 @@ export const ROLE_SECTIONS: Record<AdminRole, readonly AdminSection[]> = {
     "fees",
     "users",
   ],
-  editor: ["overview", "articles", "ads", "resources", "forum"],
+  editor: ["overview", "articles", "ads", "gallery", "resources", "forum"],
   member: [],
 };
 

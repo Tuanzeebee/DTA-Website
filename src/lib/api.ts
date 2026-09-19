@@ -627,3 +627,106 @@ export async function uploadAdImage(file: File): Promise<string> {
   const data = (await res.json()) as { url: string };
   return data.url;
 }
+
+/* ---------------- gallery endpoints ---------------- */
+
+export interface GalleryPhotoItem {
+  id: string;
+  imageUrl: string;
+  caption: string | null;
+  sortOrder: number;
+  active: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/** Public: fetch visible gallery photos for landing page. */
+export function fetchGallery(): Promise<GalleryPhotoItem[]> {
+  return fetchJson("/news/gallery");
+}
+
+/** Admin: fetch all gallery photos. */
+export function adminFetchGallery(): Promise<GalleryPhotoItem[]> {
+  return authFetch("/admin/gallery");
+}
+
+/** Admin: create a gallery photo record. */
+export function adminCreateGalleryPhoto(data: {
+  imageUrl: string;
+  caption?: string;
+  sortOrder?: number;
+  active?: boolean;
+}): Promise<GalleryPhotoItem> {
+  return authFetch("/admin/gallery", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+}
+
+/** Admin: update a gallery photo. */
+export function adminUpdateGalleryPhoto(
+  id: string,
+  data: {
+    imageUrl?: string;
+    caption?: string;
+    sortOrder?: number;
+    active?: boolean;
+  },
+): Promise<GalleryPhotoItem> {
+  return authFetch(`/admin/gallery/${id}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+}
+
+/** Admin: toggle gallery photo visibility. */
+export function adminToggleGalleryPhoto(
+  id: string,
+): Promise<GalleryPhotoItem> {
+  return authFetch(`/admin/gallery/${id}/toggle`, { method: "PATCH" });
+}
+
+/** Admin: delete a gallery photo. */
+export function adminDeleteGalleryPhoto(
+  id: string,
+): Promise<{ id: string; deleted: boolean }> {
+  return authFetch(`/admin/gallery/${id}`, { method: "DELETE" });
+}
+
+/** Upload a gallery image file to the backend. Returns the serveable URL. */
+export async function uploadGalleryImage(file: File): Promise<string> {
+  const doUpload = async (token: string | null) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    const headers: Record<string, string> = {};
+    if (token) headers["Authorization"] = `Bearer ${token}`;
+    return fetch(`${API_BASE}/admin/gallery/upload`, {
+      method: "POST",
+      headers,
+      body: formData,
+    });
+  };
+
+  const token = authService.getAccessToken();
+  let res = await doUpload(token);
+
+  if (res.status === 401) {
+    const refreshed = await authService.refreshAccessToken();
+    if (refreshed) {
+      res = await doUpload(authService.getAccessToken());
+    }
+  }
+
+  if (!res.ok) {
+    const body = await res.text().catch(() => "");
+    if (res.status === 401) {
+      authService.logout();
+      window.location.href = "/dang-nhap";
+    }
+    throw new Error(body || `Upload failed (${res.status})`);
+  }
+  const galleryData = (await res.json()) as { url: string };
+  return galleryData.url;
+}

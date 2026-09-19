@@ -14,6 +14,7 @@ import { Route as AdminRouteImport } from './routes/admin'
 import { Route as DangNhapRouteImport } from './routes/dang-nhap'
 import { Route as NewsRouteImport } from './routes/news'
 import { Route as PortalRouteImport } from './routes/portal'
+import { Route as ThuVienAnhRouteImport } from './routes/thu-vien-anh'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AdminDangKyRouteImport } from './routes/admin.dang-ky'
 import { Route as AdminHoiPhiRouteImport } from './routes/admin.hoi-phi'
@@ -22,6 +23,7 @@ import { Route as AdminNguoiDungRouteImport } from './routes/admin.nguoi-dung'
 import { Route as AdminPhanBienRouteImport } from './routes/admin.phan-bien'
 import { Route as AdminQuangCaoRouteImport } from './routes/admin.quang-cao'
 import { Route as AdminTaiNguyenRouteImport } from './routes/admin.tai-nguyen'
+import { Route as AdminThuVienAnhRouteImport } from './routes/admin.thu-vien-anh'
 import { Route as NewsIndexRouteImport } from './routes/news.index'
 import { Route as NewsDaLuuRouteImport } from './routes/news.da-luu'
 import { Route as NewsTimKiemRouteImport } from './routes/news.tim-kiem'
@@ -56,6 +58,11 @@ const NewsRoute = NewsRouteImport.update({
 const PortalRoute = PortalRouteImport.update({
   id: '/portal',
   path: '/portal',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ThuVienAnhRoute = ThuVienAnhRouteImport.update({
+  id: '/thu-vien-anh',
+  path: '/thu-vien-anh',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminIndexRoute = AdminIndexRouteImport.update({
@@ -96,6 +103,11 @@ const AdminQuangCaoRoute = AdminQuangCaoRouteImport.update({
 const AdminTaiNguyenRoute = AdminTaiNguyenRouteImport.update({
   id: '/tai-nguyen',
   path: '/tai-nguyen',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminThuVienAnhRoute = AdminThuVienAnhRouteImport.update({
+  id: '/thu-vien-anh',
+  path: '/thu-vien-anh',
   getParentRoute: () => AdminRoute,
 } as any)
 const NewsIndexRoute = NewsIndexRouteImport.update({
@@ -155,6 +167,7 @@ export interface FileRoutesByFullPath {
   '/dang-nhap': typeof DangNhapRoute
   '/news': typeof NewsRouteWithChildren
   '/portal': typeof PortalRouteWithChildren
+  '/thu-vien-anh': typeof ThuVienAnhRoute
   '/admin/dang-ky': typeof AdminDangKyRoute
   '/admin/hoi-phi': typeof AdminHoiPhiRoute
   '/admin/hoi-vien': typeof AdminHoiVienRoute
@@ -162,6 +175,7 @@ export interface FileRoutesByFullPath {
   '/admin/phan-bien': typeof AdminPhanBienRoute
   '/admin/quang-cao': typeof AdminQuangCaoRoute
   '/admin/tai-nguyen': typeof AdminTaiNguyenRoute
+  '/admin/thu-vien-anh': typeof AdminThuVienAnhRoute
   '/news/da-luu': typeof NewsDaLuuRoute
   '/news/tim-kiem': typeof NewsTimKiemRoute
   '/portal/dang-ky': typeof PortalDangKyRoute
@@ -177,6 +191,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/dang-nhap': typeof DangNhapRoute
+  '/thu-vien-anh': typeof ThuVienAnhRoute
   '/admin/dang-ky': typeof AdminDangKyRoute
   '/admin/hoi-phi': typeof AdminHoiPhiRoute
   '/admin/hoi-vien': typeof AdminHoiVienRoute
@@ -184,6 +199,7 @@ export interface FileRoutesByTo {
   '/admin/phan-bien': typeof AdminPhanBienRoute
   '/admin/quang-cao': typeof AdminQuangCaoRoute
   '/admin/tai-nguyen': typeof AdminTaiNguyenRoute
+  '/admin/thu-vien-anh': typeof AdminThuVienAnhRoute
   '/news/da-luu': typeof NewsDaLuuRoute
   '/news/tim-kiem': typeof NewsTimKiemRoute
   '/portal/dang-ky': typeof PortalDangKyRoute
@@ -203,6 +219,7 @@ export interface FileRoutesById {
   '/dang-nhap': typeof DangNhapRoute
   '/news': typeof NewsRouteWithChildren
   '/portal': typeof PortalRouteWithChildren
+  '/thu-vien-anh': typeof ThuVienAnhRoute
   '/admin/dang-ky': typeof AdminDangKyRoute
   '/admin/hoi-phi': typeof AdminHoiPhiRoute
   '/admin/hoi-vien': typeof AdminHoiVienRoute
@@ -210,6 +227,7 @@ export interface FileRoutesById {
   '/admin/phan-bien': typeof AdminPhanBienRoute
   '/admin/quang-cao': typeof AdminQuangCaoRoute
   '/admin/tai-nguyen': typeof AdminTaiNguyenRoute
+  '/admin/thu-vien-anh': typeof AdminThuVienAnhRoute
   '/news/da-luu': typeof NewsDaLuuRoute
   '/news/tim-kiem': typeof NewsTimKiemRoute
   '/portal/dang-ky': typeof PortalDangKyRoute
@@ -230,6 +248,7 @@ export interface FileRouteTypes {
     | '/dang-nhap'
     | '/news'
     | '/portal'
+    | '/thu-vien-anh'
     | '/admin/dang-ky'
     | '/admin/hoi-phi'
     | '/admin/hoi-vien'
@@ -237,6 +256,7 @@ export interface FileRouteTypes {
     | '/admin/phan-bien'
     | '/admin/quang-cao'
     | '/admin/tai-nguyen'
+    | '/admin/thu-vien-anh'
     | '/news/da-luu'
     | '/news/tim-kiem'
     | '/portal/dang-ky'
@@ -252,6 +272,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/dang-nhap'
+    | '/thu-vien-anh'
     | '/admin/dang-ky'
     | '/admin/hoi-phi'
     | '/admin/hoi-vien'
@@ -259,6 +280,7 @@ export interface FileRouteTypes {
     | '/admin/phan-bien'
     | '/admin/quang-cao'
     | '/admin/tai-nguyen'
+    | '/admin/thu-vien-anh'
     | '/news/da-luu'
     | '/news/tim-kiem'
     | '/portal/dang-ky'
@@ -277,6 +299,7 @@ export interface FileRouteTypes {
     | '/dang-nhap'
     | '/news'
     | '/portal'
+    | '/thu-vien-anh'
     | '/admin/dang-ky'
     | '/admin/hoi-phi'
     | '/admin/hoi-vien'
@@ -284,6 +307,7 @@ export interface FileRouteTypes {
     | '/admin/phan-bien'
     | '/admin/quang-cao'
     | '/admin/tai-nguyen'
+    | '/admin/thu-vien-anh'
     | '/news/da-luu'
     | '/news/tim-kiem'
     | '/portal/dang-ky'
@@ -303,6 +327,7 @@ export interface RootRouteChildren {
   DangNhapRoute: typeof DangNhapRoute
   NewsRoute: typeof NewsRouteWithChildren
   PortalRoute: typeof PortalRouteWithChildren
+  ThuVienAnhRoute: typeof ThuVienAnhRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -340,6 +365,13 @@ declare module '@tanstack/react-router' {
       path: '/portal'
       fullPath: '/portal'
       preLoaderRoute: typeof PortalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/thu-vien-anh': {
+      id: '/thu-vien-anh'
+      path: '/thu-vien-anh'
+      fullPath: '/thu-vien-anh'
+      preLoaderRoute: typeof ThuVienAnhRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/': {
@@ -396,6 +428,13 @@ declare module '@tanstack/react-router' {
       path: '/tai-nguyen'
       fullPath: '/admin/tai-nguyen'
       preLoaderRoute: typeof AdminTaiNguyenRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/thu-vien-anh': {
+      id: '/admin/thu-vien-anh'
+      path: '/thu-vien-anh'
+      fullPath: '/admin/thu-vien-anh'
+      preLoaderRoute: typeof AdminThuVienAnhRouteImport
       parentRoute: typeof AdminRoute
     }
     '/news/': {
@@ -479,6 +518,7 @@ interface AdminRouteChildren {
   AdminPhanBienRoute: typeof AdminPhanBienRoute
   AdminQuangCaoRoute: typeof AdminQuangCaoRoute
   AdminTaiNguyenRoute: typeof AdminTaiNguyenRoute
+  AdminThuVienAnhRoute: typeof AdminThuVienAnhRoute
   AdminIndexRoute: typeof AdminIndexRoute
   AdminBaiVietIdRoute: typeof AdminBaiVietIdRoute
   AdminBaiVietIndexRoute: typeof AdminBaiVietIndexRoute
@@ -492,6 +532,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminPhanBienRoute: AdminPhanBienRoute,
   AdminQuangCaoRoute: AdminQuangCaoRoute,
   AdminTaiNguyenRoute: AdminTaiNguyenRoute,
+  AdminThuVienAnhRoute: AdminThuVienAnhRoute,
   AdminIndexRoute: AdminIndexRoute,
   AdminBaiVietIdRoute: AdminBaiVietIdRoute,
   AdminBaiVietIndexRoute: AdminBaiVietIndexRoute,
@@ -538,6 +579,7 @@ const rootRouteChildren: RootRouteChildren = {
   DangNhapRoute: DangNhapRoute,
   NewsRoute: NewsRouteWithChildren,
   PortalRoute: PortalRouteWithChildren,
+  ThuVienAnhRoute: ThuVienAnhRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

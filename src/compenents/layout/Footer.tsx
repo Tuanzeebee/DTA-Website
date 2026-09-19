@@ -44,8 +44,8 @@ export function Footer({ lang }: { lang: Lang }) {
             <li className="flex items-start gap-1.5 leading-tight">
               <MapPin className="w-3.5 h-3.5 text-accent shrink-0 mt-0.5" />
               <span>
-                Tầng 4, Tòa nhà Công Viên Phần Mềm, 02 Quang Trung, Hải Châu,
-                TP. Đà Nẵng
+                Tầng 2, số 15 Quang Trung, Khu Công viên Phần mềm, phường Hải
+                Châu, TP. Đà Nẵng
               </span>
             </li>
             <li className="flex items-center gap-1.5">
@@ -78,20 +78,14 @@ export function Footer({ lang }: { lang: Lang }) {
             <li>
               •{" "}
               {lang === "vn"
-                ? "Sở Thông tin và Truyền thông"
-                : "Department of Information & Communications"}
+                ? "Sở Nội vụ thành phố"
+                : "Department of Home Affairs"}
             </li>
             <li>
               •{" "}
               {lang === "vn"
                 ? "Sở Khoa học và Công nghệ"
                 : "Department of Science & Technology"}
-            </li>
-            <li>
-              •{" "}
-              {lang === "vn"
-                ? "Sở Nội vụ thành phố"
-                : "Department of Home Affairs"}
             </li>
           </ul>
         </div>

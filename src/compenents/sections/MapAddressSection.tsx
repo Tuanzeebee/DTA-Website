@@ -68,13 +68,13 @@ export function MapAddressSection({ lang }: { lang: Lang }) {
                       </div>
                       <div className="text-sm text-muted-foreground leading-relaxed">
                         <p className="font-bold text-white text-base">
-                          Tầng 4 tòa nhà Công Viên Phần Mềm Đà Nẵng
+                          Tầng 2, số 15 Quang Trung
                         </p>
                         <p className="text-sm text-white/90 font-medium">
-                          02 Quang Trung
+                          Khu Công viên Phần mềm
                         </p>
                         <p className="text-xs text-muted-foreground">
-                          Quận Hải Châu, TP Đà Nẵng
+                          Phường Hải Châu, TP Đà Nẵng
                         </p>
                       </div>
                     </div>
@@ -117,7 +117,7 @@ export function MapAddressSection({ lang }: { lang: Lang }) {
               {/* Direct Directions Action Button */}
               <div className="mt-8 pt-6 border-t border-white/5 relative z-10">
                 <a
-                  href="https://maps.google.com/?q=Công+viên+phần+mềm+Đà+Nẵng,+2+Quang+Trung,+Hải+Châu"
+                  href="https://maps.google.com/?q=15+Quang+Trung,+Hải+Châu,+Đà+Nẵng"
                   target="_blank"
                   rel="noreferrer noopener"
                   className="w-full py-3.5 rounded-xl font-bold text-xs text-primary-foreground hover:opacity-90 active:scale-98 transition-all flex items-center justify-center gap-2 cursor-pointer"

@@ -471,23 +471,33 @@ function RegisterPage() {
                         >
                           <option value="AI">
                             {lang === "vn"
-                              ? "AI & Dữ liệu lớn"
-                              : "AI & Big Data"}
+                              ? "AI, Big Data, Blockchain, Cloud"
+                              : "AI, Big Data, Blockchain, Cloud"}
                           </option>
                           <option value="semi">
                             {lang === "vn"
-                              ? "Vi mạch & Bán dẫn"
-                              : "Semiconductors & IC Design"}
+                              ? "Vi mạch – Bán dẫn, VR/AR, nhúng, đồ họa"
+                              : "Semiconductors, VR/AR, embedded, graphics"}
                           </option>
-                          <option value="cloud">
+                          <option value="telecom">
                             {lang === "vn"
-                              ? "Điện toán đám mây"
-                              : "Cloud & Blockchain"}
+                              ? "Viễn thông, Hạ tầng số, IoT, An ninh mạng"
+                              : "Telecom, Digital infra, IoT, Cybersecurity"}
                           </option>
-                          <option value="iot">
+                          <option value="software">
                             {lang === "vn"
-                              ? "Robot & Tự động hóa nhúng"
-                              : "Robotics & Automation"}
+                              ? "Phần mềm, CNTT–TT, quy trình doanh nghiệp"
+                              : "Software, ICT, business processes"}
+                          </option>
+                          <option value="edu">
+                            {lang === "vn"
+                              ? "Đào tạo, viện nghiên cứu"
+                              : "Training & research institutes"}
+                          </option>
+                          <option value="startup">
+                            {lang === "vn"
+                              ? "Khởi nghiệp đổi mới sáng tạo, sandbox"
+                              : "Innovative startups & sandbox firms"}
                           </option>
                         </select>
                       </div>
@@ -595,8 +605,8 @@ function RegisterPage() {
                     </h2>
                     <p className="text-sm text-muted-foreground leading-relaxed">
                       {lang === "vn"
-                        ? "Hiệp hội sẽ duyệt hồ sơ theo quy trình và phản hồi chính thức trong tối đa 30 ngày làm việc. Khi được kết nạp, Ban Thư ký cấp tài khoản + mật khẩu đăng nhập Không gian số."
-                        : "The association will review your file by procedure within 30 business days. On approval, the Secretariat issues your Member Space login and password."}
+                        ? "Hiệp hội sẽ duyệt hồ sơ theo quy trình và phản hồi chính thức trong tối đa 30 ngày. Khi được kết nạp, Ban Thư ký cấp tài khoản + mật khẩu đăng nhập Không gian số."
+                        : "The association will review your file by procedure within 30 days. On approval, the Secretariat issues your Member Space login and password."}
                     </p>
 
                     <div className="p-5 rounded-2xl border border-accent/25 bg-accent/[0.06]">
@@ -648,8 +658,8 @@ function RegisterPage() {
                 title: lang === "vn" ? "Điều kiện gia nhập" : "Eligibility",
                 body:
                   lang === "vn"
-                    ? "Tổ chức, doanh nghiệp hoạt động trong lĩnh vực công nghệ số tại Đà Nẵng, có tư cách pháp nhân hợp lệ theo quy định."
-                    : "Digital-technology organisations operating in Danang with valid legal status.",
+                    ? "Tổ chức, công dân Việt Nam tán thành Điều lệ, tự nguyện đăng ký, thực hiện nghĩa vụ tài chính và được BTV/BCH chấp thuận. Gồm hội viên chính thức và hội viên danh dự."
+                    : "Vietnamese organisations/citizens endorsing the Charter, applying voluntarily, fulfilling financial duties and approved by the Board. Official and honorary members.",
               },
               {
                 icon: Clock,
@@ -659,24 +669,24 @@ function RegisterPage() {
                     : "Association Review by Procedure",
                 body:
                   lang === "vn"
-                    ? "Thẩm tra trong vòng 30 ngày: Ban Thư ký xác thực hồ sơ trực tuyến, trình Ban Chấp hành phê duyệt, ban hành quyết định công nhận và thông báo qua email đăng ký."
-                    : "Review within 30 days: online verification, board approval, recognition decision and email notification.",
+                    ? "Hồ sơ: đơn theo mẫu BCH + bản sao GCN ĐKDN/giấy tờ pháp lý. Thẩm tra trong 30 ngày: BCH (hoặc BTV được ủy quyền) quyết định kết nạp, cấp giấy chứng nhận và thông báo qua email."
+                    : "Dossier: Board-form application + business certificate copy. Review in 30 days: Board (or authorised Standing Committee) admits members, issues certificates and notifies by email.",
               },
               {
                 icon: CreditCard,
                 title: lang === "vn" ? "Hội phí minh bạch" : "Transparent Fees",
                 body:
                   lang === "vn"
-                    ? "Hội viên tổ chức: tùy quy mô, từ 3 đến 5.000.000 VNĐ/năm. Mọi thu chi được công khai, báo cáo minh bạch tại các phiên họp toàn thể để Hội viên biết, thực hành quyền giám sát."
-                    : "Corporate members: 3 to 5,000,000 VND/year depending on scale. All income and spending is disclosed at plenary meetings for member supervision.",
+                    ? "Mức phí gia nhập và hội phí hằng năm theo quy chế do Ban Chấp hành ban hành. Mọi thu chi công khai, báo cáo minh bạch tại các phiên họp toàn thể để hội viên giám sát."
+                    : "Joining fees and annual dues follow Board regulations. All income and spending is disclosed at plenary meetings for member supervision.",
               },
               {
                 icon: BadgeCheck,
-                title: lang === "vn" ? "Quyền lợi Hội viên" : "Member Benefits",
+                title: lang === "vn" ? "Quyền & nghĩa vụ" : "Rights & Duties",
                 body:
                   lang === "vn"
-                    ? "Được quy định cụ thể tại Điều lệ hoạt động do UBND thành phố phê duyệt (QĐ số 3189/QĐ-UBND ngày 20/7/2026)."
-                    : "As specified in the charter approved by the City People's Committee (Decision 3189/QD-UBND dated 20/07/2026).",
+                    ? "Được bảo vệ quyền lợi, dự Đại hội, ứng cử–bầu cử, tham gia hoạt động; nghĩa vụ chấp hành Điều lệ, tham gia sinh hoạt, đóng hội phí đúng hạn. Chi tiết tại Điều lệ (QĐ 3189/QĐ-UBND 20/7/2026)."
+                    : "Protection, congress attendance, nomination and election rights; duties to obey the Charter, join activities and pay dues on time. See the charter (Decision 3189/QD-UBND 20/07/2026).",
               },
             ].map((item) => (
               <div

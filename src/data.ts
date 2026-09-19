@@ -9,6 +9,7 @@ export const navItems: NavItem[] = [
   { label: { vn: "Dịch vụ & Hỗ trợ", en: "Services" }, href: "#services" },
   { label: { vn: "Tin tức - Sự kiện", en: "News & Events" }, href: "/news" },
   { label: { vn: "Danh bạ Hội viên", en: "Members" }, href: "#members" },
+  { label: { vn: "Thư viện ảnh", en: "Gallery" }, href: "#gallery" },
   {
     label: { vn: "Không gian số Hội viên", en: "Member Space" },
     href: "/portal",
@@ -26,46 +27,46 @@ export const coreTechAreas: TechArea[] = [
     icon: "🧠",
     title: { vn: "AI & Dữ liệu lớn (Big Data)", en: "AI & Big Data" },
     desc: {
-      vn: "Thúc đẩy nghiên cứu, ứng dụng trí tuệ nhân tạo và phân tích dữ liệu lớn phục vụ chính quyền số và kinh tế số Đà Nẵng.",
-      en: "Promoting R&D and applications of AI and big data analytics for digital government and digital economy in Danang.",
+      vn: "Nghiên cứu, ứng dụng trí tuệ nhân tạo (AI) và dữ liệu lớn (Big Data) phục vụ chính quyền số và kinh tế số.",
+      en: "R&D and applications of AI and big data for digital government and digital economy.",
     },
   },
   {
     icon: "☁️",
     title: { vn: "Điện toán đám mây & Blockchain", en: "Cloud & Blockchain" },
     desc: {
-      vn: "Xây dựng hạ tầng Cloud bền vững và phát triển ứng dụng chuỗi khối minh bạch cho giao dịch số và dịch vụ công.",
-      en: "Building sustainable Cloud infrastructure and developing transparent blockchain solutions for digital transactions.",
+      vn: "Điện toán đám mây (Cloud), chuỗi khối (Blockchain) minh bạch cho giao dịch số và dịch vụ công.",
+      en: "Cloud computing and transparent blockchain for digital transactions and public services.",
     },
   },
   {
     icon: "🔌",
     title: {
-      vn: "Vi mạch – Bán dẫn & Thiết kế số",
-      en: "Semiconductors & IC Design",
+      vn: "Vi mạch – Bán dẫn, VR/AR & Thiết kế số",
+      en: "Semiconductors, VR/AR & Digital Design",
     },
     desc: {
-      vn: "Trọng tâm chiến lược của Đà Nẵng, đào tạo nguồn nhân lực chất lượng cao và thu hút đầu tư thiết kế mạch tích hợp IC.",
-      en: "Strategic focus of Danang, nurturing high-quality engineering talents and attracting global IC design investments.",
+      vn: "Vi mạch – bán dẫn, thực tế ảo (VR)/tăng cường (AR), hệ thống nhúng–số, mỹ thuật công nghiệp, đồ họa, thiết kế thương hiệu.",
+      en: "Semiconductors, VR/AR, embedded systems, industrial graphics and brand design.",
     },
   },
   {
     icon: "🤖",
-    title: { vn: "Robot, Tự động hóa & IoT", en: "Robotics, Automation & IoT" },
+    title: { vn: "Robot, Tự động hóa, IoT & in 3D", en: "Robotics, Automation, IoT & 3D" },
     desc: {
-      vn: "Phát triển các hệ thống nhúng thông minh, giải pháp IoT công nghiệp và tự động hóa dây chuyền sản xuất tiên tiến.",
-      en: "Developing smart embedded systems, industrial IoT solutions, and state-of-the-art production line automation.",
+      vn: "Robot và tự động hóa, Internet vạn vật (IoT), in 3D, hệ thống số phục vụ sản xuất tiên tiến.",
+      en: "Robotics and automation, IoT, 3D printing and digital systems for smart production.",
     },
   },
   {
     icon: "🛡️",
     title: {
-      vn: "An toàn thông tin & Hạ tầng số",
-      en: "Cybersecurity & Digital Infrastructure",
+      vn: "Viễn thông, Hạ tầng số & An toàn thông tin",
+      en: "Telecom, Digital Infra & Cybersecurity",
     },
     desc: {
-      vn: "Đảm bảo an ninh an toàn thông tin mạng, bảo vệ dữ liệu số của doanh nghiệp và vận hành hạ tầng số vững chắc.",
-      en: "Ensuring network security, protecting enterprise digital assets, and operating robust, secure digital backbones.",
+      vn: "Dịch vụ điện tử – viễn thông, hạ tầng số, an ninh mạng và an toàn thông tin, bảo vệ dữ liệu số.",
+      en: "Electronics–telecom services, digital infrastructure and cybersecurity protecting digital assets.",
     },
   },
 ];
@@ -282,19 +283,19 @@ export const translationStrings = {
     en: "DTA Core Tenets & Objectives",
   },
   charterDesc1: {
-    vn: "Tập hợp, kết nối, bảo vệ quyền và lợi ích hợp pháp của hội viên; hỗ trợ nâng cao hình ảnh, thương hiệu, học hiệu và năng lực cạnh tranh.",
+    vn: "Tập hợp, kết nối, bảo vệ quyền và lợi ích hợp pháp của hội viên; hỗ trợ nâng cao hình ảnh, thương hiệu, học hiệu, ứng dụng giải pháp số và năng lực cạnh tranh.",
     en: "Uniting and connecting members while safeguarding their lawful rights and interests; helping elevate their image, brands, institutional reputation and competitiveness.",
   },
   charterDesc2: {
-    vn: "Tham gia góp ý, phản biện chính sách; thúc đẩy chuyển đổi số, đô thị thông minh, đổi mới sáng tạo và khởi nghiệp.",
-    en: "Contributing policy feedback and critique; advancing digital transformation, smart cities, innovation and startups.",
+    vn: "Tham gia góp ý, phản biện chính sách; thúc đẩy chuyển đổi số, đô thị thông minh, hệ sinh thái đổi mới sáng tạo và khởi nghiệp.",
+    en: "Contributing policy feedback and critique; advancing digital transformation, smart cities, innovation ecosystems and startups.",
   },
   charterDesc3: {
-    vn: "Quảng bá cộng đồng công nghệ số Đà Nẵng; mở rộng hợp tác trong nước và quốc tế, lan tỏa tới khu vực Miền Trung – Tây Nguyên.",
-    en: "Promoting Danang's digital technology community; expanding domestic and international cooperation across the Central – Highlands region.",
+    vn: "Quảng bá cộng đồng công nghệ số Đà Nẵng, lan tỏa động lực Miền Trung – Tây Nguyên; mở rộng hợp tác trong nước và quốc tế.",
+    en: "Promoting Danang's digital technology community across the Central – Highlands region; expanding domestic and international cooperation.",
   },
   btnCharterDetail: {
-    vn: "Xem toàn văn Điều lệ Hiệp hội (Dự thảo)",
-    en: "View Association Charter (Full Draft)",
+    vn: "Xem toàn văn Điều lệ Hiệp hội (Chính thức)",
+    en: "View Association Charter (Official)",
   },
 };
