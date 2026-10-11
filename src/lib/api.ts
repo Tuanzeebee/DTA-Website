@@ -1,6 +1,7 @@
 import { authService } from "@/lib/auth/service";
 import type {
   ArticleDetailResponse,
+  ArticleListItem,
   ArticleListResponse,
   ArticlesQueryParams,
   TopicResponse,
@@ -15,6 +16,21 @@ async function fetchJson<T>(path: string, init?: RequestInit): Promise<T> {
     throw new Error(`API ${res.status}: ${body || res.statusText}`);
   }
   return res.json() as Promise<T>;
+}
+
+/**
+ * Phiên hết hạn (401 sau khi refresh thất bại): xoá phiên cũ. Chỉ chuyển sang
+ * /dang-nhap khi đang ở /admin (guard của admin chỉ chạy lúc vào trang). Ở
+ * nơi khác — vd. /portal — trang tự hiện lại form đăng nhập qua useSession,
+ * nên không đá người dùng sang trang khác (lỗi "bấm lần đầu nhảy /dang-nhap"
+ * do token cũ còn trong localStorage).
+ */
+function onSessionExpired() {
+  authService.logout();
+  const { pathname, search } = window.location;
+  if (pathname.startsWith("/admin")) {
+    window.location.href = `/dang-nhap?redirect=${encodeURIComponent(pathname + search)}`;
+  }
 }
 
 /** Fetch with JWT auth header. Auto-refresh on 401. */
@@ -41,8 +57,7 @@ async function authFetch<T>(
   if (!res.ok) {
     const body = await res.text().catch(() => "");
     if (res.status === 401) {
-      authService.logout();
-      window.location.href = "/dang-nhap";
+      onSessionExpired();
     }
     throw new Error(`API ${res.status}: ${body || res.statusText}`);
   }
@@ -257,8 +272,7 @@ export async function uploadImage(file: File): Promise<string> {
   if (!res.ok) {
     const body = await res.text().catch(() => "");
     if (res.status === 401) {
-      authService.logout();
-      window.location.href = "/dang-nhap";
+      onSessionExpired();
     }
     throw new Error(body || `Upload failed (${res.status})`);
   }
@@ -642,8 +656,7 @@ export async function uploadAdImage(file: File): Promise<string> {
   if (!res.ok) {
     const body = await res.text().catch(() => "");
     if (res.status === 401) {
-      authService.logout();
-      window.location.href = "/dang-nhap";
+      onSessionExpired();
     }
     throw new Error(body || `Upload failed (${res.status})`);
   }
@@ -745,8 +758,7 @@ export async function uploadGalleryImage(file: File): Promise<string> {
   if (!res.ok) {
     const body = await res.text().catch(() => "");
     if (res.status === 401) {
-      authService.logout();
-      window.location.href = "/dang-nhap";
+      onSessionExpired();
     }
     throw new Error(body || `Upload failed (${res.status})`);
   }
