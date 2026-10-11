@@ -33,6 +33,17 @@ export function MemberLogosSection({ lang }: { lang: Lang }) {
         tintTop={seamTint.moss}
         tintBottom={seamTint.deepMoss}
       />
+      {/* Nhận nốt vệt sáng "horizon" ở đáy Nền tảng hỗ trợ (cùng màu, cùng
+          độ rộng 80%, neo tại ranh giới) — không có lớp này thì vệt sáng bị
+          cắt thẳng ở mép trên. */}
+      <div
+        aria-hidden
+        className="absolute inset-x-0 top-0 h-56 md:h-72 pointer-events-none"
+        style={{
+          background:
+            "radial-gradient(ellipse 80% 100% at 50% -12%, oklch(0.62 0.11 158 / 0.22), transparent 62%), linear-gradient(to bottom, oklch(0.78 0.12 78 / 0.05), transparent)",
+        }}
+      />
 
       <div className="max-w-7xl mx-auto relative z-10">
         <SectionHeader

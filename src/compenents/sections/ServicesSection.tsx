@@ -18,7 +18,7 @@ export function ServicesSection({ lang }: { lang: Lang }) {
     >
       <SectionBackground
         variant="horizon"
-        tintTop={seamTint.deepMoss}
+        tintTop={seamTint.moss}
         tintBottom={seamTint.moss}
       />
 

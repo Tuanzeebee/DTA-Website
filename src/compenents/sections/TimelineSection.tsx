@@ -28,6 +28,20 @@ export function TimelineSection({ lang }: { lang: Lang }) {
         tintBottom={seamTint.deepMoss}
       />
 
+      {/* Đối xứng với vầng sáng ở mép dưới Hero (cùng kích thước, cùng màu,
+          neo tại ranh giới từ phía này) — section này giờ đứng ngay sau Hero
+          nên phải nhận nốt vầng sáng, không thì ranh giới lộ thành đường cắt. */}
+      <div
+        aria-hidden
+        /* z-[1]: nằm trên mảng ảnh chéo (nếu không ảnh phủ tối vầng sáng thành
+           một cạnh ngang sắc), vẫn dưới nội dung z-10. */
+        className="absolute inset-x-0 top-0 h-56 md:h-72 pointer-events-none z-[1]"
+        style={{
+          background:
+            "radial-gradient(ellipse 70% 100% at 50% 0%, oklch(0.75 0.19 235 / 0.22), transparent 70%)",
+        }}
+      />
+
       {/* Diagonal image panel, right side, lg+ only (stacked mobile columns
           would just be visually noisy over it).
 

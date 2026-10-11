@@ -46,11 +46,13 @@ export function AboutSection({
          the disc. */
       className="py-20 md:py-28 px-5 md:px-6 relative overflow-hidden md:flex md:items-center md:min-h-[53rem] lg:min-h-[60rem]"
     >
-      {/* tintTop receives the cyan the hero hands down; tintBottom passes
-          cyan on to Topics — the same handoff chain as the rest of the page. */}
+      {/* tintTop nhận deepMoss từ Tin tức (section ngay trên, góp ý 10/2026);
+          tintBottom chuyển moss xuống Nền tảng hỗ trợ. Bỏ "spotlight": vầng
+          sáng đó sáng nhất ngay mép trên nên chỉ hợp khi đứng sát Hero —
+          giờ nó cắt thẳng vào đáy phần Tin tức. */}
       <SectionBackground
-        variant={["spotlight", "grid"]}
-        tintTop={seamTint.moss}
+        variant="grid"
+        tintTop={seamTint.deepMoss}
         tintBottom={seamTint.moss}
       />
 

@@ -68,7 +68,7 @@ export function GallerySection({ lang }: { lang: Lang }) {
     <section id="gallery" className="py-20 md:py-28 relative overflow-hidden">
       <SectionBackground
         variant="grid"
-        tintTop={seamTint.deepMoss}
+        tintTop={seamTint.moss}
         tintBottom={seamTint.moss}
       />
 
