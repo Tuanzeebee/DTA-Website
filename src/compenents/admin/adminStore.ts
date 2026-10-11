@@ -87,7 +87,19 @@ export async function loadArticles(): Promise<PortalArticle[]> {
       return cachedArticles;
     }
     const res = await adminFetchArticles({ pageSize: 200 });
-    cachedArticles = res.items.map(mapArticle);
+    const items = [...res.items];
+    for (let page = 2; page <= res.pageCount; page++) {
+      const next = await adminFetchArticles({ page, pageSize: 200 });
+      items.push(...next.items);
+    }
+    // Danh sách admin lọc/phân trang trên trình duyệt nên phải tải đủ các trang API.
+    cachedArticles = [...new Map(items.map((item) => [item.id, item])).values()]
+      .sort((a, b) => {
+        if (!a.date) return b.date ? 1 : 0;
+        if (!b.date) return -1;
+        return Date.parse(b.date) - Date.parse(a.date);
+      })
+      .map(mapArticle);
     cacheRaw = JSON.stringify(cachedArticles);
     notify();
   } catch (err) {
