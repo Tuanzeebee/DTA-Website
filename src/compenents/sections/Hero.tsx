@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { MapPin, Plus, Search } from "lucide-react";
+import { MapPin, Plus } from "lucide-react";
 import heroImage from "@/assets/HerosectionBackGroundV4.webp";
 import { ScrollReveal } from "@/compenents/ScrollReveal";
 import { SectionBackground } from "@/compenents/SectionBackground";
@@ -115,13 +115,6 @@ export function Hero({ lang }: { lang: Lang }) {
                 <Plus className="w-4 h-4" />
                 <span>{translationStrings.heroBtn1[lang]}</span>
               </Link>
-              <a
-                href="#members"
-                className="w-full sm:w-auto min-h-13 px-7 rounded-full font-bold text-sm border border-white/15 bg-white/[0.04] hover:bg-white/10 active:scale-95 transition-all duration-300 flex items-center justify-center gap-2"
-              >
-                <Search className="w-4 h-4 text-white/70" />
-                <span>{translationStrings.heroBtn2[lang]}</span>
-              </a>
             </div>
           </ScrollReveal>
         </div>

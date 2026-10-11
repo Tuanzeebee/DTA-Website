@@ -131,7 +131,36 @@ export const MEMBER_OWNERSHIP_LABEL: Record<MemberOwnership, string> = {
   fdi: "FDI",
 };
 
-export interface DtaMember {
+/** Thẻ Danh bạ đủ thông tin (góp ý 10/2026): email lãnh đạo + cán bộ đầu mối + địa chỉ. */
+export const MEMBER_CONTACT_KEYS = [
+  "leaderEmail",
+  "contactName",
+  "contactPhone",
+  "contactEmail",
+  "address",
+] as const;
+export type MemberContactKey = (typeof MEMBER_CONTACT_KEYS)[number];
+export type MemberContact = Partial<Record<MemberContactKey, string>>;
+
+/** Lấy 5 trường liên hệ từ object API/form (null/"" -> undefined). */
+export function pickContact(
+  m: Partial<Record<MemberContactKey, string | null | undefined>>,
+): MemberContact {
+  const out: MemberContact = {};
+  for (const k of MEMBER_CONTACT_KEYS) out[k] = m[k]?.trim() || undefined;
+  return out;
+}
+
+/** Payload gửi API: luôn đủ 5 khoá, "" để xoá được giá trị cũ. */
+export function contactPayload(
+  m: MemberContact,
+): Record<MemberContactKey, string> {
+  const out = {} as Record<MemberContactKey, string>;
+  for (const k of MEMBER_CONTACT_KEYS) out[k] = m[k]?.trim() ?? "";
+  return out;
+}
+
+export interface DtaMember extends MemberContact {
   id: string;
   /** Tên tiếng Việt — hiển thị chính trong Danh bạ. */
   name: string;
@@ -145,7 +174,7 @@ export interface DtaMember {
   ownership?: MemberOwnership;
   /** Lãnh đạo / người đại diện. */
   leader?: string;
-  /** Điện thoại liên hệ. */
+  /** Điện thoại lãnh đạo. */
   phone?: string;
   /** Thế mạnh / năng lực nổi bật. */
   strengths?: string;
@@ -172,7 +201,7 @@ export async function loadMembersFromApi(): Promise<DtaMember[]> {
   try {
     const res = await fetch("/api/news/members");
     if (!res.ok) return cachedMembers ?? membersData;
-    const data = (await res.json()) as Array<{
+    const data = (await res.json()) as Array<Partial<Record<MemberContactKey, string | null>> & {
       id: string;
       name: string;
       nameEn?: string | null;
@@ -199,6 +228,7 @@ export async function loadMembersFromApi(): Promise<DtaMember[]> {
           : undefined,
       leader: m.leader ?? undefined,
       phone: m.phone ?? undefined,
+      ...pickContact(m),
       strengths: m.strengths ?? undefined,
       logoUrl: m.logoUrl ?? undefined,
       website: m.website ?? undefined,

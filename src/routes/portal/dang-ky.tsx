@@ -23,6 +23,7 @@ import {
   firstMissingDirectoryField,
   type MemberDirectoryForm,
 } from "@/lib/memberDirectory";
+import { ContactFields } from "@/compenents/member/ContactFields";
 
 /**
  * /portal/dang-ky — standalone membership application.
@@ -30,9 +31,8 @@ import {
  * Deliberately OUTSIDE the sign-in wall: a prospective member has no account
  * yet, so enrollment must be reachable by anyone (and shareable by URL).
  *
- * Step 1 = Thông tin Hội viên: đúng 7 trường Danh bạ hội viên
- * (tên Việt/Anh, loại hình, lãnh đạo, điện thoại, lĩnh vực, thế mạnh)
- * + email liên hệ. Step 2 = 2 file tải lên + lĩnh vực công nghệ.
+ * Step 1 = Thông tin Hội viên: các trường thẻ Danh bạ (lib/memberDirectory)
+ * — email đầu mối là email đăng nhập. Step 2 = 2 file tải lên + lĩnh vực công nghệ.
  */
 
 export const Route = createFileRoute("/portal/dang-ky")({
@@ -52,7 +52,6 @@ function RegisterPage() {
   const [directory, setDirectory] =
     useState<MemberDirectoryForm>({ ...EMPTY_DIRECTORY_FORM });
   const [data, setData] = useState({
-    email: "",
     techField: "AI",
     consentFileName: "",
     legalFileName: "",
@@ -78,25 +77,7 @@ function RegisterPage() {
   const requireStep1 = (): boolean => {
     const missing = firstMissingDirectoryField(directory);
     if (missing) {
-      const phoneTooShort =
-        missing === "phone" && directory.phone.trim().length > 0;
-      toast.error(directoryErrorMessage(lang, missing, phoneTooShort));
-      return false;
-    }
-    if (!data.email.trim()) {
-      toast.error(
-        lang === "vn"
-          ? 'Vui lòng nhập "Email liên hệ chính" — trường bắt buộc.'
-          : 'Please fill in "Primary email" — required.',
-      );
-      return false;
-    }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email.trim())) {
-      toast.error(
-        lang === "vn"
-          ? "Địa chỉ email chưa đúng định dạng."
-          : "That email address doesn't look right.",
-      );
+      toast.error(directoryErrorMessage(lang, missing, directory));
       return false;
     }
     return true;
@@ -126,9 +107,13 @@ function RegisterPage() {
       form.append("nameEn", directory.nameEn.trim());
       form.append("ownership", directory.ownership);
       form.append("leader", directory.leader.trim());
-      form.append("contactName", directory.leader.trim());
-      form.append("email", data.email.trim());
       form.append("phone", directory.phone.trim());
+      form.append("leaderEmail", directory.leaderEmail.trim());
+      form.append("contactName", directory.contactName.trim());
+      form.append("contactPhone", directory.contactPhone.trim());
+      // Email đầu mối = email đăng nhập Không gian số khi được duyệt.
+      form.append("email", directory.contactEmail.trim());
+      form.append("address", directory.address.trim());
       form.append("type", "organization");
       form.append("domain", directory.field.trim());
       form.append("strengths", directory.strengths.trim());
@@ -162,7 +147,6 @@ function RegisterPage() {
     setConsentFile(null);
     setLegalFile(null);
     setData({
-      email: "",
       techField: "AI",
       consentFileName: "",
       legalFileName: "",
@@ -289,7 +273,7 @@ function RegisterPage() {
               </ol>
 
               <AnimatePresence mode="wait">
-                {/* STEP 1 — Thông tin Hội viên = 7 trường Danh bạ + email */}
+                {/* STEP 1 — Thông tin Hội viên = các trường thẻ Danh bạ */}
                 {step === 1 && (
                   <motion.div
                     key="step1"
@@ -301,8 +285,8 @@ function RegisterPage() {
                   >
                     <p className="text-xs text-muted-foreground leading-relaxed rounded-xl border border-white/8 bg-white/[0.02] px-4 py-3">
                       {lang === "vn"
-                        ? "Thông tin căn bản này sẽ xuất hiện trong mục Danh bạ hội viên sau khi được duyệt. Tất cả 7 trường đều bắt buộc."
-                        : "This basic info will appear in the member directory after approval. All 7 fields are required."}
+                        ? "Thông tin này sẽ xuất hiện trên thẻ hội viên trong Danh bạ sau khi được duyệt. Tất cả các trường đều bắt buộc."
+                        : "This info will appear on your member card in the directory after approval. All fields are required."}
                     </p>
                     <div className="grid sm:grid-cols-2 gap-4">
                       <div className="sm:col-span-2">
@@ -367,29 +351,13 @@ function RegisterPage() {
                       </div>
                       <div>
                         <label className={LABEL}>
-                          {lang === "vn" ? "Điện thoại *" : "Phone *"}
+                          {lang === "vn" ? "Điện thoại lãnh đạo *" : "Leader phone *"}
                         </label>
                         <input
                           type="tel"
                           placeholder="e.g. 0236 3xxx xxx"
                           value={directory.phone}
                           onChange={setDir("phone")}
-                          className={FIELD}
-                        />
-                      </div>
-                      <div>
-                        <label className={LABEL}>
-                          {lang === "vn"
-                            ? "Email liên hệ chính *"
-                            : "Primary Email *"}
-                        </label>
-                        <input
-                          type="email"
-                          placeholder="e.g. contact@softtech.com"
-                          value={data.email}
-                          onChange={(e) =>
-                            setData({ ...data, email: e.target.value })
-                          }
                           className={FIELD}
                         />
                       </div>
@@ -427,6 +395,22 @@ function RegisterPage() {
                           className={FIELD}
                         />
                       </div>
+                      <ContactFields
+                        lang={lang}
+                        value={directory}
+                        onChange={(key, v) =>
+                          setDirectory((prev) => ({ ...prev, [key]: v }))
+                        }
+                        inputClass={FIELD}
+                        labelClass={LABEL}
+                        required
+                        hints={{
+                          contactEmail:
+                            lang === "vn"
+                              ? "Dùng làm email đăng nhập Không gian số khi hồ sơ được duyệt."
+                              : "Used as your Member Space login once approved.",
+                        }}
+                      />
                     </div>
 
                     <div className="pt-3 flex justify-end">

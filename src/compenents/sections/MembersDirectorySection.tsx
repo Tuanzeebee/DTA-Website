@@ -25,6 +25,7 @@ interface SliderOrg {
   type: "organization" | "individual" | "advisory";
   logoUrl?: string;
   website?: string;
+  strengths?: string;
   icon: LucideIcon;
   gradient: string;
   borderColor: string;
@@ -88,6 +89,11 @@ function MemberCard({
         <p className="text-[11px] text-accent/80 truncate mt-1.5 leading-none">
           {org.domain}
         </p>
+        {org.strengths && (
+          <p className="text-[11px] text-white/50 truncate mt-1.5 leading-none">
+            {org.strengths}
+          </p>
+        )}
       </div>
     </>
   );
@@ -226,17 +232,20 @@ export function MembersDirectorySection({ lang }: { lang: Lang }) {
       </div>
 
       <div className="max-w-7xl mx-auto px-6 relative z-10">
+        {/* Góp ý 10/2026: chủ đề chính là "Tìm kiếm & Kết nối"; "Danh bạ
+            Hội viên" chỉ còn là một thẻ nhãn. */}
         <SectionHeader
+          eyebrow={
+            lang === "vn" ? "Danh bạ Hội viên công khai" : "Public Member Directory"
+          }
           title={
             <>
-              {lang === "vn"
-                ? "Danh bạ Hội viên Công khai"
-                : "Public Member Directory"}
+              {lang === "vn" ? "Tìm kiếm & Kết nối" : "Find & Connect"}
               <br />
               <span className="text-gradient-cyan">
                 {lang === "vn"
-                  ? "Tìm kiếm & Kết nối Doanh nghiệp"
-                  : "Find & Connect ICT Businesses"}
+                  ? "Doanh nghiệp – Tổ chức Hội viên"
+                  : "Member Businesses & Organizations"}
               </span>
             </>
           }

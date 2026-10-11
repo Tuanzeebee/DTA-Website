@@ -195,6 +195,8 @@ export interface PortalArticle {
   summary: string;
   topic: string;
   category: string;
+  /** Tên chuyên mục hiển thị (có khi lấy từ API danh sách). */
+  categoryName?: string;
   date: string;
   image: string;
   tags: string[];

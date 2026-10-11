@@ -70,7 +70,7 @@ function AdminForum() {
       id: newArticleId(),
       title: s.title,
       summary: s.note ?? `Bài phản biện của ${s.memberName}.`,
-      topic: "su-kien",
+      topic: "tin-trong-nganh",
       category: "tin-trong-nganh",
       date: s.date,
       image: "",

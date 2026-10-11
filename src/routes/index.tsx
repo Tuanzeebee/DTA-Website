@@ -12,6 +12,7 @@ import { AboutSection } from "@/compenents/sections/AboutSection";
 // import { TopicsSection } from "@/compenents/sections/TopicsSection";
 import { ServicesSection } from "@/compenents/sections/ServicesSection";
 import { TimelineSection } from "@/compenents/sections/TimelineSection";
+import { MemberLogosSection } from "@/compenents/sections/MemberLogosSection";
 import { MembersDirectorySection } from "@/compenents/sections/MembersDirectorySection";
 import { GallerySection } from "@/compenents/sections/GallerySection";
 import { MapAddressSection } from "@/compenents/sections/MapAddressSection";
@@ -32,6 +33,8 @@ function Index() {
     <PageShell>
       <Nav lang={lang} toggleLang={toggleLang} isLoggedIn={isLoggedIn} role={role} />
       <Hero lang={lang} />
+      {/* Góp ý 10/2026: Tin tức & Sự kiện lên vị trí thứ 2. */}
+      <TimelineSection lang={lang} />
       <AboutSection lang={lang} setShowCharter={setShowCharter} />
 
       {/* From the tech pillars to the footer the page sits one step brighter:
@@ -48,7 +51,7 @@ function Index() {
             TopicsSection + coreTechAreas để khôi phục một chạm). */}
         {/* <TopicsSection lang={lang} /> */}
         <ServicesSection lang={lang} />
-        <TimelineSection lang={lang} />
+        <MemberLogosSection lang={lang} />
         <MembersDirectorySection lang={lang} />
         <GallerySection lang={lang} />
         <MapAddressSection lang={lang} />

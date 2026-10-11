@@ -190,8 +190,8 @@ export function LoginCard({
 
         <p className="text-[11px] text-center text-muted-foreground leading-relaxed">
           {lang === "vn"
-            ? "Đăng nhập bằng tài khoản hội viên đã được cấp."
-            : "Sign in with your assigned member account."}
+            ? "Một tài khoản dùng chung: đăng tin bài và nộp hồ sơ gia nhập Hiệp hội."
+            : "One account for both: publishing articles and submitting your membership application."}
         </p>
       </form>
 

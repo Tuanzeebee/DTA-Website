@@ -2,14 +2,20 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { User, Check } from "lucide-react";
 import type { Lang } from "@/types";
-import type { MemberOwnership } from "@/data";
+import {
+  contactPayload,
+  pickContact,
+  type MemberContactKey,
+  type MemberOwnership,
+} from "@/data";
+import { ContactFields } from "@/compenents/member/ContactFields";
 import { memberUpdateProfile } from "@/lib/api";
 import {
   firstMissingDirectoryField,
   directoryErrorMessage,
 } from "@/lib/memberDirectory";
 
-export interface ProfileData {
+export interface ProfileData extends Record<MemberContactKey, string> {
   companyName: string;
   companyNameEn: string;
   ownership: MemberOwnership | "";
@@ -43,7 +49,7 @@ export function ProfilePanel({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const missing = firstMissingDirectoryField({
+    const form = {
       nameVi: data.companyName,
       nameEn: data.companyNameEn,
       ownership: data.ownership,
@@ -51,15 +57,15 @@ export function ProfilePanel({
       phone: data.phone,
       field: data.techStack,
       strengths: data.strengths,
-    });
+      leaderEmail: data.leaderEmail,
+      contactName: data.contactName,
+      contactPhone: data.contactPhone,
+      contactEmail: data.contactEmail,
+      address: data.address,
+    };
+    const missing = firstMissingDirectoryField(form);
     if (missing) {
-      toast.error(
-        directoryErrorMessage(
-          lang,
-          missing,
-          missing === "phone" && data.phone.trim().length > 0,
-        ),
-      );
+      toast.error(directoryErrorMessage(lang, missing, form));
       return;
     }
     setSaving(true);
@@ -71,6 +77,7 @@ export function ProfilePanel({
         ownership: data.ownership,
         leader: data.representative.trim(),
         phone: data.phone.trim(),
+        ...contactPayload(data),
         strengths: data.strengths.trim(),
         website: data.website.trim() || undefined,
       });
@@ -84,6 +91,7 @@ export function ProfilePanel({
             : "",
         representative: updated.leader ?? "",
         phone: updated.phone ?? "",
+        ...contactPayload(pickContact(updated)),
         techStack: updated.domain,
         strengths: updated.strengths ?? "",
         website: updated.website ?? "",
@@ -126,8 +134,8 @@ export function ProfilePanel({
           </h4>
           <p className="text-xs text-muted-foreground mt-0.5">
             {lang === "vn"
-              ? "Hồ sơ năng lực — giới thiệu doanh nghiệp, tổ chức, đơn vị mình trong danh bạ Hội viên. Tất cả 7 trường đều bắt buộc."
-              : "Capability profile — introduce your business in the member directory. All 7 fields are required."}
+              ? "Hồ sơ năng lực, thế mạnh — hiển thị trên thẻ hội viên trong Danh bạ. Các trường có dấu * là bắt buộc."
+              : "Capability profile — shown on your member card in the directory. Fields marked * are required."}
           </p>
         </div>
       </div>
@@ -190,7 +198,7 @@ export function ProfilePanel({
         </div>
         <div>
           <label className={LABEL}>
-            {lang === "vn" ? "Điện thoại *" : "Phone *"}
+            {lang === "vn" ? "Điện thoại lãnh đạo *" : "Leader phone *"}
           </label>
           <input
             type="tel"
@@ -221,6 +229,14 @@ export function ProfilePanel({
             className={`${FIELD_SHELL} resize-none`}
           />
         </div>
+        <ContactFields
+          lang={lang}
+          value={data}
+          onChange={(key, v) => onChange({ ...data, [key]: v })}
+          inputClass={FIELD_SHELL}
+          labelClass={LABEL}
+          required
+        />
         <div>
           <label className={LABEL}>Website</label>
           <input

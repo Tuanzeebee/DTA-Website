@@ -276,13 +276,32 @@ export function applyColor(
       `<span style="color:${color}">văn bản màu</span>`,
     );
   }
-  const sel = value.slice(start, end);
-  return splice(
-    value,
-    start,
-    end,
-    `<span style="color:${color}">${sel}</span>`,
-  );
+  let s = start;
+  let e = end;
+  let inner = value.slice(s, e);
+  // Đổi màu = THAY màu, không bọc chồng span mới lên span cũ.
+  // 1) Vùng chọn chính là cả một span màu (sau lần chọn màu trước, vùng chọn
+  //    được đặt bằng đúng span vừa chèn) -> lấy phần trong.
+  const whole = inner.match(/^<span\b[^>]*>([\s\S]*)<\/span>$/i);
+  if (whole && !/<\/?span\b/i.test(whole[1])) {
+    inner = whole[1];
+  } else {
+    // 2) Vùng chọn nằm gọn trong span màu: ...<span ...>[chọn]</span>...
+    const before = value.slice(0, s).match(/<span\b[^>]*>$/i);
+    if (before && value.slice(e).startsWith("</span>")) {
+      s -= before[0].length;
+      e += "</span>".length;
+    }
+  }
+  // 3) Bỏ các span màu cũ nằm trọn bên trong vùng chọn.
+  for (let prev = ""; prev !== inner; ) {
+    prev = inner;
+    inner = inner.replace(
+      /<span\b[^>]*>((?:(?!<\/?span\b)[\s\S])*)<\/span>/gi,
+      "$1",
+    );
+  }
+  return splice(value, s, e, `<span style="color:${color}">${inner}</span>`);
 }
 
 export function clearFormatting(

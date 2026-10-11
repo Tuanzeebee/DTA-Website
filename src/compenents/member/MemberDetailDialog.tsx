@@ -1,9 +1,12 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 import {
   Building,
   Phone,
+  Mail,
+  MapPin,
   User,
+  UserCheck,
   Globe,
   Newspaper,
   ArrowUpRight,
@@ -16,8 +19,8 @@ import { fetchArticles } from "@/lib/api";
 import type { ArticleListItem } from "@/lib/newsApiTypes";
 
 /**
- * Hồ sơ công khai của một hội viên: đủ 7 trường Danh bạ
- * (tên Việt/Anh, loại hình, lãnh đạo, điện thoại, lĩnh vực, thế mạnh)
+ * Hồ sơ công khai của một hội viên: đủ các trường thẻ Danh bạ
+ * (tên Việt/Anh, lĩnh vực, thế mạnh, lãnh đạo + đầu mối kèm SĐT/email, địa chỉ)
  * + bài viết đã đăng của hội viên đó (khớp tên tác giả).
  * Card danh bạ giữ gọn; bấm vào mới mở dialog này.
  */
@@ -78,21 +81,58 @@ export function MemberDetailDialog({
 
   if (!member) return null;
 
-  const rows: { icon: typeof User; label: string; value: string }[] = [
-    {
-      icon: User,
-      label: lang === "vn" ? "Lãnh đạo" : "Leader",
-      value: member.leader ?? "—",
-    },
-    {
-      icon: Phone,
-      label: lang === "vn" ? "Điện thoại" : "Phone",
-      value: member.phone ?? "—",
-    },
+  /** Một người liên hệ: tên + SĐT + email (bấm được). */
+  const person = (name?: string, phone?: string, email?: string) => (
+    <>
+      <span className="block">{name || "—"}</span>
+      {(phone || email) && (
+        <span className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-[12px] text-white/60">
+          {phone && (
+            <a
+              href={`tel:${phone.replace(/[^\d+]/g, "")}`}
+              className="inline-flex items-center gap-1 hover:text-accent transition-colors"
+            >
+              <Phone className="w-3 h-3" />
+              {phone}
+            </a>
+          )}
+          {email && (
+            <a
+              href={`mailto:${email}`}
+              className="inline-flex items-center gap-1 hover:text-accent transition-colors break-all"
+            >
+              <Mail className="w-3 h-3" />
+              {email}
+            </a>
+          )}
+        </span>
+      )}
+    </>
+  );
+
+  const rows: { icon: typeof User; label: string; value: ReactNode }[] = [
     {
       icon: Building,
       label: lang === "vn" ? "Lĩnh vực hoạt động" : "Field",
       value: member.domain || "—",
+    },
+    {
+      icon: User,
+      label: lang === "vn" ? "Lãnh đạo" : "Leader",
+      value: person(member.leader, member.phone, member.leaderEmail),
+    },
+    {
+      icon: UserCheck,
+      label:
+        lang === "vn"
+          ? "Cán bộ đầu mối tương tác"
+          : "Contact person",
+      value: person(member.contactName, member.contactPhone, member.contactEmail),
+    },
+    {
+      icon: MapPin,
+      label: lang === "vn" ? "Địa chỉ" : "Address",
+      value: member.address || "—",
     },
   ];
 

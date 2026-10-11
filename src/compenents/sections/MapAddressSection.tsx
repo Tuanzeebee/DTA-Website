@@ -89,11 +89,19 @@ export function MapAddressSection({ lang }: { lang: Lang }) {
                     </div>
                     <div className="text-xs text-muted-foreground">
                       <p className="font-medium text-white/70">
-                        {lang === "vn" ? "Hotline hỗ trợ" : "Support Hotline"}
+                        {lang === "vn"
+                          ? "Tổng Thư ký – Chánh Văn phòng Hiệp hội"
+                          : "Secretary General – Chief of Office"}
                       </p>
                       <p className="text-sm font-semibold text-white/90">
-                        +84 (0236) 3888-299
+                        {lang === "vn" ? "Nhà báo Trần Ngọc" : "Journalist Tran Ngoc"}
                       </p>
+                      <a
+                        href="tel:0903501320"
+                        className="text-sm font-semibold text-white/90 hover:text-accent transition-colors"
+                      >
+                        ĐT-Zalo: 0903 501 320
+                      </a>
                     </div>
                   </div>
 

@@ -4,7 +4,7 @@ import {
   adminDeleteMember,
   type MemberItem,
 } from "@/lib/api";
-import type { DtaMember } from "@/data";
+import { type DtaMember, pickContact, contactPayload } from "@/data";
 
 /**
  * Admin-side member mutations via the real backend API.
@@ -26,6 +26,7 @@ export function memberApiToDto(m: MemberItem): DtaMember {
         : undefined,
     leader: m.leader ?? undefined,
     phone: m.phone ?? undefined,
+    ...pickContact(m),
     strengths: m.strengths ?? undefined,
     logoUrl: m.logoUrl ?? undefined,
     website: m.website ?? undefined,
@@ -45,6 +46,7 @@ export async function saveMember(
     ownership: data.ownership,
     leader: data.leader,
     phone: data.phone,
+    ...contactPayload(data),
     strengths: data.strengths,
     logoUrl: data.logoUrl,
     website: data.website,

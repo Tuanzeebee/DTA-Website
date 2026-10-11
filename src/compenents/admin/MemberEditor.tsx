@@ -1,8 +1,17 @@
 import { useState, type ReactNode } from "react";
 import { toast } from "sonner";
 import { Save, X } from "lucide-react";
-import type { DtaMember, MemberOwnership } from "@/data";
+import {
+  contactPayload,
+  type DtaMember,
+  type MemberContactKey,
+  type MemberOwnership,
+} from "@/data";
+import { ContactFields } from "@/compenents/member/ContactFields";
 import { uploadImage } from "@/lib/api";
+
+const LABEL =
+  "block text-[10px] uppercase tracking-wider text-white/60 font-bold mb-1.5";
 
 const INPUT =
   "w-full px-3 py-2 bg-white/5 border border-white/10 rounded-xl text-xs text-white placeholder:text-white/30 focus:outline-none focus:border-cyan-400/60";
@@ -10,7 +19,7 @@ const INPUT =
 function Field({ label, children }: { label: string; children: ReactNode }) {
   return (
     <div>
-      <label className="block text-[10px] uppercase tracking-wider text-white/60 font-bold mb-1.5">
+      <label className={LABEL}>
         {label}
       </label>
       {children}
@@ -20,8 +29,8 @@ function Field({ label, children }: { label: string; children: ReactNode }) {
 
 /**
  * Add/edit form for one member. Calls API via parent onSave callback.
- * Đủ 7 trường Danh bạ: tên Việt/Anh, loại hình, lãnh đạo, điện thoại,
- * lĩnh vực, thế mạnh — đồng nhất với form đăng ký + ProfilePanel.
+ * Đủ các trường thẻ Danh bạ (lib/memberDirectory) — đồng nhất với form đăng
+ * ký + ProfilePanel, nhưng không bắt buộc để admin nhập dần.
  */
 export function MemberEditor({
   initial,
@@ -45,6 +54,9 @@ export function MemberEditor({
   const [leader, setLeader] = useState(initial?.leader ?? "");
   const [phone, setPhone] = useState(initial?.phone ?? "");
   const [strengths, setStrengths] = useState(initial?.strengths ?? "");
+  const [contact, setContact] = useState<Record<MemberContactKey, string>>(
+    () => contactPayload(initial ?? {}),
+  );
   const [logoUrl, setLogoUrl] = useState(initial?.logoUrl ?? "");
   const [website, setWebsite] = useState(initial?.website ?? "");
   const [saving, setSaving] = useState(false);
@@ -66,6 +78,7 @@ export function MemberEditor({
         ownership: (ownership || undefined) as MemberOwnership | undefined,
         leader: leader.trim() || undefined,
         phone: phone.trim() || undefined,
+        ...contact,
         strengths: strengths.trim() || undefined,
         logoUrl: logoUrl.trim() || undefined,
         website: website.trim() || undefined,
@@ -157,7 +170,7 @@ export function MemberEditor({
             className={INPUT}
           />
         </Field>
-        <Field label="Điện thoại">
+        <Field label="Điện thoại lãnh đạo">
           <input
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
@@ -183,6 +196,13 @@ export function MemberEditor({
             />
           </Field>
         </div>
+        <ContactFields
+          lang="vn"
+          value={contact}
+          onChange={(key, v) => setContact((prev) => ({ ...prev, [key]: v }))}
+          inputClass={INPUT}
+          labelClass={LABEL}
+        />
       </div>
 
       <div className="mt-4 space-y-4">

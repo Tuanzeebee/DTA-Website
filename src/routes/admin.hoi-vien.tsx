@@ -8,7 +8,7 @@ import {
   UserPlus,
   Loader2,
 } from "lucide-react";
-import type { DtaMember } from "@/data";
+import { type DtaMember, pickContact, contactPayload } from "@/data";
 import {
   adminFetchMembers,
   adminCreateMember,
@@ -55,6 +55,7 @@ function AdminMembers() {
               : undefined,
           leader: m.leader ?? undefined,
           phone: m.phone ?? undefined,
+          ...pickContact(m),
           strengths: m.strengths ?? undefined,
           logoUrl: m.logoUrl ?? undefined,
           website: m.website ?? undefined,
@@ -96,6 +97,7 @@ function AdminMembers() {
           ownership: data.ownership,
           leader: data.leader,
           phone: data.phone,
+          ...contactPayload(data),
           strengths: data.strengths,
           logoUrl: data.logoUrl,
           website: data.website,
@@ -114,6 +116,7 @@ function AdminMembers() {
                 : undefined,
             leader: created.leader ?? undefined,
             phone: created.phone ?? undefined,
+            ...pickContact(created),
             strengths: created.strengths ?? undefined,
             logoUrl: created.logoUrl ?? undefined,
             website: created.website ?? undefined,
@@ -131,6 +134,7 @@ function AdminMembers() {
           ownership: data.ownership,
           leader: data.leader,
           phone: data.phone,
+          ...contactPayload(data),
           strengths: data.strengths,
           logoUrl: data.logoUrl,
           website: data.website,
@@ -152,6 +156,7 @@ function AdminMembers() {
                       : undefined,
                   leader: updated.leader ?? undefined,
                   phone: updated.phone ?? undefined,
+                  ...pickContact(updated),
                   strengths: updated.strengths ?? undefined,
                   logoUrl: updated.logoUrl ?? undefined,
                   website: updated.website ?? undefined,

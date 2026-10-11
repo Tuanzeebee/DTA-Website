@@ -50,7 +50,9 @@ export function Footer({ lang }: { lang: Lang }) {
             </li>
             <li className="flex items-center gap-1.5">
               <Phone className="w-3.5 h-3.5 text-accent shrink-0" />
-              <span>+84 (0236) 3888-299</span>
+              <a href="tel:0903501320" className="hover:text-white transition-colors">
+                0903 501 320 (ĐT-Zalo)
+              </a>
             </li>
             <li className="flex items-center gap-1.5">
               <Mail className="w-3.5 h-3.5 text-accent shrink-0" />
@@ -89,6 +91,23 @@ export function Footer({ lang }: { lang: Lang }) {
             </li>
           </ul>
         </div>
+      </div>
+
+      {/* Thông tin giấy phép Trang TTĐT tổng hợp (bắt buộc theo giấy phép). */}
+      <div className="max-w-6xl mx-auto mt-10 pt-6 border-t border-white/10 text-[11px] text-muted-foreground leading-relaxed space-y-1">
+        <p>
+          {lang === "vn"
+            ? "Cung cấp thông tin lên Internet theo Giấy phép Thiết lập Trang Thông tin điện tử tổng hợp số 1337, ngày 07 tháng 08 năm 2026 của Sở Văn hóa – Thể thao và Du lịch thành phố Đà Nẵng."
+            : "Information provided on the Internet under General Website License No. 1337, issued 07 August 2026 by the Danang Department of Culture, Sports and Tourism."}
+        </p>
+        <p>
+          <span className="font-bold text-white/80">
+            {lang === "vn" ? "Chịu trách nhiệm: " : "Responsible: "}
+          </span>
+          {lang === "vn"
+            ? "Ông Phạm Kim Sơn – Chủ tịch Hiệp hội DTA; Nhà báo Trần Ngọc – Thư ký tòa soạn DTA.VN"
+            : "Mr. Pham Kim Son – Chairman of DTA; Journalist Tran Ngoc – Managing Editor of DTA.VN"}
+        </p>
       </div>
     </footer>
   );

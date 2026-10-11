@@ -4,8 +4,6 @@ import { toast } from "sonner";
 import { motion, AnimatePresence } from "motion/react";
 import {
   User,
-  CreditCard,
-  MessageSquare,
   LogOut,
   ShieldCheck,
   FileCheck,
@@ -23,10 +21,9 @@ import {
   ProfilePanel,
   type ProfileData,
 } from "@/compenents/member/panels/ProfilePanel";
-import { FinancePanel } from "@/compenents/member/panels/FinancePanel";
-import { ForumPanel } from "@/compenents/member/panels/ForumPanel";
 import { MemberArticlePanel } from "@/compenents/member/panels/MemberArticlePanel";
 import { memberFetchProfile } from "@/lib/api";
+import { contactPayload, pickContact } from "@/data";
 // ẨN theo yêu cầu 09/2026: Ấn phẩm & Tài nguyên nội bộ tạm ẩn khỏi Không gian số.
 // import { ResourcesPanel } from "@/compenents/member/panels/ResourcesPanel";
 import { TrongDongDisc } from "@/compenents/TrongDongDisc";
@@ -35,7 +32,7 @@ export const Route = createFileRoute("/portal/")({
   component: PortalIndex,
 });
 
-type TabId = "profile" | "finance" | "feedback" | "articles";
+type TabId = "profile" | "articles";
 
 function PortalIndex() {
   const { lang } = useLang();
@@ -97,8 +94,8 @@ function Lobby({
       icon: BadgeCheck,
       text:
         lang === "vn"
-          ? "Chúng tôi nói về mình — hồ sơ năng lực trong danh bạ Hội viên"
-          : "About us — capability profile in the member directory",
+          ? "Chúng tôi nói về mình – Hồ sơ năng lực, thế mạnh, trên không gian số DTA"
+          : "About us – capability profile and strengths in the DTA Member Space",
     },
     {
       icon: Handshake,
@@ -111,22 +108,8 @@ function Lobby({
       icon: FileCheck,
       text:
         lang === "vn"
-          ? "Mỗi hội viên 1 bài viết giới thiệu, quản trị duyệt rồi đăng"
-          : "One foundation post per member, published after review",
-    },
-    {
-      icon: CreditCard,
-      text:
-        lang === "vn"
-          ? "Theo dõi nộp hội phí trực tuyến"
-          : "Track your membership fee payments online",
-    },
-    {
-      icon: MessageSquare,
-      text:
-        lang === "vn"
-          ? "Gửi yêu cầu, góp ý tới Văn phòng Hiệp hội"
-          : "Send requests and feedback to the DTA office",
+          ? "Mỗi Hội viên – một Ý tưởng"
+          : "Every member – one idea",
     },
   ];
 
@@ -189,8 +172,8 @@ function Lobby({
         </h1>
         <p className="mt-5 text-sm md:text-base text-muted-foreground leading-relaxed max-w-xl">
           {lang === "vn"
-            ? "Một điểm chạm duy nhất: giới thiệu năng lực của doanh nghiệp, tổ chức, đơn vị mình; mời hợp tác, liên danh-liên kết. Đăng ký làm Thành viên mới DTA với hồ sơ trực tuyến; theo dõi nộp hội phí, gửi yêu cầu, góp ý."
-            : "One touchpoint: showcase your company or organization's capabilities; invite cooperation and joint ventures. Register as a new DTA member online; track fee payments, send requests and feedback."}
+            ? "Một điểm chạm duy nhất: giới thiệu năng lực của doanh nghiệp, tổ chức, đơn vị mình; mời hợp tác, liên danh-liên kết. Đăng ký làm Thành viên mới DTA với hồ sơ trực tuyến."
+            : "One touchpoint: showcase your company or organization's capabilities; invite cooperation and joint ventures. Register as a new DTA member online."}
         </p>
 
         {/* Membership perks */}
@@ -261,6 +244,7 @@ const INITIAL_PROFILE: ProfileData = {
   staffCount: "",
   cooperationNeed: "",
   contactInvite: "",
+  ...contactPayload({}),
 };
 
 function Dashboard({
@@ -289,6 +273,7 @@ function Dashboard({
               : "",
           representative: m.leader ?? "",
           phone: m.phone ?? "",
+          ...contactPayload(pickContact(m)),
           techStack: m.domain,
           strengths: m.strengths ?? "",
           website: m.website ?? "",
@@ -314,24 +299,14 @@ function Dashboard({
       label: lang === "vn" ? "Chúng tôi nói về mình" : "About Us",
       hint: lang === "vn" ? "Hồ sơ năng lực" : "Capability profile",
     },
-    {
-      id: "finance",
-      icon: CreditCard,
-      label: lang === "vn" ? "Hội phí" : "Membership Fee",
-      hint: lang === "vn" ? "Theo dõi nộp phí" : "Track payments",
-    },
+    // ẨN theo góp ý 10/2026: bỏ hẳn tab Hội phí và Gửi yêu cầu & Góp ý
+    // (FinancePanel / ForumPanel vẫn giữ file để khôi phục).
     // ẨN theo yêu cầu 09/2026: tab Ấn phẩm & Tài nguyên lưu hành nội bộ.
     {
       id: "articles",
       icon: FileText,
       label: lang === "vn" ? "Bài viết của chúng tôi" : "Our Articles",
-      hint: lang === "vn" ? "Chờ duyệt & đã đăng" : "Drafts & published",
-    },
-    {
-      id: "feedback",
-      icon: MessageSquare,
-      label: lang === "vn" ? "Gửi yêu cầu & Góp ý" : "Requests & Feedback",
-      hint: lang === "vn" ? "Hợp tác, liên kết" : "Cooperation",
+      hint: lang === "vn" ? "Mỗi Hội viên – một Ý tưởng" : "One member, one idea",
     },
   ];
 
@@ -359,8 +334,8 @@ function Dashboard({
             </h1>
             <p className="text-xs text-muted-foreground mt-2 leading-relaxed">
               {lang === "vn"
-                ? "Không gian số đang kết nối. Giới thiệu năng lực đơn vị mình, mời hợp tác, theo dõi hội phí và gửi yêu cầu, góp ý."
-                : "Your Member Space is connected. Showcase your capabilities, invite cooperation, track fees and send requests."}
+                ? "Không gian số đang kết nối. Giới thiệu năng lực đơn vị mình, đăng bài viết và mời hợp tác."
+                : "Your Member Space is connected. Showcase your capabilities, publish articles and invite cooperation."}
             </p>
           </div>
 
@@ -444,10 +419,8 @@ function Dashboard({
                   onChange={setProfileData}
                 />
               )}
-              {activeTab === "finance" && <FinancePanel lang={lang} />}
               {/* ẨN theo yêu cầu 09/2026: {activeTab === "resources" && <ResourcesPanel lang={lang} />} */}
               {activeTab === "articles" && <MemberArticlePanel lang={lang} />}
-              {activeTab === "feedback" && <ForumPanel lang={lang} />}
             </motion.div>
           </AnimatePresence>
         </div>

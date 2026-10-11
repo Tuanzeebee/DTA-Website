@@ -2,11 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { ChevronLeft, Loader2 } from "lucide-react";
-import {
-  useAdminArticles,
-  saveArticle,
-  loadArticleDetail,
-} from "@/compenents/admin/adminStore";
+import { saveArticle, loadArticleDetail } from "@/compenents/admin/adminStore";
 import { ArticleEditor } from "@/compenents/admin/ArticleEditor";
 import { RequireSection } from "@/compenents/admin/SectionGate";
 import type { PortalArticle } from "@/newsData";
@@ -23,33 +19,29 @@ export const Route = createFileRoute("/admin/bai-viet/$id")({
 function AdminArticleEditorPage() {
   const { id } = Route.useParams();
   const navigate = useNavigate();
-  const articles = useAdminArticles();
   const isNew = id === "moi";
 
-  const [fetchedArticle, setFetchedArticle] = useState<PortalArticle | null>(
-    null,
-  );
-  const [fetching, setFetching] = useState(false);
-  const [fetchDone, setFetchDone] = useState(false);
+  const [article, setArticle] = useState<PortalArticle | null>(null);
+  const [fetching, setFetching] = useState(!isNew);
+  const [fetchDone, setFetchDone] = useState(isNew);
 
-  // Try cache first, then fetch from API
-  const cachedArticle = isNew ? undefined : articles.find((a) => a.id === id);
-
+  // Luôn tải chi tiết từ API: bản trong danh sách (useAdminArticles) chỉ là
+  // tóm tắt với body: [] — dùng nó làm editor mở ra trống block.
   useEffect(() => {
-    if (isNew || cachedArticle) {
-      setFetchDone(true);
-      return;
-    }
-    // Not in cache — fetch from API
+    if (isNew) return;
+    let alive = true;
     setFetching(true);
+    setFetchDone(false);
     loadArticleDetail(id).then((detail) => {
-      setFetchedArticle(detail);
+      if (!alive) return;
+      setArticle(detail);
       setFetching(false);
       setFetchDone(true);
     });
-  }, [id, isNew, cachedArticle]);
-
-  const article = cachedArticle ?? fetchedArticle;
+    return () => {
+      alive = false;
+    };
+  }, [id, isNew]);
 
   if (!isNew && fetching) {
     return (

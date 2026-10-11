@@ -348,6 +348,11 @@ export interface MemberItem {
   ownership?: string | null;
   leader?: string | null;
   phone?: string | null;
+  leaderEmail?: string | null;
+  contactName?: string | null;
+  contactPhone?: string | null;
+  contactEmail?: string | null;
+  address?: string | null;
   strengths?: string | null;
   logoUrl: string | null;
   website: string | null;
@@ -376,6 +381,11 @@ export function adminCreateMember(data: {
   ownership?: string;
   leader?: string;
   phone?: string;
+  leaderEmail?: string;
+  contactName?: string;
+  contactPhone?: string;
+  contactEmail?: string;
+  address?: string;
   strengths?: string;
   logoUrl?: string;
   website?: string;
@@ -400,6 +410,11 @@ export function adminUpdateMember(
     ownership?: string;
     leader?: string;
     phone?: string;
+    leaderEmail?: string;
+    contactName?: string;
+    contactPhone?: string;
+    contactEmail?: string;
+    address?: string;
     strengths?: string;
     logoUrl?: string;
     website?: string;
@@ -432,6 +447,9 @@ export interface ApplicationItem {
   ownership: string | null;
   leader: string | null;
   contactName: string | null;
+  contactPhone: string | null;
+  leaderEmail: string | null;
+  address: string | null;
   email: string;
   phone: string | null;
   type: string;
@@ -508,6 +526,11 @@ export function memberUpdateProfile(data: {
   ownership?: string;
   leader?: string;
   phone?: string;
+  leaderEmail?: string;
+  contactName?: string;
+  contactPhone?: string;
+  contactEmail?: string;
+  address?: string;
   strengths?: string;
   logoUrl?: string;
   website?: string;

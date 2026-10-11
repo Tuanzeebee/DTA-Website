@@ -42,6 +42,7 @@ export function mapListItemToPortal(item: ArticleListItem): PortalArticle {
     summary: item.summary ?? "",
     topic: item.topic,
     category: item.category,
+    categoryName: item.categoryName,
     date: fmtDate(item.date),
     image: item.image ?? "",
     tags: item.tags,

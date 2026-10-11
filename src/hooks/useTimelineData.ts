@@ -1,17 +1,10 @@
 import { useArticles } from "./useNewsApi";
 import type { DtaNews, DtaEvent } from "@/data";
 
-/** Format ISO date string to dd/mm/yyyy. */
-function fmtDate(iso: string | null): string {
-  if (!iso) return "";
-  const d = new Date(iso);
-  const dd = String(d.getDate()).padStart(2, "0");
-  const mm = String(d.getMonth() + 1).padStart(2, "0");
-  const yyyy = d.getFullYear();
-  return `${dd}/${mm}/${yyyy}`;
-}
-
 /**
+ * item.date đã là dd/mm/yyyy (mapListItemToPortal) — không format lại: parse
+ * lại bằng new Date("25/09/2026") ra NaN/NaN/NaN và đảo ngày/tháng khi ngày ≤ 12.
+ *
  * Fetch latest news + events from the backend API and map them to the
  * DtaNews / DtaEvent format used by TimelineSection on the landing page.
  */
@@ -32,8 +25,8 @@ export function useTimelineData() {
 
   const news: DtaNews[] = newsItems.map((item) => ({
     title: { vn: item.title, en: item.title },
-    date: fmtDate(item.date),
-    category: { vn: item.categoryName, en: item.categoryName },
+    date: item.date,
+    category: { vn: item.categoryName ?? "", en: item.categoryName ?? "" },
     summary: { vn: item.summary ?? "", en: item.summary ?? "" },
     image: item.image ?? "",
   }));
@@ -45,7 +38,7 @@ export function useTimelineData() {
     const locationMatch = summary.match(/(?:dia\s*diem|dia diem|d\/c?)[:\s]+(.+?)(?:\s*[,.]|$)/i);
     return {
       title: { vn: item.title, en: item.title },
-      date: fmtDate(item.date),
+      date: item.date,
       time: timeMatch?.[1] ?? "",
       location: {
         vn: locationMatch?.[1]?.trim() ?? summary.slice(0, 80),

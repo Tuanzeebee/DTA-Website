@@ -6,7 +6,7 @@ import {
   StaggerItem,
 } from "@/compenents/ScrollReveal";
 import { SectionHeader } from "@/compenents/SectionHeader";
-import { PillarIcon, PledgeIcon } from "@/compenents/icons/SectionIcons";
+import { PillarIcon } from "@/compenents/icons/SectionIcons";
 import { programsAndServices } from "@/data";
 import type { Lang } from "@/types";
 
@@ -48,7 +48,7 @@ export function ServicesSection({ lang }: { lang: Lang }) {
         />
 
         {/* 4 Pillars Grid */}
-        <StaggerContainer className="grid md:grid-cols-4 gap-4 mb-16">
+        <StaggerContainer className="grid md:grid-cols-4 gap-4 mb-6">
           {programsAndServices.map((c, idx) => (
             <StaggerItem key={c.tag}>
               <div className="card-flow rounded-3xl p-6 h-full flex flex-col justify-between">
@@ -69,109 +69,28 @@ export function ServicesSection({ lang }: { lang: Lang }) {
           ))}
         </StaggerContainer>
 
-        {/* Financial Transparency & Digital office summary box */}
-        {/* Double-bezel: this is the page's centrepiece claim, so it sits in an
-            outer tray with a concentric inner radius rather than flat on the
-            section — the one card that gets the extra enclosure. */}
-        <ScrollReveal className="bezel mb-12">
-          <div className="card-surface p-8 md:p-12 text-center relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-44 h-44 bg-accent/5 rounded-full blur-2xl" />
-            <div className="absolute bottom-0 left-0 w-44 h-44 bg-cyan-500/5 rounded-full blur-2xl" />
-            <div className="relative">
-              <div className="text-xs tracking-[0.25em] font-black text-muted-foreground uppercase">
+        {/* Góp ý 10/2026: gộp "100% Phi lợi nhuận" và "03 Cam kết" vào chung
+            phần này — 03 Cam kết trùng ý với 4 trụ cột nên bỏ, khối phi lợi
+            nhuận thu gọn thành một dải để nhường diện tích cho Logo hội viên. */}
+        <ScrollReveal>
+          <div className="card-surface rounded-3xl p-6 md:p-8 grid md:grid-cols-[auto_1fr] gap-4 md:gap-10 items-center">
+            <div>
+              <div className="text-[10px] tracking-[0.25em] font-black text-muted-foreground uppercase">
                 {lang === "vn"
-                  ? "TỔ CHỨC VÌ CỘNG ĐỒNG - DÂN CHỦ - MINH BẠCH"
-                  : "A DEMOCRATIC & TRANSPARENT COMMUNITY"}
+                  ? "Vì cộng đồng - Dân chủ - Minh bạch"
+                  : "Democratic & Transparent"}
               </div>
-              <div className="display text-3xl md:text-5xl font-black mt-3 text-gradient-gold uppercase leading-tight">
-                {lang === "vn"
-                  ? "100% Phi Lợi Nhuận"
-                  : "100% Non-Profit Operation"}
+              <div className="display text-2xl md:text-4xl font-black mt-2 text-gradient-gold uppercase leading-tight">
+                {lang === "vn" ? "100% Phi Lợi Nhuận" : "100% Non-Profit"}
               </div>
-              <p className="mt-4 text-xs md:text-sm text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-                {lang === "vn"
-                  ? "DTA là cầu nối liên kết giữa các thành viên trong Hiệp hội, hỗ trợ trao đổi thông tin, kinh nghiệm và thị trường; hỗ trợ thành viên trong sản xuất, kinh doanh, cung ứng giải pháp, tư vấn và dịch vụ công nghệ số theo quy định pháp luật; đồng thời hỗ trợ quảng bá hình ảnh, thương hiệu, học hiệu, sản phẩm, đào tạo và cung ứng nguồn nhân lực."
-                  : "DTA bridges association members, supporting information, experience and market exchange; assisting members in production, business, solution delivery, consulting and digital technology services in line with the law; and promoting their image, brands, reputation, products, training and workforce supply."}
-              </p>
-              <p className="mt-3 text-xs md:text-sm text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-                {lang === "vn"
-                  ? "DTA tạo cơ hội và diễn đàn để hội viên phát biểu, bày tỏ và đóng góp ý kiến xây dựng, phát triển các chủ đề liên quan đến ngành nghề, lĩnh vực, môi trường kinh doanh và đầu tư."
-                  : "DTA provides opportunities and a forum for members to speak up and contribute ideas on their industries, business climate and investment."}
-              </p>
             </div>
+            <p className="text-xs md:text-sm text-muted-foreground leading-relaxed">
+              {lang === "vn"
+                ? "DTA là cầu nối liên kết giữa các thành viên trong Hiệp hội, hỗ trợ trao đổi thông tin, kinh nghiệm và thị trường; hỗ trợ thành viên trong sản xuất, kinh doanh, cung ứng giải pháp, tư vấn và dịch vụ công nghệ số theo quy định pháp luật; đồng thời hỗ trợ quảng bá hình ảnh, thương hiệu, học hiệu, sản phẩm, đào tạo và cung ứng nguồn nhân lực."
+                : "DTA bridges association members, supporting information, experience and market exchange; assisting members in production, business, solution delivery, consulting and digital technology services in line with the law; and promoting their image, brands, reputation, products, training and workforce supply."}
+            </p>
           </div>
         </ScrollReveal>
-
-        {/* Member core privileges */}
-        <ScrollReveal>
-          <h3 className="text-xs tracking-[0.25em] font-black text-muted-foreground mb-6 uppercase">
-            {lang === "vn"
-              ? "03 Cam kết Đồng hành Cốt lõi"
-              : "03 Core Engagement Pledges"}
-          </h3>
-        </ScrollReveal>
-        <StaggerContainer className="grid md:grid-cols-3 gap-5 items-stretch">
-          {[
-            {
-              type: 0,
-              rank:
-                lang === "vn" ? "Cầu nối chính sách" : "Policy Advocacy Bridge",
-              amount: lang === "vn" ? "Ý kiến trực tiếp" : "Direct Voice",
-              note:
-                lang === "vn"
-                  ? "DTA tổng hợp các phản ánh khó khăn của hội viên để kiến nghị trực tiếp lên lãnh đạo UBND TP. Đà Nẵng tháo gỡ."
-                  : "DTA channels member inquiries and challenges directly to Danang municipal leaders and digital regulatory departments.",
-              color: "cyan",
-            },
-            {
-              type: 1,
-              rank:
-                lang === "vn" ? "Bảo vệ pháp lý" : "Legal & Copyright Shield",
-              amount: lang === "vn" ? "Sở hữu trí tuệ" : "IP Defense",
-              note:
-                lang === "vn"
-                  ? "Bảo vệ bản quyền phần mềm, hỗ trợ thủ tục đăng ký bằng sáng chế công nghệ và phòng chống cạnh tranh bất bình đẳng."
-                  : "Assisting with software copyright registries, technology patent filings, and preventing anticompetitive behaviors.",
-              color: "gold",
-              featured: true,
-            },
-            {
-              type: 2,
-              rank: lang === "vn" ? "Cơ hội liên minh" : "Strategic Alliances",
-              amount: lang === "vn" ? "Hợp tác Viện - Trường" : "R&D Linkages",
-              note:
-                lang === "vn"
-                  ? "Kết nối trực tiếp doanh nghiệp với các phòng Lab nghiên cứu, tuyển dụng trực tiếp kỹ sư từ các đại học CNTT hàng đầu."
-                  : "Linking member enterprises directly with university labs, securing direct recruitments of tech graduates.",
-              color: "cyan",
-            },
-          ].map((p, idx) => (
-            <StaggerItem key={p.rank}>
-              <div
-                className={`card-surface rounded-3xl p-8 relative flex flex-col justify-between h-full ${
-                  p.featured
-                    ? "card-surface-gold md:-mt-4 md:pt-10 md:pb-10"
-                    : ""
-                }`}
-              >
-                <div>
-                  <PledgeIcon idx={p.type} />
-                  <div className="text-[10px] tracking-[0.2em] font-black text-muted-foreground uppercase">
-                    {p.rank}
-                  </div>
-                  <div
-                    className={`display text-2xl md:text-3xl font-black mt-2 ${p.featured ? "text-gradient-gold" : "text-gradient-cyan"}`}
-                  >
-                    {p.amount}
-                  </div>
-                </div>
-                <p className="text-xs text-muted-foreground mt-4 leading-relaxed">
-                  {p.note}
-                </p>
-              </div>
-            </StaggerItem>
-          ))}
-        </StaggerContainer>
       </div>
     </section>
   );

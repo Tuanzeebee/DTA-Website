@@ -242,7 +242,6 @@ function AdminApplications() {
                         {a.ownership === "fdi" ? "FDI" : "Trong nước"}
                       </span>
                     )}
-                    {a.leader && <span>Lãnh đạo: {a.leader}</span>}
                     {a.domain && <span>Lĩnh vực: {a.domain}</span>}
                     {a.strengths && <span>Thế mạnh: {a.strengths}</span>}
                   </div>
@@ -277,11 +276,36 @@ function AdminApplications() {
                   </div>
 
                   <div className="mt-2 flex flex-wrap gap-x-5 gap-y-1 text-[11px] text-white/60">
-                    {a.contactName && (
-                      <span className="font-medium text-white/75">
-                        {a.contactName}
+                    <span className="font-medium text-white/75">
+                      Lãnh đạo: {a.leader ?? "—"}
+                    </span>
+                    {a.phone && (
+                      <span className="inline-flex items-center gap-1">
+                        <Phone className="w-3 h-3" />
+                        {a.phone}
                       </span>
                     )}
+                    {a.leaderEmail && (
+                      <a
+                        href={`mailto:${a.leaderEmail}`}
+                        className="inline-flex items-center gap-1 hover:text-cyan-300 transition-colors"
+                      >
+                        <Mail className="w-3 h-3" />
+                        {a.leaderEmail}
+                      </a>
+                    )}
+                  </div>
+                  <div className="mt-1 flex flex-wrap gap-x-5 gap-y-1 text-[11px] text-white/60">
+                    <span className="font-medium text-white/75">
+                      Đầu mối: {a.contactName ?? "—"}
+                    </span>
+                    {a.contactPhone && (
+                      <span className="inline-flex items-center gap-1">
+                        <Phone className="w-3 h-3" />
+                        {a.contactPhone}
+                      </span>
+                    )}
+                    {/* Email đơn = email đầu mối = email đăng nhập khi duyệt. */}
                     <a
                       href={`mailto:${a.email}`}
                       className="inline-flex items-center gap-1 hover:text-cyan-300 transition-colors"
@@ -289,12 +313,7 @@ function AdminApplications() {
                       <Mail className="w-3 h-3" />
                       {a.email}
                     </a>
-                    {a.phone && (
-                      <span className="inline-flex items-center gap-1">
-                        <Phone className="w-3 h-3" />
-                        {a.phone}
-                      </span>
-                    )}
+                    {a.address && <span>Địa chỉ: {a.address}</span>}
                   </div>
 
                   {a.message && (

@@ -1,12 +1,14 @@
-import type { DtaMember, MemberOwnership } from "@/data";
+import type { DtaMember, MemberContact, MemberOwnership } from "@/data";
 
 /**
  * Mẫu nhập liệu Danh bạ hội viên — dùng chung cho:
  * - portal/dang-ky Step 1 (người mới nộp đơn)
  * - portal ProfilePanel "Chúng tôi nói về mình" (hội viên tự cập nhật)
- * - admin MemberEditor (quản trị nhập hộ / sửa)
+ * - admin MemberEditor (quản trị nhập hộ / sửa — không bắt buộc)
  *
- * Theo chốt với Hiệp hội: tất cả 7 trường đều bắt buộc.
+ * Theo góp ý 10/2026, mỗi thẻ hội viên gồm: tên Việt/Anh, lĩnh vực, thế mạnh,
+ * lãnh đạo + SĐT + email, cán bộ đầu mối + SĐT + email, địa chỉ.
+ * Ở đăng ký / hồ sơ hội viên: tất cả đều bắt buộc.
  */
 
 export interface MemberDirectoryForm {
@@ -16,72 +18,106 @@ export interface MemberDirectoryForm {
   nameEn: string;
   /** Loại hình: trong nước hay FDI. */
   ownership: MemberOwnership | "";
-  /** Lãnh đạo / người đại diện. */
-  leader: string;
-  /** Điện thoại liên hệ. */
-  phone: string;
   /** Lĩnh vực hoạt động (= DtaMember.domain). */
   field: string;
   /** Thế mạnh / năng lực nổi bật. */
   strengths: string;
+  /** Lãnh đạo / người đại diện. */
+  leader: string;
+  /** Điện thoại lãnh đạo. */
+  phone: string;
+  leaderEmail: string;
+  /** Cán bộ / chuyên viên quản lý — đầu mối tương tác. */
+  contactName: string;
+  contactPhone: string;
+  contactEmail: string;
+  address: string;
 }
 
 export const EMPTY_DIRECTORY_FORM: MemberDirectoryForm = {
   nameVi: "",
   nameEn: "",
   ownership: "",
-  leader: "",
-  phone: "",
   field: "",
   strengths: "",
+  leader: "",
+  phone: "",
+  leaderEmail: "",
+  contactName: "",
+  contactPhone: "",
+  contactEmail: "",
+  address: "",
 };
 
-const VN_LABEL: Record<keyof MemberDirectoryForm, string> = {
+export const VN_LABEL: Record<keyof MemberDirectoryForm, string> = {
   nameVi: "Tên công ty (tiếng Việt)",
   nameEn: "Tên công ty (tiếng Anh)",
   ownership: "Loại hình (trong nước / FDI)",
-  leader: "Lãnh đạo",
-  phone: "Điện thoại",
   field: "Lĩnh vực hoạt động",
   strengths: "Thế mạnh",
+  leader: "Lãnh đạo",
+  phone: "Điện thoại lãnh đạo",
+  leaderEmail: "Email lãnh đạo",
+  contactName: "Cán bộ đầu mối",
+  contactPhone: "Điện thoại đầu mối",
+  contactEmail: "Email đầu mối",
+  address: "Địa chỉ",
 };
 
-const EN_LABEL: Record<keyof MemberDirectoryForm, string> = {
+export const EN_LABEL: Record<keyof MemberDirectoryForm, string> = {
   nameVi: "Company name (Vietnamese)",
   nameEn: "Company name (English)",
   ownership: "Ownership (domestic / FDI)",
-  leader: "Leader",
-  phone: "Phone",
   field: "Field of activity",
   strengths: "Key strengths",
+  leader: "Leader",
+  phone: "Leader phone",
+  leaderEmail: "Leader email",
+  contactName: "Contact person",
+  contactPhone: "Contact phone",
+  contactEmail: "Contact email",
+  address: "Address",
 };
 
-/** Trả về key trường còn thiếu đầu tiên, hoặc null khi đã đủ. */
+const PHONE_KEYS = ["phone", "contactPhone"] as const;
+const EMAIL_KEYS = ["leaderEmail", "contactEmail"] as const;
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+/**
+ * Trả về key trường đầu tiên còn thiếu hoặc sai định dạng, null khi hợp lệ.
+ * SĐT tối thiểu 8 chữ số; email đúng dạng a@b.c.
+ */
 export function firstMissingDirectoryField(
   form: MemberDirectoryForm,
 ): keyof MemberDirectoryForm | null {
-  const keys = Object.keys(form) as (keyof MemberDirectoryForm)[];
+  const keys = Object.keys(EMPTY_DIRECTORY_FORM) as (keyof MemberDirectoryForm)[];
   for (const key of keys) {
     if (!String(form[key] ?? "").trim()) return key;
   }
-  // SĐT tối thiểu 8 chữ số.
-  if ((form.phone.replace(/\D/g, "").length ?? 0) < 8) return "phone";
+  for (const key of PHONE_KEYS) {
+    if (form[key].replace(/\D/g, "").length < 8) return key;
+  }
+  for (const key of EMAIL_KEYS) {
+    if (!EMAIL_RE.test(form[key].trim())) return key;
+  }
   return null;
 }
 
+/** Thông báo lỗi: trường trống -> "bắt buộc", đã nhập -> "sai định dạng". */
 export function directoryErrorMessage(
   lang: "vn" | "en",
   key: keyof MemberDirectoryForm,
-  phoneTooShort = false,
+  form: MemberDirectoryForm,
 ): string {
-  if (key === "phone" && phoneTooShort) {
+  const label = lang === "vn" ? VN_LABEL[key] : EN_LABEL[key];
+  if (String(form[key] ?? "").trim()) {
     return lang === "vn"
-      ? "Số điện thoại chưa đúng (cần ít nhất 8 chữ số)."
-      : "That phone number looks too short (at least 8 digits).";
+      ? `"${label}" chưa đúng định dạng.`
+      : `"${label}" doesn't look right.`;
   }
   return lang === "vn"
-    ? `Vui lòng nhập "${VN_LABEL[key]}" — trường bắt buộc.`
-    : `Please fill in "${EN_LABEL[key]}" — required.`;
+    ? `Vui lòng nhập "${label}" — trường bắt buộc.`
+    : `Please fill in "${label}" — required.`;
 }
 
 export function isDirectoryFormValid(form: MemberDirectoryForm): boolean {
@@ -104,23 +140,36 @@ export function directoryFormToMember(
     leader: form.leader.trim(),
     phone: form.phone.trim(),
     strengths: form.strengths.trim(),
+    leaderEmail: form.leaderEmail.trim(),
+    contactName: form.contactName.trim(),
+    contactPhone: form.contactPhone.trim(),
+    contactEmail: form.contactEmail.trim(),
+    address: form.address.trim(),
   };
 }
 
 export function memberToDirectoryForm(
-  m?: Pick<
-    DtaMember,
-    "name" | "nameEn" | "ownership" | "leader" | "phone" | "domain" | "strengths"
-  > | null,
+  m?:
+    | (Pick<
+        DtaMember,
+        "name" | "nameEn" | "ownership" | "leader" | "phone" | "domain" | "strengths"
+      > &
+        MemberContact)
+    | null,
 ): MemberDirectoryForm {
   if (!m) return { ...EMPTY_DIRECTORY_FORM };
   return {
     nameVi: m.name ?? "",
     nameEn: m.nameEn ?? "",
     ownership: m.ownership ?? "",
-    leader: m.leader ?? "",
-    phone: m.phone ?? "",
     field: m.domain ?? "",
     strengths: m.strengths ?? "",
+    leader: m.leader ?? "",
+    phone: m.phone ?? "",
+    leaderEmail: m.leaderEmail ?? "",
+    contactName: m.contactName ?? "",
+    contactPhone: m.contactPhone ?? "",
+    contactEmail: m.contactEmail ?? "",
+    address: m.address ?? "",
   };
 }
