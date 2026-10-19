@@ -68,6 +68,21 @@ export function textToBlocks(text: string): ArticleBlock[] {
   return blocks;
 }
 
+/** An imported file: optional title (from the file's heading) + body. */
+export interface ImportedArticle {
+  title?: string;
+  blocks: ArticleBlock[];
+}
+
+/** .md/.txt import: a leading "# Tiêu đề" line becomes the article title
+ *  instead of the first body paragraph. */
+export function mdToArticle(text: string): ImportedArticle {
+  const m = text.match(/^\s*#\s+(.+)(?:\r?\n|$)/);
+  return m
+    ? { title: m[1].trim(), blocks: textToBlocks(text.slice(m[0].length)) }
+    : { blocks: textToBlocks(text) };
+}
+
 export function blocksToText(blocks: ArticleBlock[]): string {
   return blocks
     .map((b) => {
@@ -147,13 +162,16 @@ const decodeXmlEntities = (s: string) =>
     .replace(/&apos;/g, "'")
     .replace(/&amp;/g, "&");
 
-/** .docx -> paragraph blocks. Giữ bold (<w:b>) và màu chữ (<w:color>)
+/** .docx -> article. Giữ bold (<w:b>) và màu chữ (<w:color>)
  *  thành <strong> / <span style="color:..."> để renderRichText hiển thị.
- *  Visible text lives in <w:t> runs; one <w:p> = one paragraph. */
-export async function docxToBlocks(file: File): Promise<ArticleBlock[]> {
+ *  Visible text lives in <w:t> runs; one <w:p> = one paragraph.
+ *  Đoạn đầu kiểu Title/Heading 1 (hoặc bắt đầu "# ") = tiêu đề bài; đoạn
+ *  "> …" = BOX, đoạn "![chú thích](url){…}" = ảnh — cùng cú pháp với .md. */
+export async function docxToArticle(file: File): Promise<ImportedArticle> {
   const xml = await extractDocumentXml(await file.arrayBuffer());
   const paragraphs = xml.split(/<\/w:p>/);
   const out: ArticleBlock[] = [];
+  let title: string | undefined;
   for (const p of paragraphs) {
     const runs = Array.from(p.matchAll(/<w:r[\s\S]*?<\/w:r>/g)).map(
       (m) => m[0],
@@ -188,9 +206,25 @@ export async function docxToBlocks(file: File): Promise<ArticleBlock[]> {
       if (isBold) seg = `<strong>${seg}</strong>`;
       html += seg;
     }
-    if (html.replace(/<[^>]+>/g, "").trim() !== "") out.push(html.trim());
+    html = html.trim();
+    const plain = html.replace(/<[^>]+>/g, "").trim();
+    if (!plain) continue;
+    if (
+      out.length === 0 &&
+      title === undefined &&
+      (/<w:pStyle w:val="(Title|Heading1)"/.test(p) || plain.startsWith("# "))
+    ) {
+      title = plain.replace(/^#\s+/, "");
+      continue;
+    }
+    const image = plain.startsWith("![") ? textToBlocks(plain)[0] : undefined;
+    if (image && typeof image !== "string" && "src" in image) out.push(image);
+    else if (plain.startsWith(">"))
+      // bỏ dấu ">" đầu tiên, giữ định dạng của phần chữ phía sau
+      out.push({ box: html.replace(/^((?:<[^>]+>)*)>\s?/, "$1").trim() });
+    else out.push(html);
   }
-  return out;
+  return { title, blocks: out };
 }
 
 /* ---------------- PDF export (browser print dialog) ---------------- */

@@ -138,12 +138,12 @@ export const applicationStore = createCollectionStore<MemberApplication>(
 
 /**
  * Vị trí hiển thị trên trang tin:
- * - `banner`  — banner lớn đầu trang (tuyên truyền / trả phí), dải ngang 2/3.
- * - `ad`      — ô quảng cáo nhỏ bên phải banner (trên).
- * - `sponsor` — ô tài trợ nhỏ bên phải banner (dưới).
- * - `sidebar` — các banner dọc xếp chồng ở cột 3 (trang chuyên mục, bài đọc).
+ * - `banner`  — banner lớn đầu trang (tuyên truyền / trả phí), carousel.
+ * - `sidebar` — các ô "Quảng cáo 1/2/3" xếp chồng ở cột phải (trang chuyên
+ *               mục, bài đọc: 3 ô; tìm kiếm, đã lưu, trang tin: 1 ô).
+ * Đồng bộ với IsIn của backend (ads/dto/ad.dto.ts).
  */
-export type AdSlot = "banner" | "ad" | "sponsor" | "sidebar";
+export type AdSlot = "banner" | "sidebar";
 
 export interface AdPlacement {
   id: string;
@@ -157,9 +157,7 @@ export interface AdPlacement {
 
 export const AD_SLOTS: { value: AdSlot; label: string }[] = [
   { value: "banner", label: "Banner lớn đầu trang" },
-  { value: "ad", label: "Ô quảng cáo (phải banner, trên)" },
-  { value: "sponsor", label: "Ô tài trợ (phải banner, dưới)" },
-  { value: "sidebar", label: "Quảng cáo cột phải" },
+  { value: "sidebar", label: "Quảng cáo cột phải (Quảng cáo 1/2/3)" },
 ];
 
 export const adSlotLabel = (slot: AdSlot) =>

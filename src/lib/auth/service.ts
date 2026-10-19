@@ -18,11 +18,17 @@ import { mapBackendRole } from "./types";
 const SESSION_KEY = "dta-admin-session";
 const SESSION_EVENT = "dta-admin-session-changed";
 
-/** Single mutable source of truth, hydrated once from localStorage. */
+/** Single mutable source of truth, hydrated once from localStorage.
+ *  Phiên lưu từ bản cũ / bị sửa tay có thể thiếu trường (vd. không có
+ *  `name` -> AdminShell crash khi .split) — thiếu trường nào thì bỏ phiên,
+ *  người dùng chỉ phải đăng nhập lại. */
 let current: AdminSession | null = (() => {
   try {
-    const raw = localStorage.getItem(SESSION_KEY);
-    return raw ? (JSON.parse(raw) as AdminSession) : null;
+    const s = JSON.parse(localStorage.getItem(SESSION_KEY) ?? "null");
+    const fields = ["userId", "name", "email", "role", "accessToken", "refreshToken"];
+    if (s && fields.every((k) => typeof s[k] === "string")) return s as AdminSession;
+    localStorage.removeItem(SESSION_KEY);
+    return null;
   } catch {
     return null;
   }

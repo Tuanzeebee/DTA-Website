@@ -26,8 +26,10 @@ import {
 import {
   textToBlocks,
   blocksToText,
-  docxToBlocks,
+  mdToArticle,
+  docxToArticle,
   exportArticlePdf,
+  type ImportedArticle,
 } from "@/compenents/admin/bodyFormats";
 import {
   mainTopics,
@@ -270,7 +272,7 @@ export function ArticleEditor({
                 onChange={(e) => {
                   const t = mainTopics.find((x) => x.slug === e.target.value);
                   setTopicSlug(e.target.value);
-                  if (t) setCategorySlug(t.categories[0].slug);
+                  if (t) setCategorySlug(t.categories[0]?.slug ?? "");
                 }}
                 className={INPUT}
               >
@@ -368,7 +370,12 @@ export function ArticleEditor({
             </label>
           )}
 
-          <BodyEditor blocks={blocks} onChange={setBlocks} />
+          <BodyEditor
+            blocks={blocks}
+            onChange={setBlocks}
+            // Tiêu đề trong file chỉ điền khi ô Tiêu đề còn trống.
+            onImportTitle={(t) => setTitle((prev) => prev.trim() || t)}
+          />
         </div>
 
         {/* ---------- live preview ---------- */}
@@ -462,9 +469,11 @@ const MODES: { value: BodyMode; label: string; icon: typeof Type }[] = [
 function BodyEditor({
   blocks,
   onChange,
+  onImportTitle,
 }: {
   blocks: ArticleBlock[];
   onChange: (blocks: ArticleBlock[]) => void;
+  onImportTitle: (title: string) => void;
 }) {
   const [mode, setMode] = useState<BodyMode>("block");
   const [text, setText] = useState("");
@@ -550,7 +559,8 @@ function BodyEditor({
             if ("box" in b) return !isRichTextEmpty(b.box ?? "");
             return Boolean(b.src);
           })}
-          onImport={(imported, replace) => {
+          onImport={({ title, blocks: imported }, replace) => {
+            if (title) onImportTitle(title);
             onChange(replace ? imported : [...blocks, ...imported]);
             setMode("block");
           }}
@@ -561,23 +571,24 @@ function BodyEditor({
 }
 
 /** File import: .md/.txt parse through the flow-text syntax, .docx is
- *  unzipped and read natively (text only — embedded images re-added by
- *  hand, since they live outside document.xml). */
+ *  unzipped and read natively (embedded pictures re-added by hand, since
+ *  they live outside document.xml — ![](url) lines do import as images). */
 function ImportPanel({
   hasContent,
   onImport,
 }: {
   hasContent: boolean;
-  onImport: (blocks: ArticleBlock[], replace: boolean) => void;
+  onImport: (article: ImportedArticle, replace: boolean) => void;
 }) {
   const fileRef = useRef<HTMLInputElement>(null);
 
   const handle = async (file: File) => {
     try {
       const isDocx = file.name.toLowerCase().endsWith(".docx");
-      const imported = isDocx
-        ? await docxToBlocks(file)
-        : textToBlocks(await file.text());
+      const article = isDocx
+        ? await docxToArticle(file)
+        : mdToArticle(await file.text());
+      const imported = article.blocks;
       if (imported.length === 0) {
         toast.error("File không có nội dung đọc được.");
         return;
@@ -587,10 +598,10 @@ function ImportPanel({
             "Thay thế toàn bộ nội dung hiện tại?\nOK = thay thế · Cancel = nối vào cuối bài.",
           )
         : true;
-      onImport(imported, replace);
+      onImport(article, replace);
       toast.success(
         `Đã nhập ${imported.length} block từ ${file.name}.` +
-          (isDocx ? " Ảnh trong file Word cần thêm lại thủ công." : ""),
+          (isDocx ? " Ảnh dán trực tiếp vào Word cần thêm lại thủ công." : ""),
       );
     } catch {
       toast.error("Không đọc được file — cần .docx, .md hoặc .txt hợp lệ.");
@@ -604,8 +615,19 @@ function ImportPanel({
         Nhập bài viết từ file{" "}
         <strong className="text-white/85">Word (.docx)</strong> hoặc{" "}
         <strong className="text-white/85">Markdown (.md, .txt)</strong>. Mỗi
-        đoạn văn thành một block; với Markdown, cú pháp <code>&gt;</code> và{" "}
+        đoạn văn thành một block; dòng đầu <code># Tiêu đề</code> (Word: kiểu
+        Title/Heading 1) thành tiêu đề bài; <code>&gt;</code> và{" "}
         <code>![…](…)</code> thành BOX và ảnh.
+      </p>
+      <p className="mt-2 text-[10px] text-white/45">
+        File mẫu:{" "}
+        <a href="/templates/mau-bai-viet.docx" download className="text-accent hover:underline">
+          mau-bai-viet.docx
+        </a>{" "}
+        ·{" "}
+        <a href="/templates/mau-bai-viet.md" download className="text-accent hover:underline">
+          mau-bai-viet.md
+        </a>
       </p>
       <button
         onClick={() => fileRef.current?.click()}
