@@ -149,6 +149,7 @@ export async function loadArticleDetail(
       topic: detail.topic,
       category: detail.category,
       date: fmtDate(detail.publishedAt ?? detail.date),
+      publishedAt: detail.publishedAt,
       image: detail.image ?? "",
       tags: detail.tags ?? [],
       views: detail.views ?? 0,
@@ -282,24 +283,23 @@ export async function saveArticle(article: PortalArticle): Promise<void> {
       };
     });
 
-  const isExistingBackend =
-    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
-      article.id,
-    );
+  // ID từ API là chuỗi bất kỳ; chỉ adm-* là bài mới chưa lưu.
+  const isExistingBackend = !article.id.startsWith("adm-");
 
   const payload = {
     title: article.title,
-    summary: article.summary || undefined,
+    author: article.author?.trim() ?? "",
+    summary: article.summary,
     categoryId,
-    thumbnailUrl: article.image || undefined,
+    thumbnailUrl: article.image || "",
     sourceUrl: undefined,
-    tags: article.tags.length > 0 ? article.tags : undefined,
-    pdfUrl: article.pdfUrl || undefined,
-    memberUrl: article.memberUrl || undefined,
-    isIntern: article.isIntern || undefined,
+    tags: article.tags,
+    pdfUrl: article.pdfUrl || "",
+    memberUrl: article.memberUrl || "",
+    isIntern: Boolean(article.isIntern),
     status: article.status === "published" ? "PUBLISHED" : "DRAFT",
-    publishedAt: article.date ? vnDateToIso(article.date) : undefined,
-    blocks: blocks.length > 0 ? blocks : undefined,
+    publishedAt: article.publishedAt ?? (article.date ? vnDateToIso(article.date) : undefined),
+    blocks,
   };
 
   try {

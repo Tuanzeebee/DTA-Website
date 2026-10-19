@@ -142,6 +142,7 @@ export function ArticleEditor({
         topic?.categories?.[0]?.slug ??
         "",
       date: date.trim() || todayVn(),
+      publishedAt: date.trim() === initial?.date ? initial.publishedAt : undefined,
       image: image.trim() || "",
       tags: tags
         .split(",")
@@ -312,6 +313,7 @@ export function ArticleEditor({
               <input
                 value={author}
                 onChange={(e) => setAuthor(e.target.value)}
+                maxLength={200}
                 placeholder="Ví dụ: Minh Châu"
                 className={INPUT}
               />

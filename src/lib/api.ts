@@ -178,6 +178,8 @@ export function adminFetchArticle(
 
 export function adminCreateArticle(data: {
   title: string;
+  author?: string;
+  publishedAt?: string;
   slug?: string;
   summary?: string;
   categoryId: number;
@@ -202,6 +204,8 @@ export function adminUpdateArticle(
   id: string,
   data: {
     title?: string;
+    author?: string;
+    publishedAt?: string;
     slug?: string;
     summary?: string;
     categoryId?: number;

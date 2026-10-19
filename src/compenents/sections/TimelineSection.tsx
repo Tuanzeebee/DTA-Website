@@ -133,6 +133,10 @@ export function TimelineSection({ lang }: { lang: Lang }) {
                     <div key={i} className="card-surface rounded-3xl h-28 animate-pulse" />
                   ))}
                 </div>
+              ) : news.length === 0 ? (
+                <p className="text-sm text-muted-foreground">
+                  {lang === "vn" ? "Chưa có tin tức." : "No news yet."}
+                </p>
               ) : (
                 news.slice(0, 3).map((item, idx) => (
                 <StaggerItem key={item.title.vn}>
@@ -230,6 +234,10 @@ export function TimelineSection({ lang }: { lang: Lang }) {
                     <div key={i} className="card-surface rounded-3xl h-40 animate-pulse" />
                   ))}
                 </div>
+              ) : events.length === 0 ? (
+                <p className="text-sm text-muted-foreground">
+                  {lang === "vn" ? "Chưa có sự kiện sắp diễn ra." : "No upcoming events."}
+                </p>
               ) : (
                 events.map((event, idx) => (
                 <StaggerItem key={event.title.vn}>

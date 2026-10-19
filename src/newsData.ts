@@ -198,6 +198,8 @@ export interface PortalArticle {
   /** Tên chuyên mục hiển thị (có khi lấy từ API danh sách). */
   categoryName?: string;
   date: string;
+  /** Giữ giờ đăng khi mở editor rồi lưu mà không đổi ngày. */
+  publishedAt?: string | null;
   image: string;
   tags: string[];
   views: number;

@@ -13,7 +13,7 @@ import {
 import { mainTopics, categoryBySlug, type PortalArticle } from "@/newsData";
 import {
   useAdminArticles,
-  saveArticle,
+  togglePublish as setArticlePublished,
   deleteArticle,
   articleOrigin,
 } from "@/compenents/admin/adminStore";
@@ -62,7 +62,7 @@ export function ArticleTable() {
   const togglePublish = async (a: PortalArticle) => {
     try {
       const publish = a.status === "draft";
-      await saveArticle({ ...a, status: publish ? "published" : "draft" });
+      await setArticlePublished(a);
       toast.success(
         publish ? "Đã duyệt và đăng bài viết." : "Đã gỡ bài về chờ duyệt.",
       );

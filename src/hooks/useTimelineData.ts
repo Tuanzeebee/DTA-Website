@@ -35,7 +35,7 @@ export function useTimelineData() {
     const summary = item.summary ?? "";
     // Extract time/location from summary if present
     const timeMatch = summary.match(/(\d{1,2}[:h]\d{2}(?:\s*[-–]\s*\d{1,2}[:h]\d{2})?)/);
-    const locationMatch = summary.match(/(?:dia\s*diem|dia diem|d\/c?)[:\s]+(.+?)(?:\s*[,.]|$)/i);
+    const locationMatch = summary.match(/(?:địa\s*điểm|dia\s*diem|[đd]\/c)[:\s]+(.+?)(?:\s*[,.]|$)/i);
     return {
       title: { vn: item.title, en: item.title },
       date: item.date,
@@ -44,7 +44,7 @@ export function useTimelineData() {
         vn: locationMatch?.[1]?.trim() ?? summary.slice(0, 80),
         en: locationMatch?.[1]?.trim() ?? summary.slice(0, 80),
       },
-      status: { vn: "Sap dien ra", en: "Upcoming" },
+      status: { vn: "Sắp diễn ra", en: "Upcoming" },
       image: item.image ?? "",
     };
   });
