@@ -260,7 +260,7 @@ export function MembersDirectorySection({ lang }: { lang: Lang }) {
       {/* Infinite Logo Slider Section */}
       <div className="relative z-10 my-12 overflow-hidden py-4 select-none w-full [mask-image:linear-gradient(90deg,transparent,black_6%,black_94%,transparent)]">
         {/* Row 1: Left sliding */}
-        <div className="flex gap-5 animate-marquee mb-5 py-2">
+        <div className="flex gap-5 animate-marquee [animation-duration:70s] mb-5 py-2">
           {track1.map((org, idx) => (
             <MemberCard
               key={`${org.id}-t1-${idx}`}
@@ -274,7 +274,7 @@ export function MembersDirectorySection({ lang }: { lang: Lang }) {
         </div>
 
         {/* Row 2: Right sliding */}
-        <div className="flex gap-5 animate-marquee-reverse py-2">
+        <div className="flex gap-5 animate-marquee-reverse [animation-duration:70s] py-2">
           {track2.map((org, idx) => (
             <MemberCard
               key={`${org.id}-t2-${idx}`}

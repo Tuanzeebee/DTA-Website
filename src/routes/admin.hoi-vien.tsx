@@ -2,7 +2,10 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 import {
+  ArrowDown,
+  ArrowUp,
   ExternalLink,
+  GripVertical,
   Pencil,
   Trash2,
   UserPlus,
@@ -14,6 +17,7 @@ import {
   adminCreateMember,
   adminUpdateMember,
   adminDeleteMember,
+  type MemberItem,
 } from "@/lib/api";
 import { MemberEditor } from "@/compenents/admin/MemberEditor";
 import { RequireSection } from "@/compenents/admin/SectionGate";
@@ -32,35 +36,59 @@ const TYPE_LABEL: Record<DtaMember["type"], string> = {
   advisory: "Cố vấn",
 };
 
+type Row = DtaMember & { sortOrder: number };
+
+function toRow(m: MemberItem): Row {
+  return {
+    id: m.id,
+    name: m.name,
+    nameEn: m.nameEn ?? undefined,
+    role: m.role,
+    type: m.type as DtaMember["type"],
+    domain: m.domain,
+    ownership:
+      m.ownership === "fdi" || m.ownership === "domestic"
+        ? m.ownership
+        : undefined,
+    leader: m.leader ?? undefined,
+    phone: m.phone ?? undefined,
+    ...pickContact(m),
+    strengths: m.strengths ?? undefined,
+    logoUrl: m.logoUrl ?? undefined,
+    website: m.website ?? undefined,
+    sortOrder: m.sortOrder,
+  };
+}
+
+/** Body gửi API khi tạo/sửa — các trường của form MemberEditor. */
+function toPayload(data: DtaMember) {
+  return {
+    name: data.name,
+    nameEn: data.nameEn,
+    role: data.role,
+    type: data.type,
+    domain: data.domain,
+    ownership: data.ownership,
+    leader: data.leader,
+    phone: data.phone,
+    ...contactPayload(data),
+    strengths: data.strengths,
+    logoUrl: data.logoUrl,
+    website: data.website,
+  };
+}
+
 function AdminMembers() {
-  const [members, setMembers] = useState<DtaMember[]>([]);
+  const [members, setMembers] = useState<Row[]>([]);
   const [loading, setLoading] = useState(true);
-  const [editing, setEditing] = useState<DtaMember | "new" | null>(null);
+  const [editing, setEditing] = useState<Row | "new" | null>(null);
+  const [dragFrom, setDragFrom] = useState<number | null>(null);
 
   const fetchMembers = useCallback(async () => {
     try {
       setLoading(true);
       const data = await adminFetchMembers();
-      setMembers(
-        data.map((m) => ({
-          id: m.id,
-          name: m.name,
-          nameEn: m.nameEn ?? undefined,
-          role: m.role,
-          type: m.type as DtaMember["type"],
-          domain: m.domain,
-          ownership:
-            m.ownership === "fdi" || m.ownership === "domestic"
-              ? m.ownership
-              : undefined,
-          leader: m.leader ?? undefined,
-          phone: m.phone ?? undefined,
-          ...pickContact(m),
-          strengths: m.strengths ?? undefined,
-          logoUrl: m.logoUrl ?? undefined,
-          website: m.website ?? undefined,
-        })),
-      );
+      setMembers(data.map(toRow));
     } catch (err: unknown) {
       toast.error(err instanceof Error ? err.message : "Lỗi tải danh sách");
     } finally {
@@ -85,84 +113,49 @@ function AdminMembers() {
     }
   };
 
+  /** Chuyển hội viên từ vị trí `from` sang `to`, đánh số lại 0..n-1 (dữ liệu
+   * cũ phần lớn sortOrder = 0 nên không hoán đổi được) và chỉ PATCH dòng đổi số. */
+  const move = async (from: number, to: number) => {
+    if (from === to || to < 0 || to >= members.length) return;
+    const next = [...members];
+    next.splice(to, 0, ...next.splice(from, 1));
+    const renumbered = next.map((m, i) => ({ ...m, sortOrder: i }));
+    const changed = renumbered.filter(
+      (m) => members.find((x) => x.id === m.id)?.sortOrder !== m.sortOrder,
+    );
+    setMembers(renumbered);
+    try {
+      await Promise.all(
+        changed.map((m) => adminUpdateMember(m.id, { sortOrder: m.sortOrder })),
+      );
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : "Lỗi lưu thứ tự");
+      fetchMembers();
+    }
+  };
+
+  useEffect(() => {
+    if (editing === null) return;
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setEditing(null);
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [editing]);
+
   const handleSave = async (data: DtaMember) => {
+    if (editing === null) return;
     try {
       if (editing === "new") {
         const created = await adminCreateMember({
-          name: data.name,
-          nameEn: data.nameEn,
-          role: data.role,
-          type: data.type,
-          domain: data.domain,
-          ownership: data.ownership,
-          leader: data.leader,
-          phone: data.phone,
-          ...contactPayload(data),
-          strengths: data.strengths,
-          logoUrl: data.logoUrl,
-          website: data.website,
+          ...toPayload(data),
+          // Hội viên mới xếp cuối danh sách.
+          sortOrder: Math.max(-1, ...members.map((m) => m.sortOrder)) + 1,
         });
-        setMembers((prev) => [
-          {
-            id: created.id,
-            name: created.name,
-            nameEn: created.nameEn ?? undefined,
-            role: created.role,
-            type: created.type as DtaMember["type"],
-            domain: created.domain,
-            ownership:
-              created.ownership === "fdi" || created.ownership === "domestic"
-                ? created.ownership
-                : undefined,
-            leader: created.leader ?? undefined,
-            phone: created.phone ?? undefined,
-            ...pickContact(created),
-            strengths: created.strengths ?? undefined,
-            logoUrl: created.logoUrl ?? undefined,
-            website: created.website ?? undefined,
-          },
-          ...prev,
-        ]);
+        setMembers((prev) => [...prev, toRow(created)]);
         toast.success("Đã thêm hội viên.");
       } else {
-        const updated = await adminUpdateMember(editing.id, {
-          name: data.name,
-          nameEn: data.nameEn,
-          role: data.role,
-          type: data.type,
-          domain: data.domain,
-          ownership: data.ownership,
-          leader: data.leader,
-          phone: data.phone,
-          ...contactPayload(data),
-          strengths: data.strengths,
-          logoUrl: data.logoUrl,
-          website: data.website,
-        });
+        const updated = await adminUpdateMember(editing.id, toPayload(data));
         setMembers((prev) =>
-          prev.map((m) =>
-            m.id === editing.id
-              ? {
-                  id: updated.id,
-                  name: updated.name,
-                  nameEn: updated.nameEn ?? undefined,
-                  role: updated.role,
-                  type: updated.type as DtaMember["type"],
-                  domain: updated.domain,
-                  ownership:
-                    updated.ownership === "fdi" ||
-                    updated.ownership === "domestic"
-                      ? updated.ownership
-                      : undefined,
-                  leader: updated.leader ?? undefined,
-                  phone: updated.phone ?? undefined,
-                  ...pickContact(updated),
-                  strengths: updated.strengths ?? undefined,
-                  logoUrl: updated.logoUrl ?? undefined,
-                  website: updated.website ?? undefined,
-                }
-              : m,
-          ),
+          prev.map((m) => (m.id === editing.id ? toRow(updated) : m)),
         );
         toast.success("Đã lưu thay đổi.");
       }
@@ -196,12 +189,20 @@ function AdminMembers() {
       </div>
 
       {editing !== null && (
-        <MemberEditor
-          key={editing === "new" ? "new" : editing.id}
-          initial={editing === "new" ? undefined : editing}
-          onSave={handleSave}
-          onCancel={() => setEditing(null)}
-        />
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div
+            className="absolute inset-0 bg-black/70"
+            onClick={() => setEditing(null)}
+          />
+          <div className="relative w-full max-w-3xl max-h-[90vh] overflow-y-auto rounded-2xl bg-[#101a18]">
+            <MemberEditor
+              key={editing === "new" ? "new" : editing.id}
+              initial={editing === "new" ? undefined : editing}
+              onSave={handleSave}
+              onCancel={() => setEditing(null)}
+            />
+          </div>
+        </div>
       )}
 
       {loading ? (
@@ -214,6 +215,7 @@ function AdminMembers() {
           <table className="w-full text-left text-xs min-w-[860px]">
             <thead>
               <tr className="border-b border-white/10 bg-white/[0.03] text-[10px] uppercase tracking-wider text-white/50">
+                <th className="px-2 py-3 font-bold w-0">Thứ tự</th>
                 <th className="px-4 py-3 font-bold">Hội viên</th>
                 <th className="px-4 py-3 font-bold">Loại hình</th>
                 <th className="px-4 py-3 font-bold">Lĩnh vực</th>
@@ -223,8 +225,48 @@ function AdminMembers() {
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
-              {members.map((m) => (
-                <tr key={m.id} className="hover:bg-white/[0.02]">
+              {members.map((m, i) => (
+                <tr
+                  key={m.id}
+                  draggable
+                  onDragStart={() => setDragFrom(i)}
+                  onDragOver={(e) => e.preventDefault()}
+                  onDrop={() => {
+                    if (dragFrom !== null) move(dragFrom, i);
+                    setDragFrom(null);
+                  }}
+                  onDragEnd={() => setDragFrom(null)}
+                  className={`hover:bg-white/[0.02] ${dragFrom === i ? "opacity-40" : ""}`}
+                >
+                  <td className="px-2 py-3">
+                    <div className="flex items-center gap-1 text-white/40">
+                      <GripVertical
+                        className="w-4 h-4 cursor-grab"
+                        aria-label="Kéo để sắp xếp"
+                      />
+                      <span className="w-5 text-center tabular-nums">
+                        {i + 1}
+                      </span>
+                      <div className="flex flex-col">
+                        <button
+                          onClick={() => move(i, i - 1)}
+                          disabled={i === 0}
+                          title="Lên trên"
+                          className="p-0.5 hover:text-white disabled:opacity-20 cursor-pointer disabled:cursor-default"
+                        >
+                          <ArrowUp className="w-3 h-3" />
+                        </button>
+                        <button
+                          onClick={() => move(i, i + 1)}
+                          disabled={i === members.length - 1}
+                          title="Xuống dưới"
+                          className="p-0.5 hover:text-white disabled:opacity-20 cursor-pointer disabled:cursor-default"
+                        >
+                          <ArrowDown className="w-3 h-3" />
+                        </button>
+                      </div>
+                    </div>
+                  </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-lg bg-white/90 border border-white/10 flex items-center justify-center overflow-hidden shrink-0">
@@ -319,7 +361,7 @@ function AdminMembers() {
               {members.length === 0 && (
                 <tr>
                   <td
-                    colSpan={6}
+                    colSpan={7}
                     className="px-4 py-10 text-center text-white/45"
                   >
                     Danh sách trống — bấm "Thêm hội viên".

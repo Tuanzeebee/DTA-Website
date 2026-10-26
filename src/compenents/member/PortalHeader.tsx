@@ -2,7 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { ArrowLeft, Globe } from "lucide-react";
 import { useLang } from "@/hooks/useLang";
 import { useScrolled } from "@/hooks/useScrolled";
-import logoDta from "@/assets/Logo1.png";
+import logoDta from "@/assets/Logo1.webp";
 
 /**
  * Shared fixed header for every member-portal page (/portal, /portal/dang-ky).

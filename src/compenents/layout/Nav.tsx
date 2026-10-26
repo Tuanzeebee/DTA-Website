@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Link } from "@tanstack/react-router";
 import { Globe, Building } from "lucide-react";
 import { navItems } from "@/data";
-import logoDta from "@/assets/Logo1.png";
+import logoDta from "@/assets/Logo1.webp";
 import type { Lang } from "@/types";
 import { useScrolled } from "@/hooks/useScrolled";
 import { resolveHref } from "@/lib/nav";

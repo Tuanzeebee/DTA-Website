@@ -80,9 +80,9 @@ Invoke-WebRequest http://127.0.0.1:3000/news/topics
 Copy `nginx.conf` to the Nginx `conf` directory, then verify and reload it:
 
 ```powershell
-New-Item -ItemType Directory -Force C:\nginx\conf\conf.d | Out-Null
-Copy-Item C:\DTAWeb\DTA-Website-main\dta-news\nginx.conf C:\nginx\conf\conf.d\dta.conf -Force
-Set-Location C:\nginx
+New-Item -ItemType Directory -Force C:\nginx-1.31.5\conf\conf.d | Out-Null
+Copy-Item C:\DTAWeb\DTA-Website-main\dta-news\nginx.conf C:\nginx-1.31.5\conf\conf.d\dta.conf -Force
+Set-Location C:\nginx-1.31.5
 .\nginx.exe -t
 .\nginx.exe -s reload
 ```
@@ -90,8 +90,8 @@ Set-Location C:\nginx
 If Nginx is not already a Windows service, install it with NSSM:
 
 ```powershell
-nssm install DTA-Nginx C:\nginx\nginx.exe
-nssm set DTA-Nginx AppDirectory C:\nginx
+nssm install DTA-Nginx C:\nginx-1.31.5\nginx.exe
+nssm set DTA-Nginx AppDirectory C:\nginx-1.31.5
 nssm set DTA-Nginx Start SERVICE_AUTO_START
 nssm start DTA-Nginx
 ```
