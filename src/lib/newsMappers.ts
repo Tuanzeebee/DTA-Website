@@ -48,6 +48,9 @@ export function mapListItemToPortal(item: ArticleListItem): PortalArticle {
     tags: item.tags,
     views: item.views,
     isIntern: item.isIntern,
+    eventStartAt: item.eventStartAt,
+    eventEndAt: item.eventEndAt,
+    eventPostponed: item.eventPostponed,
     author: item.author ?? undefined,
     body: [],
   };

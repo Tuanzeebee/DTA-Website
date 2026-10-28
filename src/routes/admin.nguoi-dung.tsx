@@ -50,6 +50,7 @@ function AdminUsers() {
         id: u.id,
         name: u.fullName,
         email: u.email,
+        username: u.username ?? undefined,
         role: mapBackendRole(u.roles) as AdminRole,
         password: "",
         disabled: u.status !== "ACTIVE",
@@ -182,6 +183,7 @@ function AdminUsers() {
                           </div>
                           <div className="text-[10px] text-white/40 font-mono truncate">
                             {user.email}
+                            {user.username && ` · ${user.username}`}
                           </div>
                         </div>
                       </div>

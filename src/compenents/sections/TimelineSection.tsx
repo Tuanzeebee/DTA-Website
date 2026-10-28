@@ -10,12 +10,13 @@ import {
 } from "@/compenents/ScrollReveal";
 import { SectionHeader } from "@/compenents/SectionHeader";
 import { useTimelineData } from "@/hooks/useTimelineData";
+import { EVENT_STATUS_CLASS, EVENT_STATUS_LABEL } from "@/lib/eventStatus";
 import type { Lang } from "@/types";
 import tinTucCutout from "@/assets/image-1566.webp";
 import leftGradientBg from "@/assets/left-gradient-start-background.webp";
 
 export function TimelineSection({ lang }: { lang: Lang }) {
-  const { news, events, newsSlugs, eventSlugs, newsLoading, eventLoading } =
+  const { news, columns, newsSlugs, newsLoading, eventLoading } =
     useTimelineData();
   return (
     <section
@@ -138,7 +139,7 @@ export function TimelineSection({ lang }: { lang: Lang }) {
                   {lang === "vn" ? "Chưa có tin tức." : "No news yet."}
                 </p>
               ) : (
-                news.slice(0, 3).map((item, idx) => (
+                news.map((item, idx) => (
                 <StaggerItem key={item.title.vn}>
                   <div className="card-surface card-solid rounded-3xl flex overflow-hidden group relative transition-all duration-300 hover:border-accent/40 hover:-translate-y-0.5">
                     <Link
@@ -214,19 +215,9 @@ export function TimelineSection({ lang }: { lang: Lang }) {
             </StaggerContainer>
           </div>
 
-          {/* Right Column: Events */}
+          {/* Right Column: 3 Main Topic — Tin trong ngành / Sự kiện / Đào tạo
+              (góp ý 27/10/2026), mỗi khối là bài mới nhất của topic đó. */}
           <div className="lg:col-span-7 space-y-6">
-            <ScrollReveal>
-              <h3 className="text-xs tracking-[0.2em] font-bold text-accent uppercase mb-4 flex items-center gap-2">
-                <Calendar className="w-4 h-4 text-accent" />
-                <span>
-                  {lang === "vn"
-                    ? "Sự kiện sắp diễn ra"
-                    : "Upcoming Events Calendar"}
-                </span>
-              </h3>
-            </ScrollReveal>
-
             <StaggerContainer className="space-y-6">
               {eventLoading ? (
                 <div className="space-y-6">
@@ -234,17 +225,36 @@ export function TimelineSection({ lang }: { lang: Lang }) {
                     <div key={i} className="card-surface rounded-3xl h-40 animate-pulse" />
                   ))}
                 </div>
-              ) : events.length === 0 ? (
-                <p className="text-sm text-muted-foreground">
-                  {lang === "vn" ? "Chưa có sự kiện sắp diễn ra." : "No upcoming events."}
-                </p>
               ) : (
-                events.map((event, idx) => (
-                <StaggerItem key={event.title.vn}>
-                  <div className="card-surface card-solid rounded-3xl relative overflow-hidden flex flex-col md:flex-row group transition-all duration-300 hover:border-accent/40 hover:-translate-y-0.5">
+                columns.map(({ slug: topicSlug, label, items }) => {
+                const isEvent = topicSlug === "su-kien";
+                return (
+                <StaggerItem key={topicSlug}>
+                  <div className="flex items-center justify-between mb-3">
+                    <h3 className="text-xs tracking-[0.2em] font-bold text-accent uppercase flex items-center gap-2">
+                      <Calendar className="w-4 h-4 text-accent" />
+                      <span>{label[lang]}</span>
+                    </h3>
+                    <Link
+                      to="/news/$topic"
+                      params={{ topic: topicSlug }}
+                      className="text-[10px] uppercase font-bold text-white/50 hover:text-accent transition-colors flex items-center gap-1"
+                    >
+                      {lang === "vn" ? "Xem tất cả" : "View all"}
+                      <ArrowUpRight className="w-3 h-3" />
+                    </Link>
+                  </div>
+                  {items.length === 0 ? (
+                    <p className="text-sm text-muted-foreground">
+                      {lang === "vn" ? "Chưa có bài viết." : "No articles yet."}
+                    </p>
+                  ) : (
+                  <div className="space-y-4">
+                  {items.map(({ event, summary, slug }) => (
+                  <div key={slug} className="card-surface card-solid rounded-3xl relative overflow-hidden flex flex-col md:flex-row group transition-all duration-300 hover:border-accent/40 hover:-translate-y-0.5">
                     <Link
                       to="/news/article/$slug"
-                      params={{ slug: eventSlugs[idx] }}
+                      params={{ slug }}
                       aria-label={event.title[lang]}
                       className="absolute inset-0 z-[1] rounded-3xl"
                     />
@@ -256,19 +266,23 @@ export function TimelineSection({ lang }: { lang: Lang }) {
                         referrerPolicy="no-referrer"
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       />
-                      <div className="absolute top-3 left-3 md:hidden">
-                        <span className="px-2.5 py-1 bg-emerald-500/90 text-white text-[8px] font-black uppercase tracking-widest rounded-lg border border-emerald-500/20">
-                          {event.status[lang]}
-                        </span>
-                      </div>
+                      {isEvent && event.status && (
+                        <div className="absolute top-3 left-3 md:hidden">
+                          <span className={`px-2.5 py-1 backdrop-blur text-[8px] font-black uppercase tracking-widest rounded-lg border ${EVENT_STATUS_CLASS[event.status]}`}>
+                            {EVENT_STATUS_LABEL[event.status][lang]}
+                          </span>
+                        </div>
+                      )}
                     </div>
 
                     <div className="p-5 md:p-6 flex-1 relative flex flex-col justify-between">
-                      <div className="absolute top-0 right-0 hidden md:block">
-                        <span className="px-3 py-1 bg-emerald-500/15 text-emerald-400 text-[8px] font-black uppercase tracking-widest rounded-bl-xl border-l border-b border-emerald-500/10">
-                          {event.status[lang]}
-                        </span>
-                      </div>
+                      {isEvent && event.status && (
+                        <div className="absolute top-0 right-0 hidden md:block">
+                          <span className={`px-3 py-1 text-[8px] font-black uppercase tracking-widest rounded-bl-xl border-l border-b ${EVENT_STATUS_CLASS[event.status]}`}>
+                            {EVENT_STATUS_LABEL[event.status][lang]}
+                          </span>
+                        </div>
+                      )}
                       <div className="flex items-start gap-4">
                         {/* Calendar Date Block */}
                         <div className="p-3 rounded-xl bg-white/5 border border-white/10 flex flex-col items-center justify-center text-center shrink-0 min-w-[70px]">
@@ -284,6 +298,7 @@ export function TimelineSection({ lang }: { lang: Lang }) {
                           <h4 className="text-base font-bold text-white leading-snug">
                             {event.title[lang]}
                           </h4>
+                          {isEvent ? (
                           <div className="mt-2.5 space-y-1 text-xs text-muted-foreground">
                             {event.time && (
                               <p className="flex items-center gap-1.5">
@@ -300,7 +315,13 @@ export function TimelineSection({ lang }: { lang: Lang }) {
                               {event.location[lang]}
                             </p>
                           </div>
+                          ) : (
+                            <p className="mt-2.5 text-xs text-muted-foreground leading-relaxed line-clamp-2">
+                              {summary}
+                            </p>
+                          )}
                           <div className="mt-4 flex items-center gap-4">
+                            {isEvent && event.status === "upcoming" && (
                             <button
                               onClick={() => {
                                 toast.success(
@@ -315,6 +336,7 @@ export function TimelineSection({ lang }: { lang: Lang }) {
                                 ? "Đăng ký Tham gia"
                                 : "Register Now"}
                             </button>
+                            )}
                             <span className="text-[10px] uppercase font-bold text-white/40 group-hover:text-accent transition-colors duration-300 flex items-center gap-1 pointer-events-none">
                               <span>
                                 {lang === "vn" ? "Xem chi tiết" : "Details"}
@@ -326,8 +348,12 @@ export function TimelineSection({ lang }: { lang: Lang }) {
                       </div>
                     </div>
                   </div>
+                  ))}
+                  </div>
+                  )}
                 </StaggerItem>
-                ))
+                );
+                })
               )}
             </StaggerContainer>
           </div>

@@ -111,7 +111,7 @@ export const authService = {
       if (!res.ok) {
         const body = await res.text().catch(() => "");
         if (res.status === 401) {
-          if (body.includes("Email hoặc mật khẩu không đúng")) {
+          if (body.includes("mật khẩu không đúng")) {
             return { ok: false, reason: "wrong_password" };
           }
           if (body.includes("khóa hoặc vô hiệu hóa")) {

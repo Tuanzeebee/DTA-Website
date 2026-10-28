@@ -16,6 +16,8 @@ export interface AdminUser {
   id: string;
   name: string;
   email: string;
+  /** Tài khoản đăng nhập do Hiệp hội cấp (đăng nhập bằng email hoặc tài khoản). */
+  username?: string;
   role: AdminRole;
   password: string;
   /** Locked accounts fail sign-in but stay in the directory. */

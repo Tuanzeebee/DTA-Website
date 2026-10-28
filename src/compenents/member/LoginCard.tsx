@@ -38,8 +38,8 @@ export function LoginCard({
     if (!email.trim() || !password.trim()) {
       toast.error(
         lang === "vn"
-          ? "Vui lòng nhập email và mật khẩu."
-          : "Please enter both email and password.",
+          ? "Vui lòng nhập email/tài khoản và mật khẩu."
+          : "Please enter your email/username and password.",
       );
       return;
     }
@@ -60,7 +60,9 @@ export function LoginCard({
         );
       } else if (result.reason === "wrong_password") {
         toast.error(
-          lang === "vn" ? "Mật khẩu chưa đúng." : "That password isn't right.",
+          lang === "vn"
+            ? "Tài khoản hoặc mật khẩu chưa đúng."
+            : "Wrong username or password.",
         );
       } else if (result.reason === "network") {
         toast.error(
@@ -110,17 +112,17 @@ export function LoginCard({
             htmlFor="portal-email"
             className="block text-[11px] uppercase tracking-wider text-muted-foreground font-bold mb-1.5"
           >
-            Email
+            {lang === "vn" ? "Email đơn vị / Tài khoản" : "Email / Username"}
           </label>
           <div className={inputShell}>
             <Mail className="w-4 h-4 ml-3.5 text-white/35 shrink-0" />
             <input
               id="portal-email"
-              type="email"
-              autoComplete="email"
+              type="text"
+              autoComplete="username"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="ten@doanhnghiep.vn"
+              placeholder={lang === "vn" ? "ten@doanhnghiep.vn hoặc tài khoản" : "name@company.vn or username"}
               className={inputInner}
             />
           </div>

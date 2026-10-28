@@ -36,17 +36,12 @@ export function MemberArticlePanel({ lang }: { lang: Lang }) {
     let alive = true;
     (async () => {
       try {
-        const cats = await adminFetchCategories();
+        // Hội viên chỉ được đăng trong Main Topic "Hội viên" (backend cũng chặn).
+        const cats = await adminFetchCategories("hoi-vien");
         if (!alive) return;
         setCategories(cats);
         if (cats.length > 0 && categoryId === null) {
-          const preferred =
-            cats.find(
-              (c) =>
-                c.slug.toLowerCase().includes("hoi-vien") ||
-                c.name.toLowerCase().includes("hội viên"),
-            ) ?? cats[0];
-          setCategoryId(preferred.id);
+          setCategoryId(cats[0].id);
         }
       } catch {
         /* chưa đăng nhập / chưa có quyền — form vẫn dùng được ở chế độ local */

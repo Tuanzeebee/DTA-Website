@@ -1,10 +1,16 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect } from "react";
-import { Eye, Tag, Newspaper } from "lucide-react";
+import { Eye, Tag, Newspaper, CalendarDays } from "lucide-react";
+import {
+  EVENT_STATUS_CLASS,
+  EVENT_STATUS_LABEL,
+  eventStatus,
+} from "@/lib/eventStatus";
 import { topicShort, categoryName } from "@/newsData";
 import { useArticleDetail, useTopics } from "@/hooks/useNewsApi";
 import { ArticleBody } from "@/compenents/news/ArticleBody";
 import { useLang } from "@/hooks/useLang";
+import type { Lang } from "@/types";
 import {
   ArticleActions,
   ReaderUtilityBar,
@@ -138,6 +144,8 @@ function ArticlePage() {
           {article.title}
         </h1>
 
+        <EventScheduleRow article={article} lang={lang} />
+
         <div className="flex items-center flex-wrap gap-x-4 gap-y-3 mt-5">
           <div className="flex items-center gap-3">
             <AuthorAvatar author={article.author} />
@@ -210,6 +218,46 @@ function ArticlePage() {
         <SidebarAssociation />
         <SidebarLogos />
       </aside>
+    </div>
+  );
+}
+
+/** Lịch + nhãn trạng thái sự kiện; không hiện gì khi bài không có lịch. */
+function EventScheduleRow({
+  article,
+  lang,
+}: {
+  article: {
+    eventStartAt?: string | null;
+    eventEndAt?: string | null;
+    eventPostponed?: boolean;
+  };
+  lang: Lang;
+}) {
+  const status = eventStatus(article);
+  if (!status) return null;
+  const fmt = (iso: string) =>
+    new Date(iso).toLocaleString(lang === "vn" ? "vi-VN" : "en-GB", {
+      hour: "2-digit",
+      minute: "2-digit",
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    });
+  return (
+    <div className="mt-4 flex flex-wrap items-center gap-3 text-xs text-white/70">
+      <span
+        className={`px-2.5 py-1 rounded-lg border text-[10px] font-black uppercase tracking-widest ${EVENT_STATUS_CLASS[status]}`}
+      >
+        {EVENT_STATUS_LABEL[status][lang]}
+      </span>
+      {article.eventStartAt && (
+        <span className="flex items-center gap-1.5">
+          <CalendarDays className="w-3.5 h-3.5 text-accent" />
+          {fmt(article.eventStartAt)}
+          {article.eventEndAt && ` – ${fmt(article.eventEndAt)}`}
+        </span>
+      )}
     </div>
   );
 }

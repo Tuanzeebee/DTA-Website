@@ -43,6 +43,14 @@ import { EditablePreview } from "@/compenents/admin/EditablePreview";
 import { ArticleBody } from "@/compenents/news/ArticleBody";
 import { RichTextArea, isRichTextEmpty } from "@/compenents/admin/richText";
 
+/** ISO → giá trị cho <input type="datetime-local"> theo giờ máy (yyyy-mm-ddThh:mm). */
+function toLocalInput(iso?: string | null): string {
+  if (!iso) return "";
+  const d = new Date(iso);
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
 /**
  * Word-style article editor. The body is the same block list the portal
  * renders (paragraph / image with align+wrap+width / highlight box), and the
@@ -94,6 +102,9 @@ export function ArticleEditor({
   const [pdfUrl, setPdfUrl] = useState(initial?.pdfUrl ?? "");
   const [memberUrl, setMemberUrl] = useState(initial?.memberUrl ?? "");
   const [isIntern, setIsIntern] = useState(initial?.isIntern ?? false);
+  const [eventStart, setEventStart] = useState(toLocalInput(initial?.eventStartAt));
+  const [eventEnd, setEventEnd] = useState(toLocalInput(initial?.eventEndAt));
+  const [eventPostponed, setEventPostponed] = useState(initial?.eventPostponed ?? false);
   const [blocks, setBlocks] = useState<ArticleBlock[]>(initial?.body ?? [""]);
   const [showPreview, setShowPreview] = useState(false);
   /* Direct-manipulation mode on the preview: drag images in the rendered
@@ -125,6 +136,15 @@ export function ArticleEditor({
       toast.error("Ngày đăng cần đúng định dạng dd/mm/yyyy.");
       return null;
     }
+    const isEvent = topic?.slug === "su-kien";
+    if (isEvent && eventEnd && !eventStart) {
+      toast.error("Cần nhập ngày bắt đầu sự kiện trước ngày kết thúc.");
+      return null;
+    }
+    if (isEvent && eventStart && eventEnd && eventEnd < eventStart) {
+      toast.error("Ngày kết thúc sự kiện phải sau ngày bắt đầu.");
+      return null;
+    }
     const body = blocks.filter((b) => {
       if (typeof b === "string") return !isRichTextEmpty(b);
       if ("box" in b) return !isRichTextEmpty(b.box ?? "");
@@ -154,6 +174,10 @@ export function ArticleEditor({
       pdfUrl: pdfUrl.trim() || undefined,
       memberUrl: memberUrl.trim() || undefined,
       isIntern: isIntern || undefined,
+      // Đổi sang chủ đề khác thì xoá lịch, tránh nhãn sự kiện "mồ côi".
+      eventStartAt: isEvent && eventStart ? new Date(eventStart).toISOString() : null,
+      eventEndAt: isEvent && eventEnd ? new Date(eventEnd).toISOString() : null,
+      eventPostponed: isEvent && eventPostponed,
       author: author.trim() || undefined,
       status: publish ? "published" : "draft",
       // Drop empty paragraphs so stray enters don't publish as gaps.
@@ -357,6 +381,44 @@ export function ArticleEditor({
               />
             </Field>
           </div>
+
+          {topicSlug === "su-kien" && (
+            <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4 space-y-3">
+              <p className="text-[11px] text-white/60 leading-relaxed">
+                Lịch sự kiện — nhãn <b>Sắp diễn ra / Đang diễn ra / Đã kết thúc</b>{" "}
+                tự tính theo ngày này. Dời lịch chỉ cần sửa ngày. Để trống = bài
+                không hiện nhãn (bài tường thuật, tin cũ).
+              </p>
+              <div className="grid sm:grid-cols-2 gap-3">
+                <Field label="Bắt đầu">
+                  <input
+                    type="datetime-local"
+                    value={eventStart}
+                    onChange={(e) => setEventStart(e.target.value)}
+                    className={INPUT}
+                  />
+                </Field>
+                <Field label="Kết thúc (trống = hết ngày bắt đầu)">
+                  <input
+                    type="datetime-local"
+                    value={eventEnd}
+                    min={eventStart || undefined}
+                    onChange={(e) => setEventEnd(e.target.value)}
+                    className={INPUT}
+                  />
+                </Field>
+              </div>
+              <label className="flex items-center gap-2 text-xs text-white/75 cursor-pointer w-fit">
+                <input
+                  type="checkbox"
+                  checked={eventPostponed}
+                  onChange={(e) => setEventPostponed(e.target.checked)}
+                  className="accent-cyan-400"
+                />
+                Tạm hoãn (chưa có lịch mới) — hiện nhãn "Tạm hoãn"
+              </label>
+            </div>
+          )}
 
           {categorySlug === "tuyen-dung" && (
             <label className="flex items-center gap-2 text-xs text-white/75 cursor-pointer">

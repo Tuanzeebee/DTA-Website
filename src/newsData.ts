@@ -206,6 +206,10 @@ export interface PortalArticle {
   pdfUrl?: string;
   memberUrl?: string;
   isIntern?: boolean;
+  /** Lịch sự kiện (ISO) — xem lib/eventStatus.ts. */
+  eventStartAt?: string | null;
+  eventEndAt?: string | null;
+  eventPostponed?: boolean;
   author?: string;
   status?: "draft" | "published";
   body: ArticleBlock[];

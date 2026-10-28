@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { MapPin, Plus } from "lucide-react";
+import { LogIn, MapPin } from "lucide-react";
 import heroImage from "@/assets/HerosectionBackGroundV4.webp";
 import { ScrollReveal } from "@/compenents/ScrollReveal";
 import { SectionBackground } from "@/compenents/SectionBackground";
@@ -112,7 +112,7 @@ export function Hero({ lang }: { lang: Lang }) {
                   boxShadow: "var(--shadow-glow)",
                 }}
               >
-                <Plus className="w-4 h-4" />
+                <LogIn className="w-4 h-4" />
                 <span>{translationStrings.heroBtn1[lang]}</span>
               </Link>
             </div>

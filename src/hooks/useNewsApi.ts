@@ -112,11 +112,12 @@ export function useAds(slot: string) {
 export function useDigest(
   topicSlugs: string[],
   pageSize = 3,
+  primaryOnly = false,
 ) {
   return useQuery<Record<string, PortalArticle[]>>({
-    queryKey: ["digest", topicSlugs, pageSize],
+    queryKey: ["digest", topicSlugs, pageSize, primaryOnly],
     queryFn: async () => {
-      const raw = await fetchDigest(topicSlugs, pageSize);
+      const raw = await fetchDigest(topicSlugs, pageSize, primaryOnly);
       const result: Record<string, PortalArticle[]> = {};
       for (const [topic, items] of Object.entries(raw)) {
         result[topic] = items.map(mapListItemToPortal);

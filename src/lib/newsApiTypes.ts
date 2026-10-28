@@ -36,6 +36,9 @@ export interface ArticleListItem {
   tags: string[];
   views: number;
   isIntern: boolean;
+  eventStartAt?: string | null;
+  eventEndAt?: string | null;
+  eventPostponed?: boolean;
   author: string | null;
 }
 

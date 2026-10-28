@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { toast } from "sonner";
-import { User, Check } from "lucide-react";
+import { User, Check, KeyRound } from "lucide-react";
 import type { Lang } from "@/types";
 import {
   contactPayload,
@@ -9,7 +9,7 @@ import {
   type MemberOwnership,
 } from "@/data";
 import { ContactFields } from "@/compenents/member/ContactFields";
-import { memberUpdateProfile } from "@/lib/api";
+import { changeOwnPassword, memberUpdateProfile } from "@/lib/api";
 import {
   firstMissingDirectoryField,
   directoryErrorMessage,
@@ -123,6 +123,7 @@ export function ProfilePanel({
     ) => onChange({ ...data, [key]: e.target.value });
 
   return (
+    <>
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="flex items-center gap-3 pb-4 border-b border-white/8">
         <span className="w-9 h-9 rounded-lg bg-primary/15 border border-primary/25 flex items-center justify-center">
@@ -313,6 +314,102 @@ export function ProfilePanel({
                 ? "Lưu thay đổi hồ sơ"
                 : "Save Changes"}
           </span>
+        </button>
+      </div>
+    </form>
+    <ChangePasswordForm lang={lang} />
+    </>
+  );
+}
+
+/** Hội viên tự quản mật khẩu (góp ý 27/10/2026). */
+function ChangePasswordForm({ lang }: { lang: Lang }) {
+  const [current, setCurrent] = useState("");
+  const [next, setNext] = useState("");
+  const [confirm, setConfirm] = useState("");
+  const [saving, setSaving] = useState(false);
+
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (next.length < 8) {
+      toast.error(
+        lang === "vn"
+          ? "Mật khẩu mới cần ít nhất 8 ký tự."
+          : "New password needs at least 8 characters.",
+      );
+      return;
+    }
+    if (next !== confirm) {
+      toast.error(
+        lang === "vn" ? "Mật khẩu nhập lại không khớp." : "Passwords do not match.",
+      );
+      return;
+    }
+    setSaving(true);
+    try {
+      await changeOwnPassword(current, next);
+      setCurrent("");
+      setNext("");
+      setConfirm("");
+      toast.success(lang === "vn" ? "Đã đổi mật khẩu." : "Password changed.");
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "";
+      toast.error(
+        msg.includes("Mật khẩu hiện tại không đúng")
+          ? lang === "vn"
+            ? "Mật khẩu hiện tại không đúng."
+            : "Current password is wrong."
+          : lang === "vn"
+            ? "Không đổi được mật khẩu."
+            : "Could not change password.",
+      );
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const fields: [string, string, string, (v: string) => void, string][] = [
+    ["pw-current", lang === "vn" ? "Mật khẩu hiện tại" : "Current password", current, setCurrent, "current-password"],
+    ["pw-new", lang === "vn" ? "Mật khẩu mới" : "New password", next, setNext, "new-password"],
+    ["pw-confirm", lang === "vn" ? "Nhập lại mật khẩu mới" : "Confirm new password", confirm, setConfirm, "new-password"],
+  ];
+
+  return (
+    <form onSubmit={submit} className="mt-10 pt-6 border-t border-white/8 space-y-4">
+      <h4 className="display text-base font-black text-white flex items-center gap-2">
+        <KeyRound className="w-4 h-4 text-cyan-300" />
+        {lang === "vn" ? "Đổi mật khẩu" : "Change password"}
+      </h4>
+      <div className="grid sm:grid-cols-3 gap-4">
+        {fields.map(([id, label, value, set, auto]) => (
+          <div key={id}>
+            <label htmlFor={id} className={LABEL}>
+              {label}
+            </label>
+            <input
+              id={id}
+              type="password"
+              autoComplete={auto}
+              value={value}
+              onChange={(e) => set(e.target.value)}
+              className={FIELD_SHELL}
+            />
+          </div>
+        ))}
+      </div>
+      <div className="flex justify-end">
+        <button
+          type="submit"
+          disabled={saving || !current || !next}
+          className="px-6 h-11 rounded-xl font-bold text-sm border border-white/15 text-white hover:bg-white/5 transition-all cursor-pointer disabled:opacity-50"
+        >
+          {saving
+            ? lang === "vn"
+              ? "Đang đổi…"
+              : "Saving…"
+            : lang === "vn"
+              ? "Đổi mật khẩu"
+              : "Change password"}
         </button>
       </div>
     </form>

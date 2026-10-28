@@ -1,3 +1,4 @@
+import type { EventStatus } from "@/lib/eventStatus";
 export interface NavItem {
   label: { vn: string; en: string };
   href: string;
@@ -260,7 +261,8 @@ export interface DtaEvent {
   date: string;
   time: string;
   location: { vn: string; en: string };
-  status: { vn: string; en: string };
+  /** null = bài không có lịch sự kiện → không hiện nhãn. */
+  status: EventStatus | null;
   image: string;
 }
 
@@ -301,8 +303,8 @@ export const translationStrings = {
     en: "A vital bridge and digital platform supporting tech enterprises, academic institutes, and smart city builders in Central Vietnam.",
   },
   heroBtn1: {
-    vn: "Gia nhập DTA",
-    en: "Join DTA",
+    vn: "Đăng nhập Không gian số DTA",
+    en: "Sign in to DTA Digital Space",
   },
   heroBtn2: {
     vn: "Xem danh bạ Hội viên",

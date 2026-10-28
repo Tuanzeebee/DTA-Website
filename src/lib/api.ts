@@ -101,11 +101,14 @@ export type DigestResponse = Record<string, ArticleListItem[]>;
 export function fetchDigest(
   topicSlugs: string[],
   pageSize = 3,
+  /** Chỉ tính chuyên mục chính — mỗi bài thuộc đúng 1 topic. */
+  primaryOnly = false,
 ): Promise<DigestResponse> {
   const qs = new URLSearchParams({
     topics: topicSlugs.join(","),
     pageSize: String(pageSize),
   });
+  if (primaryOnly) qs.set("primary", "1");
   return fetchJson(`/news/articles/digest?${qs.toString()}`);
 }
 
@@ -125,6 +128,9 @@ export interface AdminArticleItem {
   tags: string[];
   views: number;
   isIntern: boolean;
+  eventStartAt?: string | null;
+  eventEndAt?: string | null;
+  eventPostponed?: boolean;
   author: string | null;
   status: string;
   updatedAt: string;
@@ -190,6 +196,9 @@ export function adminCreateArticle(data: {
   pdfUrl?: string;
   memberUrl?: string;
   isIntern?: boolean;
+  eventStartAt?: string | null;
+  eventEndAt?: string | null;
+  eventPostponed?: boolean;
   status?: string;
   blocks?: unknown[];
 }): Promise<AdminArticleDetailResponse> {
@@ -216,6 +225,9 @@ export function adminUpdateArticle(
     pdfUrl?: string;
     memberUrl?: string;
     isIntern?: boolean;
+    eventStartAt?: string | null;
+    eventEndAt?: string | null;
+    eventPostponed?: boolean;
     status?: string;
     blocks?: unknown[];
   },
@@ -302,6 +314,7 @@ export function adminFetchCategories(
 export interface AdminUserItem {
   id: string;
   email: string;
+  username: string | null;
   fullName: string;
   status: string;
   avatarUrl: string | null;
@@ -318,6 +331,7 @@ export function adminCreateUser(data: {
   fullName: string;
   password: string;
   roles?: string[];
+  username?: string;
 }): Promise<AdminUserItem> {
   return authFetch("/admin/users", {
     method: "POST",
@@ -345,6 +359,42 @@ export function adminSetUserStatus(
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ status }),
+  });
+}
+
+/** Quản trị đặt lại mật khẩu cho một tài khoản. */
+export function adminSetUserPassword(
+  id: string,
+  password: string,
+): Promise<{ id: string }> {
+  return authFetch(`/admin/users/${id}/password`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ password }),
+  });
+}
+
+/** Gán/gỡ Tài khoản đăng nhập (null = chỉ đăng nhập bằng email). */
+export function adminSetUsername(
+  id: string,
+  username: string | null,
+): Promise<{ id: string; username: string | null }> {
+  return authFetch(`/admin/users/${id}/username`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ username }),
+  });
+}
+
+/** Người dùng đang đăng nhập tự đổi mật khẩu. */
+export async function changeOwnPassword(
+  currentPassword: string,
+  newPassword: string,
+): Promise<void> {
+  await authFetch(`/auth/change-password`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ currentPassword, newPassword }),
   });
 }
 

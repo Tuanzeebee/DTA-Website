@@ -3,7 +3,13 @@ import { toast } from "sonner";
 import { Save, X } from "lucide-react";
 import type { AdminRole, AdminUser } from "@/lib/auth/types";
 import { ROLE_LABEL } from "@/lib/auth/permissions";
-import { adminCreateUser, adminSetUserRoles, adminSetUserStatus } from "@/lib/api";
+import {
+  adminCreateUser,
+  adminSetUserRoles,
+  adminSetUserPassword,
+  adminSetUserStatus,
+  adminSetUsername,
+} from "@/lib/api";
 
 const INPUT =
   "w-full px-3 py-2 bg-white/5 border border-white/10 rounded-xl text-xs text-white placeholder:text-white/30 focus:outline-none focus:border-cyan-400/60";
@@ -40,6 +46,7 @@ export function UserEditor({
 }) {
   const [name, setName] = useState(initial?.name ?? "");
   const [email, setEmail] = useState(initial?.email ?? "");
+  const [username, setUsername] = useState(initial?.username ?? "");
   const [role, setRole] = useState<AdminRole>(initial?.role ?? "editor");
   const [password, setPassword] = useState("");
   const [disabled, setDisabled] = useState(initial?.disabled ?? false);
@@ -55,8 +62,17 @@ export function UserEditor({
       toast.error("Địa chỉ email chưa đúng định dạng.");
       return;
     }
+    const normalizedUsername = username.trim().toLowerCase();
+    if (normalizedUsername && !/^[a-z0-9._-]{3,32}$/.test(normalizedUsername)) {
+      toast.error("Tài khoản chỉ gồm 3–32 ký tự a-z, 0-9, dấu chấm, gạch dưới, gạch ngang.");
+      return;
+    }
     if (!initial && !password.trim()) {
       toast.error("Cần đặt mật khẩu cho tài khoản mới.");
+      return;
+    }
+    if (initial && password.trim() && password.trim().length < 8) {
+      toast.error("Mật khẩu mới cần ít nhất 8 ký tự.");
       return;
     }
 
@@ -67,10 +83,17 @@ export function UserEditor({
         const backendRole = roleToBackend(role);
         await adminSetUserRoles(initial.id, [backendRole]);
         await adminSetUserStatus(initial.id, disabled ? "INACTIVE" : "ACTIVE");
+        if (normalizedUsername !== (initial.username ?? "")) {
+          await adminSetUsername(initial.id, normalizedUsername || null);
+        }
+        if (password.trim()) {
+          await adminSetUserPassword(initial.id, password.trim());
+        }
         onSave({
           ...initial,
           name: name.trim(),
           email: normalizedEmail,
+          username: normalizedUsername || undefined,
           role,
           disabled,
         });
@@ -83,11 +106,13 @@ export function UserEditor({
           fullName: name.trim(),
           password: password.trim(),
           roles: [backendRole],
+          username: normalizedUsername || undefined,
         });
         onSave({
           id: created.id,
           name: created.fullName,
           email: created.email,
+          username: created.username ?? undefined,
           role,
           password: "",
           disabled: false,
@@ -98,6 +123,10 @@ export function UserEditor({
       const msg = err instanceof Error ? err.message : "Lỗi không xác định";
       if (msg.includes("Email đã được sử dụng")) {
         toast.error("Email này đã có người dùng khác sử dụng.");
+      } else if (msg.includes("Tài khoản đã được sử dụng")) {
+        toast.error("Tài khoản này đã có người dùng khác sử dụng.");
+      } else if (msg.includes("Chỉ Super Admin")) {
+        toast.error("Chỉ Super Admin được đặt lại mật khẩu tài khoản quản trị.");
       } else {
         toast.error(`Lỗi: ${msg}`);
       }
@@ -136,6 +165,16 @@ export function UserEditor({
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="ten@dta.org.vn"
+            className={INPUT}
+          />
+        </Field>
+
+        <Field label="Tài khoản (Hiệp hội cấp, không bắt buộc)">
+          <input
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            placeholder="vd: dta.fpt"
+            autoComplete="off"
             className={INPUT}
           />
         </Field>
