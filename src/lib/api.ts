@@ -101,14 +101,11 @@ export type DigestResponse = Record<string, ArticleListItem[]>;
 export function fetchDigest(
   topicSlugs: string[],
   pageSize = 3,
-  /** Chỉ tính chuyên mục chính — mỗi bài thuộc đúng 1 topic. */
-  primaryOnly = false,
 ): Promise<DigestResponse> {
   const qs = new URLSearchParams({
     topics: topicSlugs.join(","),
     pageSize: String(pageSize),
   });
-  if (primaryOnly) qs.set("primary", "1");
   return fetchJson(`/news/articles/digest?${qs.toString()}`);
 }
 

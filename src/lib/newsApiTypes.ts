@@ -70,7 +70,7 @@ export interface ArticlesQueryParams {
   topic?: string;
   category?: string;
   sort?: "latest" | "oldest" | "views";
-  flag?: "intern";
+  flag?: "intern" | "upcoming";
   q?: string;
   page?: number;
   pageSize?: number;

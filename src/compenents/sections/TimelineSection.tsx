@@ -246,7 +246,13 @@ export function TimelineSection({ lang }: { lang: Lang }) {
                   </div>
                   {items.length === 0 ? (
                     <p className="text-sm text-muted-foreground">
-                      {lang === "vn" ? "Chưa có bài viết." : "No articles yet."}
+                      {isEvent
+                        ? lang === "vn"
+                          ? "Chưa có sự kiện sắp diễn ra."
+                          : "No upcoming events."
+                        : lang === "vn"
+                          ? "Chưa có bài viết."
+                          : "No articles yet."}
                     </p>
                   ) : (
                   <div className="space-y-4">

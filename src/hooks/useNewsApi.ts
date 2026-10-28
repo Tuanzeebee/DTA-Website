@@ -26,6 +26,7 @@ const sortMap: Record<string, ArticlesQueryParams["sort"]> = {
 /** Flag mapping: frontend slug → backend value. */
 const flagMap: Record<string, ArticlesQueryParams["flag"]> = {
   "thuc-tap": "intern",
+  "sap-dien-ra": "upcoming",
 };
 
 export function useTopics() {
@@ -112,12 +113,11 @@ export function useAds(slot: string) {
 export function useDigest(
   topicSlugs: string[],
   pageSize = 3,
-  primaryOnly = false,
 ) {
   return useQuery<Record<string, PortalArticle[]>>({
-    queryKey: ["digest", topicSlugs, pageSize, primaryOnly],
+    queryKey: ["digest", topicSlugs, pageSize],
     queryFn: async () => {
-      const raw = await fetchDigest(topicSlugs, pageSize, primaryOnly);
+      const raw = await fetchDigest(topicSlugs, pageSize);
       const result: Record<string, PortalArticle[]> = {};
       for (const [topic, items] of Object.entries(raw)) {
         result[topic] = items.map(mapListItemToPortal);

@@ -1,5 +1,6 @@
 import { useArticles, useDigest } from "./useNewsApi";
 import type { DtaNews, DtaEvent } from "@/data";
+import type { PortalArticle } from "@/newsData";
 import { eventStatus } from "@/lib/eventStatus";
 
 /** 3 Main Topic ở cột phải trang chủ, theo thứ tự hiển thị. */
@@ -23,11 +24,21 @@ export function useTimelineData() {
     pageSize: 18,
   });
 
-  const { data: digest, isLoading: eventLoading } = useDigest(
-    RIGHT_TOPICS.map((t) => t.slug),
+  const { data: digestData, isLoading: digestLoading } = useDigest(
+    RIGHT_TOPICS.filter((t) => t.slug !== "su-kien").map((t) => t.slug),
     3,
-    true, // chỉ chuyên mục chính: bài DSA gắn nhiều chuyên mục sẽ không lặp giữa 3 khối
   );
+  // Khối Sự kiện chỉ hiện sự kiện chưa kết thúc, gần nhất lên đầu (góp ý 28/10/2026).
+  const { data: upcomingData, isLoading: upcomingLoading } = useArticles({
+    topic: "su-kien",
+    flag: "sap-dien-ra",
+    pageSize: 3,
+  });
+  const digest: Record<string, PortalArticle[]> = {
+    ...digestData,
+    "su-kien": upcomingData?.items ?? [],
+  };
+  const eventLoading = digestLoading || upcomingLoading;
 
   // Cột trái bỏ các bài đã hiện ở cột phải — cả trang không lặp bài.
   const rightIds = new Set(
