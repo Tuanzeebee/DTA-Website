@@ -96,14 +96,17 @@ export function GallerySection({ lang }: { lang: Lang }) {
       {/* Infinite photo banner */}
       <div className="relative z-10 mt-10 overflow-hidden select-none w-full [mask-image:linear-gradient(90deg,transparent,black_6%,black_94%,transparent)]">
         {loading ? (
-          <div className="flex gap-4 px-6">
-            {[1, 2, 3, 4].map((i) => (
-              <div
-                key={i}
-                className="w-72 h-48 shrink-0 rounded-2xl card-surface animate-pulse"
-              />
-            ))}
-          </div>
+          // 2 hàng như banner thật — dữ liệu về không làm section cao thêm.
+          ["mb-4 py-2", "py-2"].map((row) => (
+            <div key={row} className={`flex gap-4 px-6 ${row}`}>
+              {[1, 2, 3, 4, 5, 6].map((i) => (
+                <div
+                  key={i}
+                  className="w-72 h-48 shrink-0 rounded-2xl card-surface animate-pulse"
+                />
+              ))}
+            </div>
+          ))
         ) : single ? (
           <div className="flex justify-center px-6">
             <PhotoCard photo={photos[0]} lang={lang} onOpen={() => setLightbox(0)} />

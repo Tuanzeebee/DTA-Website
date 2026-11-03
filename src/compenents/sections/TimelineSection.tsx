@@ -129,8 +129,8 @@ export function TimelineSection({ lang }: { lang: Lang }) {
             <StaggerContainer className="space-y-4">
               {newsLoading ? (
                 <div className="space-y-4">
-                  {[1, 2, 3].map((i) => (
-                    <div key={i} className="card-surface rounded-3xl h-28 animate-pulse" />
+                  {Array.from({ length: 9 }, (_, i) => (
+                    <NewsCardSkeleton key={i} />
                   ))}
                 </div>
               ) : news.length === 0 ? (
@@ -197,7 +197,14 @@ export function TimelineSection({ lang }: { lang: Lang }) {
               {eventLoading ? (
                 <div className="space-y-6">
                   {[1, 2, 3].map((i) => (
-                    <div key={i} className="card-surface rounded-3xl h-40 animate-pulse" />
+                    <div key={i}>
+                      <div className="h-4 w-40 mb-3 rounded bg-white/10" />
+                      <div className="space-y-4">
+                        {[1, 2, 3].map((j) => (
+                          <TopicCardSkeleton key={j} />
+                        ))}
+                      </div>
+                    </div>
                   ))}
                 </div>
               ) : (
@@ -325,5 +332,51 @@ export function TimelineSection({ lang }: { lang: Lang }) {
         </div>
       </div>
     </section>
+  );
+}
+
+/*
+ * Khung chờ cùng SỐ LƯỢNG và cùng bố cục (padding, ảnh, số dòng chữ) với thẻ
+ * thật: dữ liệu về không làm section cao thêm, nên các section bên dưới (Logo,
+ * Danh bạ hội viên…) không bị đẩy xuống khi đang cuộn / khôi phục vị trí cuộn.
+ * Chiều cao dòng: tiêu đề text-base leading-snug 2 dòng = 44px, tóm tắt
+ * text-xs leading-relaxed 2 dòng = 39px.
+ */
+const Bar = ({ className }: { className: string }) => (
+  <div className={`rounded bg-white/10 ${className}`} />
+);
+
+function NewsCardSkeleton() {
+  return (
+    <div className="card-surface card-solid rounded-3xl flex flex-col sm:flex-row overflow-hidden animate-pulse">
+      <div className="w-full h-36 sm:w-28 sm:h-auto shrink-0 bg-white/5" />
+      <div className="p-5 flex-1">
+        <div className="flex items-center justify-between gap-2 mb-3">
+          <Bar className="h-6 w-24" />
+          <Bar className="h-4 w-16" />
+        </div>
+        <Bar className="h-[44px] mb-2" />
+        <Bar className="h-[39px] w-4/5" />
+        <div className="mt-4 pt-3 border-t border-white/5">
+          <Bar className="h-4 w-24" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function TopicCardSkeleton() {
+  return (
+    <div className="card-surface card-solid rounded-3xl overflow-hidden flex flex-col md:flex-row animate-pulse">
+      <div className="w-full md:w-44 h-36 md:h-auto shrink-0 bg-white/5" />
+      <div className="p-5 md:p-6 flex-1 flex items-start gap-4">
+        <Bar className="w-[70px] h-[68px] rounded-xl shrink-0" />
+        <div className="flex-1">
+          <Bar className="h-[44px]" />
+          <Bar className="h-[39px] w-4/5 mt-2.5" />
+          <Bar className="h-4 w-24 mt-4" />
+        </div>
+      </div>
+    </div>
   );
 }

@@ -189,10 +189,13 @@ function buildSliderOrgs(members: DtaMember[]): SliderOrg[] {
 
 export function MembersDirectorySection({ lang }: { lang: Lang }) {
   const [members, setMembers] = useState<DtaMember[]>(() => allMembers());
+  const [loaded, setLoaded] = useState(() => members.length > 0);
   const [selected, setSelected] = useState<DtaMember | null>(null);
 
   useEffect(() => {
-    loadMembersFromApi().then(setMembers);
+    loadMembersFromApi()
+      .then(setMembers)
+      .finally(() => setLoaded(true));
   }, []);
 
   const sliderOrganizations = useMemo(
@@ -280,10 +283,27 @@ export function MembersDirectorySection({ lang }: { lang: Lang }) {
 
       {/* Infinite Logo Slider Section */}
       <div className="relative z-10 my-12 overflow-hidden py-4 select-none w-full [mask-image:linear-gradient(90deg,transparent,black_6%,black_94%,transparent)]">
+        {/* Chưa có dữ liệu: giữ chỗ 2 hàng thẻ cùng kích thước để phần dưới không bị đẩy xuống. */}
+        {!loaded &&
+          ["mb-5 py-2", "py-2"].map((row) => (
+            <div key={row} className={`flex gap-5 px-6 ${row}`}>
+              {[1, 2, 3, 4, 5].map((i) => (
+                <div
+                  key={i}
+                  className="card-surface card-solid rounded-3xl p-4 w-[330px] shrink-0 animate-pulse"
+                >
+                  <div className="w-[75px] h-[75px] rounded-2xl bg-white/5" />
+                </div>
+              ))}
+            </div>
+          ))}
+
         {/* Row 1: Left sliding */}
-        <div className="flex gap-5 animate-marquee [animation-duration:70s] mb-5 py-2">
-          {renderTrack(row1)}
-        </div>
+        {row1.length > 0 && (
+          <div className="flex gap-5 animate-marquee [animation-duration:70s] mb-5 py-2">
+            {renderTrack(row1)}
+          </div>
+        )}
 
         {/* Row 2: Right sliding */}
         {row2.length > 0 && (
