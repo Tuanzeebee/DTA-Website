@@ -190,15 +190,35 @@ export const membersData: DtaMember[] = [];
  * allMembers() now fetches from the real backend API.
  * ------------------------------------------------------------------ */
 
-let cachedMembers: DtaMember[] | null = null;
-let cacheKey = "";
+const STORAGE_KEY = "dta-members";
+
+/** Lần xem sau dựng ngay lưới logo/Danh bạ từ bản đã lưu, không chờ API (tránh nhảy bố cục khi cuộn tới). */
+function readStored(): DtaMember[] | null {
+  try {
+    return JSON.parse(localStorage.getItem(STORAGE_KEY) ?? "null");
+  } catch {
+    return null;
+  }
+}
+
+let cachedMembers: DtaMember[] | null = readStored();
+let cacheKey = cachedMembers ? JSON.stringify(cachedMembers) : "";
+/** Nhiều section gọi cùng lúc → dùng chung 1 request. */
+let inflight: Promise<DtaMember[]> | null = null;
 
 export function allMembers(): DtaMember[] {
   return cachedMembers ?? membersData;
 }
 
 /** Fetch members from the backend and update the cache. Called by components. */
-export async function loadMembersFromApi(): Promise<DtaMember[]> {
+export function loadMembersFromApi(): Promise<DtaMember[]> {
+  inflight ??= fetchMembersFromApi().finally(() => {
+    inflight = null;
+  });
+  return inflight;
+}
+
+async function fetchMembersFromApi(): Promise<DtaMember[]> {
   try {
     const res = await fetch("/api/news/members");
     if (!res.ok) return cachedMembers ?? membersData;
@@ -238,6 +258,11 @@ export async function loadMembersFromApi(): Promise<DtaMember[]> {
     if (key !== cacheKey) {
       cacheKey = key;
       cachedMembers = members;
+      try {
+        localStorage.setItem(STORAGE_KEY, key);
+      } catch {
+        /* hết quota / chế độ ẩn danh — chỉ mất phần dựng sẵn */
+      }
     }
     return members;
   } catch {
