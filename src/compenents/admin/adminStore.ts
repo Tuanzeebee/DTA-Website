@@ -357,3 +357,23 @@ export function articleOrigin(id: string): "mock" | "admin" {
 /** Generate a temporary client-side ID. */
 export const newArticleId = () =>
   `adm-${Date.now().toString(36)}${Math.random().toString(36).slice(2, 5)}`;
+
+/* ---------------- member review queue ---------------- */
+
+export const PENDING_CHANGED = "dta-member-review-changed";
+
+/** Số bài hội viên chờ duyệt — badge ở sidebar. */
+export function usePendingMemberPosts(enabled: boolean): number {
+  const [count, setCount] = useState(0);
+  useEffect(() => {
+    if (!enabled) return;
+    const load = () =>
+      adminFetchArticles({ fromMembers: true, status: "DRAFT", pageSize: 1 })
+        .then((r) => setCount(r.total))
+        .catch(() => {});
+    load();
+    window.addEventListener(PENDING_CHANGED, load);
+    return () => window.removeEventListener(PENDING_CHANGED, load);
+  }, [enabled]);
+  return count;
+}

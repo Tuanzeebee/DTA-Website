@@ -50,7 +50,7 @@ export function CharterModal({ lang, onClose }: CharterModalProps) {
         {/* Modal Header */}
         <div className="p-6 border-b border-white/10 flex justify-between items-center bg-white/5 shrink-0">
           <div>
-            <span className="text-[10px] font-black uppercase text-accent tracking-widest">
+            <span className="text-xs font-black uppercase text-accent tracking-widest">
               {vn ? "Văn bản minh bạch công khai" : "Transparent Official Bill"}
             </span>
             <h3 className="text-lg font-black text-white uppercase tracking-wide mt-1">
@@ -58,7 +58,7 @@ export function CharterModal({ lang, onClose }: CharterModalProps) {
                 ? "Điều lệ Hiệp hội (Chính thức)"
                 : "DTA Official Association Charter"}
             </h3>
-            <p className="text-[11px] text-muted-foreground mt-1">
+            <p className="text-xs text-muted-foreground mt-1">
               {vn
                 ? "Kèm theo QĐ số 3189/QĐ-UBND ngày 20/7/2026 của Chủ tịch UBND TP Đà Nẵng · Thông qua 28/03/2026 · 08 chương, 29 điều"
                 : "Attached to Decision 3189/QD-UBND dated 20/07/2026 · Adopted 28/03/2026 · 08 chapters, 29 articles"}
@@ -88,7 +88,7 @@ export function CharterModal({ lang, onClose }: CharterModalProps) {
                 ? "Điều lệ Hiệp hội Công nghệ số thành phố Đà Nẵng"
                 : "Charter of Danang Digital Technology Association"}
             </p>
-            <p className="text-[11px] text-muted-foreground/80 mt-2 leading-relaxed">
+            <p className="text-xs text-muted-foreground/80 mt-2 leading-relaxed">
               {vn
                 ? "Được Đại hội Đại biểu bất thường Hiệp hội Doanh nghiệp phần mềm TP Đà Nẵng NK 2023–2028 thông qua ngày 28/03/2026; thay thế Điều lệ kèm QĐ 5245/QĐ-UBND ngày 13/07/2010."
                 : "Adopted 28/03/2026 by the Extraordinary Congress (2023–2028); replacing the charter attached to Decision 5245/QD-UBND dated 13/07/2010."}
@@ -277,7 +277,7 @@ export function CharterModal({ lang, onClose }: CharterModalProps) {
             </Item>
           </div>
 
-          <p className="text-[11px] leading-relaxed border-t border-white/5 pt-4 flex items-start gap-2">
+          <p className="text-xs leading-relaxed border-t border-white/5 pt-4 flex items-start gap-2">
             <FileText className="w-4 h-4 text-accent shrink-0 mt-0.5" />
             <span>
               {vn

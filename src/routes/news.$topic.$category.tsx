@@ -219,7 +219,7 @@ function CategoryPage() {
   const { lang } = useLang();
   const { topic: topicSlug, category: categorySlug } = Route.useParams();
   const search = Route.useSearch();
-  const { data: topics } = useTopics();
+  const { data: topics, isLoading: topicsLoading } = useTopics();
 
   const topic = topics?.find((t) => t.slug === topicSlug);
   const category = topic?.categories.find((c) => c.slug === categorySlug);
@@ -233,6 +233,18 @@ function CategoryPage() {
     pageSize: 6,
   });
 
+  // Ctrl+F5 xoá cache: chờ danh sách chủ đề tải xong rồi mới kết luận 404.
+  if (topicsLoading) {
+    return (
+      <div className="animate-pulse space-y-4 lg:w-1/2">
+        <div className="h-3 w-48 bg-white/10 rounded" />
+        <div className="h-8 w-64 bg-white/10 rounded" />
+        {Array.from({ length: 4 }).map((_, i) => (
+          <div key={i} className="h-20 bg-white/5 rounded-xl" />
+        ))}
+      </div>
+    );
+  }
   if (!topic || !category) throw notFound();
 
   const flags = [...articleFlags];

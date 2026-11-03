@@ -83,14 +83,14 @@ function MemberCard({
         <h4 className="font-bold text-sm text-white tracking-wide truncate">
           {org.name}
         </h4>
-        <p className="text-[10px] text-muted-foreground mt-0.5 uppercase leading-none font-semibold font-mono tracking-wider">
+        <p className="text-xs text-muted-foreground mt-0.5 uppercase leading-none font-semibold font-mono tracking-wider">
           {initials} · {typeLabel}
         </p>
-        <p className="text-[11px] text-accent/80 truncate mt-1.5 leading-none">
+        <p className="text-xs text-accent/80 truncate mt-1.5 leading-none">
           {org.domain}
         </p>
         {org.strengths && (
-          <p className="text-[11px] text-white/50 truncate mt-1.5 leading-none">
+          <p className="text-xs text-white/50 truncate mt-1.5 leading-none">
             {org.strengths}
           </p>
         )}
@@ -199,13 +199,33 @@ export function MembersDirectorySection({ lang }: { lang: Lang }) {
     [members],
   );
 
-  const [track1, track2] = useMemo(
-    () => [
-      [...sliderOrganizations, ...sliderOrganizations],
-      [...sliderOrganizations, ...sliderOrganizations].reverse(),
-    ],
-    [sliderOrganizations],
-  );
+  // Mỗi hội viên chỉ xuất hiện ở 1 hàng; ít hội viên thì gom 1 hàng cho đủ dài.
+  const [row1, row2] = useMemo(() => {
+    const n = sliderOrganizations.length;
+    const half = n >= 12 ? Math.ceil(n / 2) : n;
+    return [sliderOrganizations.slice(0, half), sliderOrganizations.slice(half)];
+  }, [sliderOrganizations]);
+
+  // Marquee cần nhân đôi để chạy vòng liền mạch; bản sao ẩn khỏi trình đọc màn hình & Tab.
+  const renderTrack = (orgs: SliderOrg[]) =>
+    [0, 1].flatMap((copy) =>
+      orgs.map((org) => (
+        <div
+          key={`${org.id}-${copy}`}
+          className="shrink-0"
+          aria-hidden={copy === 1 || undefined}
+          inert={copy === 1}
+        >
+          <MemberCard
+            org={org}
+            lang={lang}
+            onOpen={() =>
+              setSelected(members.find((m) => m.id === org.id) ?? null)
+            }
+          />
+        </div>
+      )),
+    );
 
   return (
     <section id="members" className="py-20 md:py-28 relative overflow-hidden">
@@ -261,31 +281,15 @@ export function MembersDirectorySection({ lang }: { lang: Lang }) {
       <div className="relative z-10 my-12 overflow-hidden py-4 select-none w-full [mask-image:linear-gradient(90deg,transparent,black_6%,black_94%,transparent)]">
         {/* Row 1: Left sliding */}
         <div className="flex gap-5 animate-marquee [animation-duration:70s] mb-5 py-2">
-          {track1.map((org, idx) => (
-            <MemberCard
-              key={`${org.id}-t1-${idx}`}
-              org={org}
-              lang={lang}
-              onOpen={() =>
-                setSelected(members.find((m) => m.id === org.id) ?? null)
-              }
-            />
-          ))}
+          {renderTrack(row1)}
         </div>
 
         {/* Row 2: Right sliding */}
-        <div className="flex gap-5 animate-marquee-reverse [animation-duration:70s] py-2">
-          {track2.map((org, idx) => (
-            <MemberCard
-              key={`${org.id}-t2-${idx}`}
-              org={org}
-              lang={lang}
-              onOpen={() =>
-                setSelected(members.find((m) => m.id === org.id) ?? null)
-              }
-            />
-          ))}
-        </div>
+        {row2.length > 0 && (
+          <div className="flex gap-5 animate-marquee-reverse [animation-duration:70s] py-2">
+            {renderTrack(row2)}
+          </div>
+        )}
       </div>
 
       <MemberDetailDialog

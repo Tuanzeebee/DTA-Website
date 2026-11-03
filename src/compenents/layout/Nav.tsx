@@ -116,7 +116,7 @@ export function Nav({ lang, toggleLang, isLoggedIn, role }: NavProps) {
               onClick={toggleLang}
               /* min-h-9 / min-w-11: below lg this is a real touch target rather
                than the 20px-tall pill it used to be. */
-              className="px-2.5 min-h-9 lg:min-h-0 lg:py-1 rounded-md text-[10px] font-bold text-gray-700 border border-gray-300 hover:border-green-500 hover:text-green-600 hover:bg-green-50 active:scale-95 transition-all flex items-center justify-center gap-1 cursor-pointer shrink-0 whitespace-nowrap font-['Be_Vietnam_Pro']"
+              className="px-2.5 min-h-9 lg:min-h-0 lg:py-1 rounded-md text-xs font-bold text-gray-700 border border-gray-300 hover:border-green-500 hover:text-green-600 hover:bg-green-50 active:scale-95 transition-all flex items-center justify-center gap-1 cursor-pointer shrink-0 whitespace-nowrap font-['Be_Vietnam_Pro']"
               id="lang-toggle-btn"
               aria-label={
                 lang === "vn" ? "Chuyển sang tiếng Anh" : "Switch to Vietnamese"
@@ -143,7 +143,7 @@ export function Nav({ lang, toggleLang, isLoggedIn, role }: NavProps) {
             ) : (
               <Link
                 to="/portal/dang-ky"
-                className="hidden lg:block px-4 py-1.5 rounded-full text-xs font-bold text-primary-foreground hover:opacity-90 active:scale-95 transition-all duration-300 cursor-pointer whitespace-nowrap shrink-0"
+                className="hidden sm:block px-4 py-1.5 rounded-full text-xs font-bold text-primary-foreground hover:opacity-90 active:scale-95 transition-all duration-300 cursor-pointer whitespace-nowrap shrink-0"
                 style={{
                   background: "var(--gradient-primary)",
                   boxShadow: "var(--shadow-glow)",

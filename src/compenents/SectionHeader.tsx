@@ -13,7 +13,7 @@ export function SectionHeader({
   return (
     <ScrollReveal className="max-w-3xl mb-10 md:mb-14">
       {eyebrow && (
-        <div className="text-[10px] md:text-xs tracking-[0.2em] md:tracking-[0.25em] font-bold text-accent uppercase mb-3 md:mb-4 leading-relaxed">
+        <div className="text-xs tracking-[0.2em] md:tracking-[0.25em] font-bold text-accent uppercase mb-3 md:mb-4 leading-relaxed">
           {eyebrow}
         </div>
       )}

@@ -48,7 +48,8 @@ function AdminOverview() {
         topic: t,
         count: articles.filter((a) => a.topic === t.slug).length,
       })),
-      recent: [...articles].slice(-5).reverse(),
+      // loadArticles đã sắp mới → cũ: lấy 5 bài ĐẦU (slice(-5) ra 5 bài cũ nhất).
+      recent: articles.slice(0, 5),
     };
   }, [articles, memberCount]);
 

@@ -15,8 +15,10 @@ import {
   Megaphone,
   UserCog,
   Images,
+  ClipboardCheck,
 } from "lucide-react";
 import { forumStore, applicationStore } from "@/compenents/admin/opsData";
+import { usePendingMemberPosts } from "@/compenents/admin/adminStore";
 import { useAuthSession, useLogout } from "@/lib/auth/useAuth";
 import {
   ROLE_LABEL,
@@ -136,6 +138,13 @@ const NAV: NavItem[] = [
     exact: false,
   },
   {
+    to: "/admin/duyet-bai",
+    section: "review",
+    label: "Duyệt bài hội viên",
+    icon: ClipboardCheck,
+    exact: false,
+  },
+  {
     to: "/admin/quang-cao",
     section: "ads",
     label: "Thêm quảng cáo",
@@ -211,7 +220,9 @@ function Sidebar() {
   const pendingApps = applicationStore
     .useItems()
     .filter((a) => a.status === "pending").length;
+  const pendingPosts = usePendingMemberPosts(canAccess(role, "review"));
   const badges: Record<string, number> = {
+    "/admin/duyet-bai": pendingPosts,
     "/admin/phan-bien": pendingForum,
     "/admin/dang-ky": pendingApps,
   };

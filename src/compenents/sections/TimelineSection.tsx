@@ -1,6 +1,5 @@
-import { toast } from "sonner";
 import { Link } from "@tanstack/react-router";
-import { FileText, Calendar, Download, ArrowUpRight } from "lucide-react";
+import { FileText, Calendar, ArrowUpRight } from "lucide-react";
 import { SectionBackground } from "@/compenents/SectionBackground";
 import { seamTint } from "@/compenents/seamTint";
 import {
@@ -141,7 +140,7 @@ export function TimelineSection({ lang }: { lang: Lang }) {
               ) : (
                 news.map((item, idx) => (
                 <StaggerItem key={item.title.vn}>
-                  <div className="card-surface card-solid rounded-3xl flex overflow-hidden group relative transition-all duration-300 hover:border-accent/40 hover:-translate-y-0.5">
+                  <div className="card-surface card-solid rounded-3xl flex flex-col sm:flex-row overflow-hidden group relative transition-all duration-300 hover:border-accent/40 hover:-translate-y-0.5">
                     <Link
                       to="/news/article/$slug"
                       params={{ slug: newsSlugs[idx] }}
@@ -149,7 +148,7 @@ export function TimelineSection({ lang }: { lang: Lang }) {
                       className="absolute inset-0 z-[1] rounded-3xl"
                     />
                     {/* News Image Metadata */}
-                    <div className="w-28 h-auto shrink-0 relative overflow-hidden hidden sm:block">
+                    <div className="w-full h-36 sm:w-28 sm:h-auto shrink-0 relative overflow-hidden">
                       <img
                         src={item.image}
                         alt={item.title[lang]}
@@ -161,10 +160,10 @@ export function TimelineSection({ lang }: { lang: Lang }) {
                     <div className="p-5 flex-1 flex flex-col justify-between">
                       <div>
                         <div className="flex items-center justify-between gap-2 mb-3">
-                          <span className="px-2.5 py-1 rounded-md text-[9px] font-bold bg-accent/10 text-accent uppercase tracking-wider">
+                          <span className="px-2.5 py-1 rounded-md text-xs font-bold bg-accent/10 text-accent uppercase tracking-wider">
                             {item.category[lang]}
                           </span>
-                          <span className="text-[10px] text-muted-foreground font-mono">
+                          <span className="text-xs text-muted-foreground font-mono">
                             {item.date}
                           </span>
                         </div>
@@ -176,36 +175,12 @@ export function TimelineSection({ lang }: { lang: Lang }) {
                         </p>
                       </div>
                       <div className="mt-4 pt-3 border-t border-white/5 flex items-center justify-between gap-3">
-                        <span className="text-[10px] uppercase font-bold text-white/40 group-hover:text-accent transition-colors duration-300 flex items-center gap-1 pointer-events-none">
+                        <span className="text-xs uppercase font-bold text-white/40 group-hover:text-accent transition-colors duration-300 flex items-center gap-1 pointer-events-none">
                           <span>
                             {lang === "vn" ? "Đọc bài viết" : "Read article"}
                           </span>
                           <ArrowUpRight className="w-3 h-3" />
                         </span>
-                        <button
-                          onClick={() => {
-                            toast.info(
-                              lang === "vn"
-                                ? "Đang tải tài liệu nội bộ..."
-                                : "Downloading resource...",
-                            );
-                            setTimeout(() => {
-                              toast.success(
-                                lang === "vn"
-                                  ? "Tải xuống hoàn tất!"
-                                  : "Download complete!",
-                              );
-                            }, 1500);
-                          }}
-                          className="relative z-[2] text-[10px] uppercase font-bold text-cyan-400 flex items-center gap-1 cursor-pointer hover:underline"
-                        >
-                          <Download className="w-3 h-3" />
-                          <span>
-                            {lang === "vn"
-                              ? "Tải Ấn phẩm (PDF)"
-                              : "Download PDF"}
-                          </span>
-                        </button>
                       </div>
                     </div>
                   </div>
@@ -238,7 +213,7 @@ export function TimelineSection({ lang }: { lang: Lang }) {
                     <Link
                       to="/news/$topic"
                       params={{ topic: topicSlug }}
-                      className="text-[10px] uppercase font-bold text-white/50 hover:text-accent transition-colors flex items-center gap-1"
+                      className="text-xs uppercase font-bold text-accent hover:text-white transition-colors flex items-center gap-1"
                     >
                       {lang === "vn" ? "Xem tất cả" : "View all"}
                       <ArrowUpRight className="w-3 h-3" />
@@ -274,7 +249,7 @@ export function TimelineSection({ lang }: { lang: Lang }) {
                       />
                       {isEvent && event.status && (
                         <div className="absolute top-3 left-3 md:hidden">
-                          <span className={`px-2.5 py-1 backdrop-blur text-[8px] font-black uppercase tracking-widest rounded-lg border ${EVENT_STATUS_CLASS[event.status]}`}>
+                          <span className={`px-2.5 py-1 backdrop-blur text-xs font-black uppercase tracking-widest rounded-lg border ${EVENT_STATUS_CLASS[event.status]}`}>
                             {EVENT_STATUS_LABEL[event.status][lang]}
                           </span>
                         </div>
@@ -284,7 +259,7 @@ export function TimelineSection({ lang }: { lang: Lang }) {
                     <div className="p-5 md:p-6 flex-1 relative flex flex-col justify-between">
                       {isEvent && event.status && (
                         <div className="absolute top-0 right-0 hidden md:block">
-                          <span className={`px-3 py-1 text-[8px] font-black uppercase tracking-widest rounded-bl-xl border-l border-b ${EVENT_STATUS_CLASS[event.status]}`}>
+                          <span className={`px-3 py-1 text-xs font-black uppercase tracking-widest rounded-bl-xl border-l border-b ${EVENT_STATUS_CLASS[event.status]}`}>
                             {EVENT_STATUS_LABEL[event.status][lang]}
                           </span>
                         </div>
@@ -292,12 +267,12 @@ export function TimelineSection({ lang }: { lang: Lang }) {
                       <div className="flex items-start gap-4">
                         {/* Calendar Date Block */}
                         <div className="p-3 rounded-xl bg-white/5 border border-white/10 flex flex-col items-center justify-center text-center shrink-0 min-w-[70px]">
-                          <span className="text-[10px] font-bold text-accent font-mono">
-                            {event.date.split("/")[2]}
-                          </span>
-                          <span className="text-base font-black text-white font-mono mt-0.5">
+                          <span className="text-base font-black text-white font-mono">
                             {event.date.split("/")[0]}/
                             {event.date.split("/")[1]}
+                          </span>
+                          <span className="text-xs font-bold text-accent font-mono mt-0.5">
+                            {event.date.split("/")[2]}
                           </span>
                         </div>
                         <div>
@@ -327,23 +302,7 @@ export function TimelineSection({ lang }: { lang: Lang }) {
                             </p>
                           )}
                           <div className="mt-4 flex items-center gap-4">
-                            {isEvent && event.status === "upcoming" && (
-                            <button
-                              onClick={() => {
-                                toast.success(
-                                  lang === "vn"
-                                    ? "Đăng ký thành công! Vé tham dự điện tử đã gửi tới Email của bạn."
-                                    : "Registered successfully! Ticket sent to email.",
-                                );
-                              }}
-                              className="relative z-[2] px-4 py-1.5 rounded-full text-[10px] font-bold border border-white/10 hover:bg-white/10 active:scale-95 transition-all duration-200 text-white cursor-pointer"
-                            >
-                              {lang === "vn"
-                                ? "Đăng ký Tham gia"
-                                : "Register Now"}
-                            </button>
-                            )}
-                            <span className="text-[10px] uppercase font-bold text-white/40 group-hover:text-accent transition-colors duration-300 flex items-center gap-1 pointer-events-none">
+                            <span className="text-xs uppercase font-bold text-white/40 group-hover:text-accent transition-colors duration-300 flex items-center gap-1 pointer-events-none">
                               <span>
                                 {lang === "vn" ? "Xem chi tiết" : "Details"}
                               </span>

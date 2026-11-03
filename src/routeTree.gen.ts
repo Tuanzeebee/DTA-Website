@@ -17,6 +17,7 @@ import { Route as PortalRouteImport } from './routes/portal'
 import { Route as ThuVienAnhRouteImport } from './routes/thu-vien-anh'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AdminDangKyRouteImport } from './routes/admin.dang-ky'
+import { Route as AdminDuyetBaiRouteImport } from './routes/admin.duyet-bai'
 import { Route as AdminHoiPhiRouteImport } from './routes/admin.hoi-phi'
 import { Route as AdminHoiVienRouteImport } from './routes/admin.hoi-vien'
 import { Route as AdminNguoiDungRouteImport } from './routes/admin.nguoi-dung'
@@ -73,6 +74,11 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
 const AdminDangKyRoute = AdminDangKyRouteImport.update({
   id: '/dang-ky',
   path: '/dang-ky',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminDuyetBaiRoute = AdminDuyetBaiRouteImport.update({
+  id: '/duyet-bai',
+  path: '/duyet-bai',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminHoiPhiRoute = AdminHoiPhiRouteImport.update({
@@ -169,6 +175,7 @@ export interface FileRoutesByFullPath {
   '/portal': typeof PortalRouteWithChildren
   '/thu-vien-anh': typeof ThuVienAnhRoute
   '/admin/dang-ky': typeof AdminDangKyRoute
+  '/admin/duyet-bai': typeof AdminDuyetBaiRoute
   '/admin/hoi-phi': typeof AdminHoiPhiRoute
   '/admin/hoi-vien': typeof AdminHoiVienRoute
   '/admin/nguoi-dung': typeof AdminNguoiDungRoute
@@ -193,6 +200,7 @@ export interface FileRoutesByTo {
   '/dang-nhap': typeof DangNhapRoute
   '/thu-vien-anh': typeof ThuVienAnhRoute
   '/admin/dang-ky': typeof AdminDangKyRoute
+  '/admin/duyet-bai': typeof AdminDuyetBaiRoute
   '/admin/hoi-phi': typeof AdminHoiPhiRoute
   '/admin/hoi-vien': typeof AdminHoiVienRoute
   '/admin/nguoi-dung': typeof AdminNguoiDungRoute
@@ -221,6 +229,7 @@ export interface FileRoutesById {
   '/portal': typeof PortalRouteWithChildren
   '/thu-vien-anh': typeof ThuVienAnhRoute
   '/admin/dang-ky': typeof AdminDangKyRoute
+  '/admin/duyet-bai': typeof AdminDuyetBaiRoute
   '/admin/hoi-phi': typeof AdminHoiPhiRoute
   '/admin/hoi-vien': typeof AdminHoiVienRoute
   '/admin/nguoi-dung': typeof AdminNguoiDungRoute
@@ -250,6 +259,7 @@ export interface FileRouteTypes {
     | '/portal'
     | '/thu-vien-anh'
     | '/admin/dang-ky'
+    | '/admin/duyet-bai'
     | '/admin/hoi-phi'
     | '/admin/hoi-vien'
     | '/admin/nguoi-dung'
@@ -274,6 +284,7 @@ export interface FileRouteTypes {
     | '/dang-nhap'
     | '/thu-vien-anh'
     | '/admin/dang-ky'
+    | '/admin/duyet-bai'
     | '/admin/hoi-phi'
     | '/admin/hoi-vien'
     | '/admin/nguoi-dung'
@@ -301,6 +312,7 @@ export interface FileRouteTypes {
     | '/portal'
     | '/thu-vien-anh'
     | '/admin/dang-ky'
+    | '/admin/duyet-bai'
     | '/admin/hoi-phi'
     | '/admin/hoi-vien'
     | '/admin/nguoi-dung'
@@ -386,6 +398,13 @@ declare module '@tanstack/react-router' {
       path: '/dang-ky'
       fullPath: '/admin/dang-ky'
       preLoaderRoute: typeof AdminDangKyRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/duyet-bai': {
+      id: '/admin/duyet-bai'
+      path: '/duyet-bai'
+      fullPath: '/admin/duyet-bai'
+      preLoaderRoute: typeof AdminDuyetBaiRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/hoi-phi': {
@@ -512,6 +531,7 @@ declare module '@tanstack/react-router' {
 
 interface AdminRouteChildren {
   AdminDangKyRoute: typeof AdminDangKyRoute
+  AdminDuyetBaiRoute: typeof AdminDuyetBaiRoute
   AdminHoiPhiRoute: typeof AdminHoiPhiRoute
   AdminHoiVienRoute: typeof AdminHoiVienRoute
   AdminNguoiDungRoute: typeof AdminNguoiDungRoute
@@ -526,6 +546,7 @@ interface AdminRouteChildren {
 
 const AdminRouteChildren: AdminRouteChildren = {
   AdminDangKyRoute: AdminDangKyRoute,
+  AdminDuyetBaiRoute: AdminDuyetBaiRoute,
   AdminHoiPhiRoute: AdminHoiPhiRoute,
   AdminHoiVienRoute: AdminHoiVienRoute,
   AdminNguoiDungRoute: AdminNguoiDungRoute,

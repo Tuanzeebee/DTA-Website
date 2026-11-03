@@ -18,7 +18,7 @@ export function Footer({ lang }: { lang: Lang }) {
               <span className="text-xs font-black tracking-wider leading-none">
                 DTA DANANG
               </span>
-              <span className="text-[8px] font-semibold text-muted-foreground mt-0.5 uppercase tracking-normal">
+              <span className="text-xs font-semibold text-muted-foreground mt-0.5 uppercase tracking-normal">
                 {lang === "vn"
                   ? "Hiệp hội Công nghệ số Đà Nẵng"
                   : "Danang Digital Technology Association"}
@@ -30,7 +30,7 @@ export function Footer({ lang }: { lang: Lang }) {
               ? "DTA là tổ chức xã hội - nghề nghiệp tự nguyện đại diện tiếng nói của hàng trăm tổ chức, chuyên gia công nghệ số Đà Nẵng."
               : "DTA is a voluntary social-professional association representing hundreds of digital technology enterprises and specialists in Danang City."}
           </p>
-          <p className="text-[10px] font-medium text-muted-foreground/60">
+          <p className="text-xs font-medium text-muted-foreground/60">
             © 2026 Danang Digital Technology Association (DTA). All rights
             reserved.
           </p>
@@ -40,7 +40,7 @@ export function Footer({ lang }: { lang: Lang }) {
           <div className="font-bold text-white uppercase tracking-wider mb-3">
             {lang === "vn" ? "Liên hệ Trụ sở" : "Contact HQ"}
           </div>
-          <ul className="space-y-3 text-[11px]">
+          <ul className="space-y-3 text-xs">
             <li className="flex items-start gap-1.5 leading-tight">
               <MapPin className="w-3.5 h-3.5 text-accent shrink-0 mt-0.5" />
               <span>
@@ -70,7 +70,7 @@ export function Footer({ lang }: { lang: Lang }) {
           <div className="font-bold text-white uppercase tracking-wider mb-3">
             {lang === "vn" ? "Cơ quan Quản lý" : "Regulatory Bodies"}
           </div>
-          <ul className="space-y-2 text-[11px] leading-relaxed">
+          <ul className="space-y-2 text-xs leading-relaxed">
             <li>
               •{" "}
               {lang === "vn"
@@ -94,7 +94,7 @@ export function Footer({ lang }: { lang: Lang }) {
       </div>
 
       {/* Thông tin giấy phép Trang TTĐT tổng hợp (bắt buộc theo giấy phép). */}
-      <div className="max-w-6xl mx-auto mt-10 pt-6 border-t border-white/10 text-[11px] text-muted-foreground leading-relaxed space-y-1">
+      <div className="max-w-6xl mx-auto mt-10 pt-6 border-t border-white/10 text-xs text-muted-foreground leading-relaxed space-y-1">
         <p>
           {lang === "vn"
             ? "Cung cấp thông tin lên Internet theo Giấy phép Thiết lập Trang Thông tin điện tử tổng hợp số 1337, ngày 07 tháng 08 năm 2026 của Sở Văn hóa – Thể thao và Du lịch thành phố Đà Nẵng."

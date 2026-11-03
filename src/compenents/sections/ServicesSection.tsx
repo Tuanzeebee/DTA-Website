@@ -54,7 +54,7 @@ export function ServicesSection({ lang }: { lang: Lang }) {
               <div className="card-flow rounded-3xl p-6 h-full flex flex-col justify-between">
                 <div>
                   <PillarIcon idx={idx} />
-                  <div className="text-[10px] tracking-[0.25em] font-black text-accent mb-2 uppercase">
+                  <div className="text-xs tracking-[0.25em] font-black text-accent mb-2 uppercase">
                     {c.tag}
                   </div>
                   <div className="text-lg font-bold text-white mb-2 leading-tight">
@@ -75,7 +75,7 @@ export function ServicesSection({ lang }: { lang: Lang }) {
         <ScrollReveal>
           <div className="card-surface rounded-3xl p-6 md:p-8 grid md:grid-cols-[auto_1fr] gap-4 md:gap-10 items-center">
             <div>
-              <div className="text-[10px] tracking-[0.25em] font-black text-muted-foreground uppercase">
+              <div className="text-xs tracking-[0.25em] font-black text-muted-foreground uppercase">
                 {lang === "vn"
                   ? "Vì cộng đồng - Dân chủ - Minh bạch"
                   : "Democratic & Transparent"}

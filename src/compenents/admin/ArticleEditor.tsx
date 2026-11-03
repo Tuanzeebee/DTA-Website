@@ -57,12 +57,25 @@ function toLocalInput(iso?: string | null): string {
  * preview pane renders through the SAME ArticleBody component the article
  * page uses — what the editor sees is exactly what publishes.
  */
+/** Bài hội viên luôn nằm ở đây — backend cũng ép, editor chỉ ẩn lựa chọn. */
+const MEMBER_TOPIC = "hoi-vien";
+const MEMBER_CATEGORY = "tin-doanh-nghiep";
+
 export function ArticleEditor({
   initial,
   onSave,
+  member = false,
+  defaultAuthor = "DTA News",
 }: {
   initial?: PortalArticle;
   onSave: (article: PortalArticle, publish: boolean) => void;
+  /**
+   * Chế độ hội viên (Không gian số): cố định chuyên mục Tin doanh nghiệp, ẩn
+   * ngày đăng/tags/PDF/lịch sự kiện, chỉ có nút "Gửi bài chờ duyệt".
+   */
+  member?: boolean;
+  /** Tên tác giả hiển thị khi ô Tác giả để trống. */
+  defaultAuthor?: string;
 }) {
   const [topicsReady, setTopicsReady] = useState(mainTopics.length > 0);
 
@@ -90,10 +103,12 @@ export function ArticleEditor({
   const [title, setTitle] = useState(initial?.title ?? "");
   const [summary, setSummary] = useState(initial?.summary ?? "");
   const [topicSlug, setTopicSlug] = useState(
-    initial?.topic ?? mainTopics[0]?.slug ?? "",
+    member ? MEMBER_TOPIC : (initial?.topic ?? mainTopics[0]?.slug ?? ""),
   );
   const [categorySlug, setCategorySlug] = useState(
-    initial?.category ?? mainTopics[0]?.categories?.[0]?.slug ?? "",
+    member
+      ? MEMBER_CATEGORY
+      : (initial?.category ?? mainTopics[0]?.categories?.[0]?.slug ?? ""),
   );
   const [date, setDate] = useState(initial?.date ?? todayVn());
   const [author, setAuthor] = useState(initial?.author ?? "");
@@ -126,7 +141,7 @@ export function ArticleEditor({
       toast.error("Tiêu đề cần ít nhất 3 ký tự (server yêu cầu).");
       return null;
     }
-    if (!topicsReady || !topic?.slug || !categorySlug) {
+    if (!member && (!topicsReady || !topic?.slug || !categorySlug)) {
       toast.error(
         "Danh mục chưa tải xong — đợi 1-2 giây cho Chủ đề/Chuyên mục hiện rồi thử lại.",
       );
@@ -158,11 +173,12 @@ export function ArticleEditor({
       id: initial?.id ?? newArticleId(),
       title: title.trim(),
       summary: summary.trim(),
-      topic: topic?.slug ?? "",
-      category:
-        topic?.categories?.find((c) => c.slug === categorySlug)?.slug ??
-        topic?.categories?.[0]?.slug ??
-        "",
+      topic: member ? MEMBER_TOPIC : (topic?.slug ?? ""),
+      category: member
+        ? MEMBER_CATEGORY
+        : (topic?.categories?.find((c) => c.slug === categorySlug)?.slug ??
+          topic?.categories?.[0]?.slug ??
+          ""),
       date: date.trim() || todayVn(),
       publishedAt: date.trim() === initial?.date ? initial.publishedAt : undefined,
       image: image.trim() || "",
@@ -248,22 +264,37 @@ export function ArticleEditor({
           >
             <FileDown className="w-3.5 h-3.5" /> Xuất PDF
           </button>
-          <button
-            onClick={() => submit(false)}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-xl border border-white/10 bg-white/[0.03] text-xs font-bold text-white/80 hover:text-white hover:border-white/25 transition-colors cursor-pointer"
-          >
-            <Save className="w-3.5 h-3.5" /> Lưu nháp
-          </button>
-          <button
-            onClick={() => submit(true)}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold text-primary-foreground hover:opacity-90 active:scale-98 transition-all cursor-pointer"
-            style={{
-              background: "var(--gradient-primary)",
-              boxShadow: "var(--shadow-glow)",
-            }}
-          >
-            <Send className="w-3.5 h-3.5" /> Xuất bản
-          </button>
+          {member ? (
+            <button
+              onClick={() => submit(false)}
+              className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold text-primary-foreground hover:opacity-90 active:scale-98 transition-all cursor-pointer"
+              style={{
+                background: "var(--gradient-primary)",
+                boxShadow: "var(--shadow-glow)",
+              }}
+            >
+              <Send className="w-3.5 h-3.5" /> Gửi bài chờ duyệt
+            </button>
+          ) : (
+            <>
+              <button
+                onClick={() => submit(false)}
+                className="flex items-center gap-1.5 px-4 py-2 rounded-xl border border-white/10 bg-white/[0.03] text-xs font-bold text-white/80 hover:text-white hover:border-white/25 transition-colors cursor-pointer"
+              >
+                <Save className="w-3.5 h-3.5" /> Lưu nháp
+              </button>
+              <button
+                onClick={() => submit(true)}
+                className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold text-primary-foreground hover:opacity-90 active:scale-98 transition-all cursor-pointer"
+                style={{
+                  background: "var(--gradient-primary)",
+                  boxShadow: "var(--shadow-glow)",
+                }}
+              >
+                <Send className="w-3.5 h-3.5" /> Xuất bản
+              </button>
+            </>
+          )}
         </div>
       </div>
 
@@ -289,62 +320,81 @@ export function ArticleEditor({
             />
           </Field>
 
-          <div className="grid sm:grid-cols-2 gap-4">
-            <Field label="Chủ đề chính">
-              <select
-                value={topicSlug}
-                onChange={(e) => {
-                  const t = mainTopics.find((x) => x.slug === e.target.value);
-                  setTopicSlug(e.target.value);
-                  if (t) setCategorySlug(t.categories[0]?.slug ?? "");
-                }}
-                className={INPUT}
-              >
-                {mainTopics.map((t) => (
-                  <option key={t.slug} value={t.slug}>
-                    {t.name}
-                  </option>
-                ))}
-              </select>
-              {!topicsReady && (
-                <p className="mt-1 text-[10px] text-amber-300/80">
-                  Đang tải danh mục từ server…
-                </p>
-              )}
-            </Field>
-            <Field label="Chuyên mục">
-              <select
-                value={categorySlug}
-                onChange={(e) => setCategorySlug(e.target.value)}
-                className={INPUT}
-              >
-                {topic?.categories?.map((c) => (
-                  <option key={c.slug} value={c.slug}>
-                    {c.name}
-                  </option>
-                ))}
-              </select>
-            </Field>
-          </div>
+          {member ? (
+            <div className="grid sm:grid-cols-2 gap-4">
+              <Field label="Chuyên mục">
+                <p className={`${INPUT} text-white/60`}>Hội viên › Tin doanh nghiệp</p>
+              </Field>
+              <Field label={`Tác giả (trống = ${defaultAuthor})`}>
+                <input
+                  value={author}
+                  onChange={(e) => setAuthor(e.target.value)}
+                  maxLength={200}
+                  placeholder="Ví dụ: Phòng Truyền thông"
+                  className={INPUT}
+                />
+              </Field>
+            </div>
+          ) : (
+            <>
+            <div className="grid sm:grid-cols-2 gap-4">
+              <Field label="Chủ đề chính">
+                <select
+                  value={topicSlug}
+                  onChange={(e) => {
+                    const t = mainTopics.find((x) => x.slug === e.target.value);
+                    setTopicSlug(e.target.value);
+                    if (t) setCategorySlug(t.categories[0]?.slug ?? "");
+                  }}
+                  className={INPUT}
+                >
+                  {mainTopics.map((t) => (
+                    <option key={t.slug} value={t.slug}>
+                      {t.name}
+                    </option>
+                  ))}
+                </select>
+                {!topicsReady && (
+                  <p className="mt-1 text-[10px] text-amber-300/80">
+                    Đang tải danh mục từ server…
+                  </p>
+                )}
+              </Field>
+              <Field label="Chuyên mục">
+                <select
+                  value={categorySlug}
+                  onChange={(e) => setCategorySlug(e.target.value)}
+                  className={INPUT}
+                >
+                  {topic?.categories?.map((c) => (
+                    <option key={c.slug} value={c.slug}>
+                      {c.name}
+                    </option>
+                  ))}
+                </select>
+              </Field>
+            </div>
 
-          <div className="grid sm:grid-cols-2 gap-4">
-            <Field label="Ngày đăng (dd/mm/yyyy)">
-              <input
-                value={date}
-                onChange={(e) => setDate(e.target.value)}
-                className={INPUT}
-              />
-            </Field>
-            <Field label="Tác giả (trống = DTA News)">
-              <input
-                value={author}
-                onChange={(e) => setAuthor(e.target.value)}
-                maxLength={200}
-                placeholder="Ví dụ: Minh Châu"
-                className={INPUT}
-              />
-            </Field>
-          </div>
+            <div className="grid sm:grid-cols-2 gap-4">
+              <Field label="Ngày đăng (dd/mm/yyyy)">
+                <input
+                  value={date}
+                  onChange={(e) => setDate(e.target.value)}
+                  className={INPUT}
+                />
+              </Field>
+              <Field label="Tác giả (trống = DTA News)">
+                <input
+                  value={author}
+                  onChange={(e) => setAuthor(e.target.value)}
+                  maxLength={200}
+                  placeholder="Ví dụ: Minh Châu"
+                  className={INPUT}
+                />
+              </Field>
+            </div>
+            </>
+          )}
 
           <Field label="Ảnh đại diện — dán URL hoặc chọn file từ máy">
             <ImageInput
@@ -354,25 +404,29 @@ export function ArticleEditor({
             />
           </Field>
 
-          <Field label="Tags (phân cách bằng dấu phẩy)">
-            <input
-              value={tags}
-              onChange={(e) => setTags(e.target.value)}
-              placeholder="Chính sách, Vi mạch"
-              className={INPUT}
-            />
-          </Field>
-
-          <div className="grid sm:grid-cols-2 gap-4">
-            <Field label="File PDF đính kèm (URL)">
+          {!member && (
+            <Field label="Tags (phân cách bằng dấu phẩy)">
               <input
-                value={pdfUrl}
-                onChange={(e) => setPdfUrl(e.target.value)}
-                placeholder="/documents/…"
+                value={tags}
+                onChange={(e) => setTags(e.target.value)}
+                placeholder="Chính sách, Vi mạch"
                 className={INPUT}
               />
             </Field>
-            <Field label="Link website hội viên">
+          )}
+
+          <div className="grid sm:grid-cols-2 gap-4">
+            {!member && (
+              <Field label="File PDF đính kèm (URL)">
+                <input
+                  value={pdfUrl}
+                  onChange={(e) => setPdfUrl(e.target.value)}
+                  placeholder="/documents/…"
+                  className={INPUT}
+                />
+              </Field>
+            )}
+            <Field label={member ? "Link website đơn vị / bài gốc" : "Link website hội viên"}>
               <input
                 value={memberUrl}
                 onChange={(e) => setMemberUrl(e.target.value)}
@@ -501,7 +555,7 @@ export function ArticleEditor({
           )}
           <p className="mt-6 text-right text-sm text-white/85 clear-both">
             <span className="text-white/50 font-normal">Tác giả: </span>
-            <span className="font-bold">{author.trim() || "DTA News"}</span>
+            <span className="font-bold">{author.trim() || defaultAuthor}</span>
           </p>
         </div>
       </div>

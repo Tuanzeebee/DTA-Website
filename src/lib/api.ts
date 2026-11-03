@@ -130,6 +130,9 @@ export interface AdminArticleItem {
   eventPostponed?: boolean;
   author: string | null;
   status: string;
+  /** Lý do từ chối (bài hội viên, status ARCHIVED). */
+  reviewNote?: string | null;
+  createdAt?: string;
   updatedAt: string;
   wpId: number | null;
 }
@@ -156,6 +159,7 @@ export function adminFetchArticles(params?: {
   q?: string;
   status?: string;
   mine?: boolean;
+  fromMembers?: boolean;
   topic?: string;
   category?: string;
   page?: number;
@@ -165,6 +169,7 @@ export function adminFetchArticles(params?: {
   if (params?.q) qs.set("q", params.q);
   if (params?.status) qs.set("status", params.status);
   if (params?.mine) qs.set("mine", "true");
+  if (params?.fromMembers) qs.set("fromMembers", "true");
   if (params?.topic) qs.set("topic", params.topic);
   if (params?.category) qs.set("category", params.category);
   if (params?.page && params.page > 1) qs.set("page", String(params.page));
@@ -185,7 +190,8 @@ export function adminCreateArticle(data: {
   publishedAt?: string;
   slug?: string;
   summary?: string;
-  categoryId: number;
+  /** Hội viên bỏ trống — backend luôn xếp vào Tin doanh nghiệp. */
+  categoryId?: number;
   thumbnailUrl?: string;
   sourceUrl?: string;
   rawHtml?: string;
@@ -247,6 +253,18 @@ export function adminPublishArticle(
 ): Promise<AdminArticleDetailResponse> {
   return authFetch(`/admin/news/articles/${encodeURIComponent(id)}/publish`, {
     method: "PATCH",
+  });
+}
+
+/** Từ chối bài hội viên gửi (kèm lý do cho hội viên sửa & gửi lại). */
+export function adminRejectArticle(
+  id: string,
+  note?: string,
+): Promise<AdminArticleDetailResponse> {
+  return authFetch(`/admin/news/articles/${encodeURIComponent(id)}/reject`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ note }),
   });
 }
 

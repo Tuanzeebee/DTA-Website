@@ -10,6 +10,7 @@ import type { AdminRole } from "./types";
 export type AdminSection =
   | "overview"
   | "articles"
+  | "review"
   | "ads"
   | "gallery"
   | "resources"
@@ -32,6 +33,7 @@ export const ROLE_SECTIONS: Record<AdminRole, readonly AdminSection[]> = {
   admin: [
     "overview",
     "articles",
+    "review",
     "ads",
     "gallery",
     "resources",
@@ -41,7 +43,7 @@ export const ROLE_SECTIONS: Record<AdminRole, readonly AdminSection[]> = {
     "fees",
     "users",
   ],
-  editor: ["overview", "articles", "ads", "gallery", "resources", "forum"],
+  editor: ["overview", "articles", "review", "ads", "gallery", "resources", "forum"],
   member: [],
 };
 

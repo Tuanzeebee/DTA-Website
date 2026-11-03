@@ -97,7 +97,7 @@ export function MemberLogosSection({ lang }: { lang: Lang }) {
             <li
               key={`slot-${i}`}
               aria-hidden
-              className="h-24 rounded-2xl border border-dashed border-white/15 bg-white/[0.02] flex items-center justify-center text-[10px] uppercase tracking-widest text-white/25"
+              className="h-24 rounded-2xl border border-dashed border-white/15 bg-white/[0.02] flex items-center justify-center text-xs uppercase tracking-widest text-white/25"
             >
               {lang === "vn" ? "Logo hội viên" : "Member logo"}
             </li>

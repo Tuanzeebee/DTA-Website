@@ -71,12 +71,12 @@ export function Hero({ lang }: { lang: Lang }) {
           <ScrollReveal className="max-w-3xl">
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold glass mb-6 border border-white/5">
               <span className="w-2 h-2 rounded-full bg-[oklch(0.85_0.16_90)] animate-pulse" />
-              <span className="tracking-wider uppercase text-[10px] text-accent font-bold">
+              <span className="tracking-wider uppercase text-xs text-accent font-bold">
                 {translationStrings.heroEyebrow[lang]}
               </span>
             </div>
 
-            <h1 className="display text-[1.7rem] sm:text-4xl md:text-6xl lg:text-7xl font-black leading-[1.35] tracking-tight py-2 overflow-visible">
+            <h1 className="display text-[clamp(2.25rem,6vw_+_0.5rem,4.5rem)] text-balance font-black leading-[1.35] tracking-tight py-2 overflow-visible">
               <span className="text-gradient-cyan inline-block uppercase py-1 leading-[1.35]">
                 {lang === "vn" ? "Hợp Tác · Liên Kết" : "Collaboration"}
               </span>

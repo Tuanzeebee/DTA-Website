@@ -96,7 +96,7 @@ export function AboutSection({
                 >
                   <c.icon className="w-3.5 h-3.5 text-accent shrink-0 mt-0.5" />
                   <div className="min-w-0">
-                    <div className="text-[10px] font-bold uppercase tracking-[0.14em] text-muted-foreground/70 leading-none">
+                    <div className="text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground/70 leading-none">
                       {c.label}
                     </div>
                     <div className="text-[12px] font-semibold text-white leading-snug mt-1">

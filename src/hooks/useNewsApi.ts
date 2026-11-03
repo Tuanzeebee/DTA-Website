@@ -37,6 +37,8 @@ export function useTopics() {
       return data.map(mapTopicToMainTopic);
     },
     staleTime: 5 * 60 * 1000,
+    // Máy chủ ngừng thì báo bảo trì sau ~1 giây thay vì ~7 giây (mặc định thử lại 3 lần).
+    retry: 1,
   });
 }
 

@@ -51,7 +51,7 @@ export function MapAddressSection({ lang }: { lang: Lang }) {
 
               <div className="space-y-8 relative z-10">
                 <div>
-                  <span className="text-[10px] font-black uppercase text-accent tracking-widest block mb-2">
+                  <span className="text-xs font-black uppercase text-accent tracking-widest block mb-2">
                     {lang === "vn" ? "ĐỊA CHỈ TRỤ SỞ" : "HEADQUARTERS ADDRESS"}
                   </span>
                   <h4 className="text-xl md:text-2xl font-black text-white leading-snug mb-4">
@@ -193,7 +193,7 @@ export function MapAddressSection({ lang }: { lang: Lang }) {
                 >
                   {/* Label pill */}
                   <div className="mb-2 px-3 py-1.5 rounded-full glass border border-accent/30 shadow-[0_0_20px_oklch(0.85_0.16_90_/_0.25)] whitespace-nowrap">
-                    <span className="text-[10px] font-black uppercase tracking-wider text-accent">
+                    <span className="text-xs font-black uppercase tracking-wider text-accent">
                       {lang === "vn" ? "Trụ sở DTA tại đây" : "DTA HQ is here"}
                     </span>
                   </div>
