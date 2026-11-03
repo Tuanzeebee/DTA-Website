@@ -420,6 +420,11 @@
 
 .card-solid {
   background-color: oklch(0.17 0.04 160 / 0.92);
+  /* Nền đặc 92% → blur phía sau gần như không thấy, nhưng rất tốn GPU: thẻ
+     Danh bạ chạy marquee buộc trình duyệt blur lại mỗi khung hình (gây giật
+     khi cuộn qua Logo/Danh bạ hội viên). */
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
 
 /* Gold variant for the featured / accent card — now bronze-toned. */
@@ -653,6 +658,7 @@
 .animate-marquee {
   display: flex;
   width: max-content;
+  will-change: transform;
   animation: marquee 40s linear infinite;
 }
 
@@ -663,6 +669,7 @@
 .animate-marquee-reverse {
   display: flex;
   width: max-content;
+  will-change: transform;
   animation: marquee 40s linear infinite reverse;
 }
 

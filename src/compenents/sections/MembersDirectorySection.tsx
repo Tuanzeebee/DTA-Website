@@ -72,6 +72,7 @@ function MemberCard({
           <img
             src={org.logoUrl}
             alt={org.name}
+            decoding="async"
             referrerPolicy="no-referrer"
             className="w-full h-full object-contain p-0.5 bg-white rounded-2xl"
           />

@@ -62,6 +62,7 @@ export function MemberLogosSection({ lang }: { lang: Lang }) {
                 src={m.logoUrl}
                 alt={m.name}
                 loading="lazy"
+                decoding="async"
                 referrerPolicy="no-referrer"
                 className="max-h-full max-w-full object-contain"
               />
