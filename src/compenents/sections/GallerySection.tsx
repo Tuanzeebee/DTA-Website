@@ -11,6 +11,15 @@ import { useGallery } from "@/hooks/useGallery";
 import type { Lang } from "@/types";
 
 /** One banner card. Click opens the lightbox at this photo. */
+/**
+ * Ảnh upload vào Thư viện có bản thu nhỏ .thumb.webp (≤640px) do backend tạo.
+ * Banner chỉ hiển thị 288×192 — giải mã ảnh gốc 1600–2000px khi cuộn tới gây giật.
+ */
+const thumbOf = (url: string) =>
+  url.startsWith("/uploads/gallery/") && !url.endsWith(".thumb.webp")
+    ? url.replace(/\.[^./]+$/, ".thumb.webp")
+    : url;
+
 function PhotoCard({
   photo,
   lang,
@@ -26,7 +35,12 @@ function PhotoCard({
       className="group relative w-72 h-48 shrink-0 overflow-hidden rounded-2xl border border-white/10 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
     >
       <img
-        src={photo.imageUrl}
+        src={thumbOf(photo.imageUrl)}
+        // Chưa có thumbnail (ảnh cũ chưa chạy gallery:thumbs) → dùng ảnh gốc.
+        onError={(e) => {
+          if (e.currentTarget.src !== new URL(photo.imageUrl, location.href).href)
+            e.currentTarget.src = photo.imageUrl;
+        }}
         alt={
           photo.caption ??
           (lang === "vn" ? "Ảnh thư viện DTA" : "DTA gallery photo")
