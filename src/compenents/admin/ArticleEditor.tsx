@@ -831,6 +831,13 @@ function BlockListEditor({
     commit(next);
   };
   const add = (block: ArticleBlock) => commit([...items, newBlockItem(block)]);
+  /* Insert right below a block — no dragging a new image up from the bottom. */
+  const insertAfter = (id: string, block: ArticleBlock) => {
+    const i = items.findIndex((x) => x.id === id);
+    const next = [...items];
+    next.splice(i + 1, 0, newBlockItem(block));
+    commit(next);
+  };
 
   return (
     <div>
@@ -853,6 +860,7 @@ function BlockListEditor({
             onUpdate={update}
             onRemove={remove}
             onMove={move}
+            onInsertAfter={insertAfter}
           />
         ))}
       </Reorder.Group>
@@ -880,6 +888,7 @@ function BlockCard({
   onUpdate,
   onRemove,
   onMove,
+  onInsertAfter,
 }: {
   item: BlockItem;
   index: number;
@@ -887,6 +896,7 @@ function BlockCard({
   onUpdate: (id: string, block: ArticleBlock) => void;
   onRemove: (id: string) => void;
   onMove: (id: string, dir: -1 | 1) => void;
+  onInsertAfter: (id: string, block: ArticleBlock) => void;
 }) {
   const controls = useDragControls();
   const { block } = item;
@@ -924,6 +934,14 @@ function BlockCard({
               ? "BOX điểm nhấn"
               : "Ảnh"}
         </span>
+        {typeof block === "string" && (
+          <IconBtn
+            label="Chèn ảnh ngay dưới đoạn này"
+            onClick={() => onInsertAfter(item.id, { src: "", align: "center" })}
+          >
+            <ImageIcon className="w-3.5 h-3.5" />
+          </IconBtn>
+        )}
         <IconBtn
           label="Lên"
           onClick={() => onMove(item.id, -1)}

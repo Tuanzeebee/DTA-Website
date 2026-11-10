@@ -142,7 +142,7 @@ export function ArticleCard({
         params={{ slug: article.id }}
         className="group flex gap-4 py-4"
       >
-        <div className="w-28 md:w-36 shrink-0 overflow-hidden rounded-xl border border-white/10">
+        <div className="w-28 md:w-36 shrink-0 self-center aspect-video overflow-hidden rounded-xl border border-white/10">
           <img
             src={article.image}
             alt=""
@@ -232,8 +232,8 @@ export function TopStories({ articles }: { articles: PortalArticle[] }) {
           params={{ slug: lead.id }}
           className="group block lg:col-span-7"
         >
-          <article className="card-surface relative rounded-2xl overflow-hidden h-full">
-            <div className="aspect-[16/10] h-full overflow-hidden">
+          <article className="card-surface relative rounded-2xl overflow-hidden">
+            <div className="aspect-video overflow-hidden">
               <img
                 src={lead.image}
                 alt=""
@@ -283,7 +283,7 @@ export function TopStories({ articles }: { articles: PortalArticle[] }) {
               params={{ slug: a.id }}
               className="group flex items-center gap-4 py-4 first:pt-0 last:pb-0"
             >
-              <div className="w-28 md:w-32 shrink-0 aspect-[4/3] rounded-xl overflow-hidden border border-white/10">
+              <div className="w-28 md:w-32 shrink-0 aspect-video rounded-xl overflow-hidden border border-white/10">
                 <img
                   src={a.image}
                   alt=""
