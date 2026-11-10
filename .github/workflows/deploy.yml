@@ -1,0 +1,71 @@
+# Deploy frontend lên VPS Windows của DTA (IIS phục vụ thư mục dist).
+# Chạy trên self-hosted runner cài tại server (nhãn "dta"). Repo backend có
+# workflow + runner riêng. Cài runner: deploy/install-runner.ps1
+#
+# Build trong thư mục làm việc của runner, rồi mirror dist/ sang thư mục IIS.
+# dist/web.config đi kèm bản build nên rule rewrite luôn khớp code.
+#
+# Biến tùy chọn (Settings → Secrets and variables → Actions → Variables):
+#   FRONTEND_DIST_DIR mặc định C:\DTAWeb\DTA-Website-main\dta-news\dist
+
+name: Deploy frontend
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-frontend
+  cancel-in-progress: false
+
+defaults:
+  run:
+    shell: powershell
+
+jobs:
+  deploy:
+    # Off until the runner is installed: set repo variable DEPLOY_ENABLED=true.
+    if: vars.DEPLOY_ENABLED == 'true'
+    runs-on: [self-hosted, windows, dta]
+    environment: production
+    env:
+      LIVE: ${{ vars.FRONTEND_DIST_DIR || 'C:\DTAWeb\DTA-Website-main\dta-news\dist' }}
+      BACKUP: C:\DTAWeb\releases\frontend-prev
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install and build
+        run: |
+          $ErrorActionPreference = 'Stop'
+          npm ci;        if ($LASTEXITCODE) { throw 'npm ci failed' }
+          npm run build; if ($LASTEXITCODE) { throw 'build failed' }
+          if (-not (Test-Path dist\index.html)) { throw 'dist\index.html missing' }
+
+      - name: Backup current dist
+        run: |
+          robocopy "$env:LIVE" "$env:BACKUP" /MIR /NFL /NDL /NJH /NJS /NP | Out-Null
+          if ($LASTEXITCODE -ge 8) { throw 'backup failed' }
+          $global:LASTEXITCODE = 0
+
+      - name: Publish dist
+        id: swap
+        run: |
+          robocopy dist "$env:LIVE" /MIR /NFL /NDL /NJH /NJS /NP | Out-Null
+          if ($LASTEXITCODE -ge 8) { throw 'publish failed' }
+          $global:LASTEXITCODE = 0
+
+      - name: Health check
+        run: |
+          $html = Get-Content "$env:LIVE\index.html" -Raw
+          if ($html -notmatch '<div id="root">') { throw 'index.html looks wrong' }
+          Write-Host 'Frontend OK'
+
+      - name: Rollback
+        # Only if live files were touched; a failed build leaves prod as-is.
+        if: failure() && steps.swap.outcome != 'skipped'
+        run: |
+          if (-not (Test-Path "$env:BACKUP\index.html")) { Write-Host 'No backup yet'; exit 0 }
+          robocopy "$env:BACKUP" "$env:LIVE" /MIR /NFL /NDL /NJH /NJS /NP | Out-Null
+          Write-Host 'Rolled back to previous release'
+          exit 0
