@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
+import { copyText } from "@/lib/utils";
 import {
   Check,
   XCircle,
@@ -148,7 +149,7 @@ function AdminApplications() {
   const copyCreds = async () => {
     if (!creds) return;
     try {
-      await navigator.clipboard.writeText(
+      await copyText(
         `DTA - Tai khoan Không gian số\nEmail: ${creds.email}\nMat khau: ${creds.tempPassword}\nDang nhap tai /dang-nhap va doi mat khau ngay.`,
       );
       toast.success("Đã copy tài khoản.");

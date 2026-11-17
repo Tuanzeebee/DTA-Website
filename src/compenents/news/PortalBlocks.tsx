@@ -38,6 +38,7 @@ import {
   type ArticleFlag,
 } from "@/newsData";
 import { useTopics, useArticles, useAds, useDigest } from "@/hooks/useNewsApi";
+import { copyText } from "@/lib/utils";
 
 export interface ArticleListSearch {
   sort?: ArticleSort;
@@ -902,8 +903,7 @@ export function ReaderUtilityBar({
     }
   };
   const copy = () => {
-    navigator.clipboard
-      .writeText(window.location.href)
+    copyText(window.location.href)
       .then(() =>
         toast.success(
           lang === "vn" ? "Đã sao chép liên kết bài viết." : "Link copied.",
